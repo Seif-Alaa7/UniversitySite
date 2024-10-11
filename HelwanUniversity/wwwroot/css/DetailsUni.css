@@ -1,0 +1,67 @@
+﻿.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.university-header {
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+    .university-header img {
+        max-width: 300px;
+        height: auto;
+        border-radius: 10px;
+    }
+
+.university-details {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    .university-details h4 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .university-details dl {
+        margin: 0;
+    }
+
+    .university-details dt {
+        font-weight: bold;
+        padding: 10px 0;
+    }
+
+    .university-details dd {
+        margin: 0;
+        padding: 0 0 10px;
+    }
+
+.action-links {
+    text-align: center;
+    margin-top: 20px;
+}
+.text-Arabic {
+    font-family: "Cairo", sans-serif;
+    font-size: 16px;
+}
+.edit-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}

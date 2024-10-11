@@ -1,0 +1,52 @@
+﻿@model Doctor
+@{
+    ViewData["Title"] = "Personal Data";
+}
+
+<!-- Styles -->
+<style>
+    .badge-info {
+        color: white !important;
+        background-color: #17a2b8 !important;
+    }
+</style>
+<div class="container py-5">
+    <h2 class="text-center mb-5 font-weight-bold">Personal Data</h2>
+    <div class="card shadow-lg rounded-lg overflow-hidden">
+        <div class="row no-gutters">
+            @if (!string.IsNullOrEmpty(Model.Picture))
+            {
+                <div class="col-lg-4">
+                    <img src="@Model.Picture" class="card-img h-100 object-fit-cover" alt="@Model.Name">
+                </div>
+            }
+            <div class="@(string.IsNullOrEmpty(Model.Picture) ? "col-lg-12" : "col-lg-8")">
+                <div class="card-body p-5">
+                    <h3 class="card-title mb-4 text-primary">@Model.Name</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="card-text"><i class="fas fa-venus-mars mr-2"></i><strong>Gender:</strong> @Model.Gender</p>
+                            <p class="card-text"><i class="fas fa-pray mr-2"></i><strong>Religion:</strong> @Model.Religion</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="card-text"><i class="fas fa-map-marker-alt mr-2"></i><strong>Address:</strong> @(string.IsNullOrEmpty(Model.Address) ? "N/A" : Model.Address)</p>
+                            <p class="card-text">
+                                <i class="fas fa-user-md mr-2"></i><strong>Job Title:</strong>
+                                <span class="badge badge-info">@Model.JobTitle</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="@Url.Action("ChangePicture", "Doctor", new { id = Model.Id })" class="btn btn-primary mr-2">
+                            <i class="fas fa-camera mr-1"></i> Change Personal Picture
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

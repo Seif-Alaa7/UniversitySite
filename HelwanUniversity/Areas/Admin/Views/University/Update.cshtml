@@ -1,0 +1,120 @@
+﻿@model ViewModels.UniversityVM
+
+@{
+    ViewData["Title"] = "Update Univeristy";
+}
+
+<link rel="icon" href="@ViewBag.LogoTitle" type="image/png">
+
+<!-- Stylesheet -->
+<link rel="stylesheet" href="/css/Picture.css">
+
+<h1 class="text-center">Update University</h1>
+<br/>
+
+<div class="card mb-3">
+    <div class="row no-gutters">
+        <div class="col-md-8">
+            <div class="card-body">
+                <h4 class="card-title">Edit Form</h4>
+
+                <!-- Form -->
+                <form asp-action="SaveUpdate" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <input type="hidden" asp-for="Id" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control"/>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="Description" class="control-label"></label>
+                        <input asp-for="Description" class="form-control"/>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <label asp-for="Logo" class="control-label" style="margin-top:15px;"></label>
+                    <div>
+                        <img src="@Model.Logo" alt="Current Image" style="max-width: 150px; max-height: 150px;" />
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="LogoFile" class="control-label"></label>
+                        <input asp-for="LogoFile" type="file" class="form-control-file" id="profilePicture" style="display:none;" />
+                        <div id="logoPreview" class="mt-2"></div>
+                        <label for="profilePicture" class="custom-file-upload">
+                            <i class="fa fa-upload"></i> Upload Logo
+                        </label>
+                    </div>
+                    <label asp-for="MainPicture" class="control-label" style="margin-top:15px;"></label>
+                    <div>
+                        <img src="@Model.MainPicture" alt="Current Image" style="max-width: 150px; max-height: 150px;" />
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="MainPictureFile" class="control-label"></label>
+                        <input asp-for="MainPictureFile" type="file" class="form-control-file" id="pictureInput" style="display:none;" />
+                        <div id="mainPicturePreview" class="mt-2"></div>
+                        <label for="pictureInput" class="custom-file-upload">
+                            <i class="fa fa-upload"></i> Upload Picture File
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="FacebookPage" class="control-label"></label>
+                        <input asp-for="FacebookPage" class="form-control" />
+                        <span asp-validation-for="FacebookPage" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="LinkedInPage" class="control-label"></label>
+                        <input asp-for="LinkedInPage" class="form-control" />
+                        <span asp-validation-for="LinkedInPage" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="MainPage" class="control-label"></label>
+                        <input asp-for="MainPage" class="form-control" />
+                        <span asp-validation-for="MainPage" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="ContactMail" class="control-label"></label>
+                        <input asp-for="ContactMail" class="form-control" />
+                        <span asp-validation-for="ContactMail" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="HistoricalBackground" class="control-label"></label>
+                        <input asp-for="HistoricalBackground" class="form-control" />
+                        <span asp-validation-for="HistoricalBackground" class="text-danger"></span>
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label asp-for="GoogleForm" class="control-label">Google Form</label>
+                        <input asp-for="GoogleForm" class="form-control" />
+                        <span asp-validation-for="GoogleForm" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" asp-for="ViewCount" class="form-control" />
+                    </div>
+                    <div class="form-group" style="margin-top:15px;">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                        <button type="button" onclick="cancelForm()" class="btn btn-secondary">
+                            Cancel
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex justify-content-center align-items-center">
+            <img src="@ViewBag.ImgUpdate" class="img-fluid" alt="Update Page Img">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="/js/picture.js" defer></script>
+    }
+}
+<script>
+    function cancelForm() {
+        window.location.href = 'Details';
+    }
+</script>

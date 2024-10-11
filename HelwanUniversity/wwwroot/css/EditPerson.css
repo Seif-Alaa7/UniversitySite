@@ -1,0 +1,149 @@
+﻿/* EditStudent.css */
+
+/* Basic Reset and Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Form Container */
+form {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Form Labels */
+.form-label {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Input Fields */
+input.form-control, select.form-select {
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    font-size: 1rem;
+}
+
+/* Validation Error */
+.text-danger {
+    font-size: 0.875rem;
+    color: #d9534f;
+}
+
+/* Picture Preview */
+#currentPicturePreview {
+    text-align: center;
+}
+
+    #currentPicturePreview img {
+        max-width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+/* Custom File Upload */
+.custom-file-upload {
+    border: 1px solid #ddd;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #007bff;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+    .custom-file-upload:hover {
+        background-color: #e9ecef;
+        color: #0056b3;
+    }
+
+    .custom-file-upload i {
+        margin-right: 0.5rem;
+    }
+
+/* Button Styles */
+.btn {
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+/* Margin and Padding Adjustments */
+.mb-3, .mb-4, .mt-2, .mt-4 {
+    margin-bottom: 1rem;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+}
+.Divider {
+    border: 1px solid #000;
+}
+.card {
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+    border-bottom: 0;
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.form-control-file {
+    margin-top: 10px;
+}
+
+.img-preview {
+    margin-top: 20px;
+    max-width: 100%;
+    height: auto;
+}

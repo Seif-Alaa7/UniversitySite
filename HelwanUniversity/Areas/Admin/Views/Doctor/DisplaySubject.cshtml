@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Models.Subject>
+@{
+    ViewData["Title"] = "Doctor Subjects";
+}
+
+<!-- StyleSheet -->
+<link rel="stylesheet" href="/css/DisplaySubject.css">
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info" role="alert">
+        @ViewBag.Message
+    </div>
+}
+else
+{
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Subject</th>
+                <th>Departments</th>
+                <th>Register Results</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subject in Model)
+            {
+                <tr>
+                    <td>@subject.Name</td>
+                    <td>
+                        @if (ViewBag.SubjectDepartments.ContainsKey(subject.Id))
+                        {
+                            <ul class="list-unstyled centered-content">
+                                @foreach (var departmentId in ViewBag.SubjectDepartments[subject.Id])
+                                {
+                                    <li>
+                                        @ViewBag.DepartmentDictionary[departmentId]
+                                        <a href="@Url.Action("StudentsByDepartment", "Student", new { id = departmentId })" class="ml-2" title="View Students">
+                                            <i class="fas fa-user"></i>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p>There are No Departments for this Subject</p>
+                        }
+                    </td>
+                    <td>
+                        <a href="@Url.Action("StudentSubjectRegistered", "StudentSubjects", new { id = subject.Id })" class="ml-2" title="Register Results">
+                            <i class="fas fa-clipboard-list fa-lg"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+

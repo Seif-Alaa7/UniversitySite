@@ -1,0 +1,227 @@
+﻿@page
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using Models.Enums
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+<link rel="stylesheet" href="/css/Register.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <img width="48" height="48" src="https://img.icons8.com/pulsar-line/48/FFFFFF/add-user-male.png" alt="add-user-male"/>
+                        @ViewData["Title"]
+                        </h2>
+                </div>
+                <div class="card-body">
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
+                        <h3 class="mb-4">Create a new account</h3>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-4">
+                            <input asp-for="Input.Picture" type="file" class="form-control-file" id="profilePicture" style="display:none;" />
+                            <div id="picturePreview" class="mt-2"></div>
+                            <label for="profilePicture" class="custom-file-upload">
+                                  <i class="fa fa-upload"></i> Upload Profile Picture
+                            </label>
+                            <span asp-validation-for="Input.Picture" class="text-danger"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Input.Email" class="form-label">Email</label>
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="StudentId@Faculty.helwan.edu.eg" />
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Input.Password" class="form-label">Password</label>
+                                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Password" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
+                                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirm password" />
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label d-block">User Type</label>
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="Input.UserType" id="studentType" value="Student" autocomplete="off" checked>
+                                <label class="btn btn-outline-primary" for="studentType">Student</label>
+
+                                <input type="radio" class="btn-check" name="Input.UserType" id="doctorType" value="Doctor" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="doctorType">Doctor</label>
+
+                                <input type="radio" class="btn-check" name="Input.UserType" id="highboardType" value="HighBoard" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="highboardType">High Board</label>
+                            </div>
+                        </div>
+                        <!-- Student Fields -->
+                        <div id="studentFields" class="type-specific-fields">
+                            <h4 class="mt-4 mb-3">Student Information</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Input.StudentName" class="form-label">Name</label>
+                                    <input asp-for="Input.StudentName" class="form-control" placeholder="Full Name" />
+                                    <span asp-validation-for="Input.StudentName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Input.StudentPhoneNumber" class="form-label">Phone Number</label>
+                                    <input asp-for="Input.StudentPhoneNumber" id="PhoneNumber" name="Input.StudentPhoneNumber" class="form-control" type="tel" />
+                                    <span asp-validation-for="Input.StudentPhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Input.StudentAddress" class="form-label">Address</label>
+                                <input asp-for="Input.StudentAddress" class="form-control" placeholder="Address" />
+                                <span asp-validation-for="Input.StudentAddress" class="text-danger"></span>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label asp-for="Input.StudentNationality" class="form-label">Nationality</label>
+                                    <input asp-for="Input.StudentNationality" class="form-control" value="Egyptian" />
+                                    <span asp-validation-for="Input.StudentNationality" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="Input.StudentGender" class="form-label">Gender</label>
+                                    <select asp-for="Input.StudentGender" class="form-select">
+                                        <option disabled><--Select--></></option>
+                                        <option value="@Gender.Male">Male</option>
+                                        <option value="@Gender.Female">Female</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="Input.StudentReligion" class="form-label">Religion</label>
+                                    <select asp-for="Input.StudentReligion" class="form-select">
+                                        <option disabled><--Select--></></option>
+                                        <option value="@Religion.Muslim">Muslim</option>
+                                        <option value="@Religion.Christian">Christian</option>
+                                        <option value="@Religion.Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Input.StudentBirthDate" class="form-label">Birth Date</label>
+                                    <input asp-for="Input.StudentBirthDate" class="form-control" type="date" />
+                                    <span asp-validation-for="Input.StudentBirthDate" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Input.StudentDepartmentId" class="form-label">Department</label>
+                                    <select asp-for="Input.StudentDepartmentId" class="form-select" asp-items="@ViewBag.Departments">
+                                        <option disabled><--Select--></></option>
+                                    </select>
+                                    <span asp-validation-for="Input.StudentDepartmentId" class="text-danger"></span>
+                                </div>
+                            </div>
+                                <input type="hidden" asp-for="Input.StudentPaymentFees" class="form-control" value=false/>
+                            </div>
+
+                        <!-- Doctor Fields -->
+                        <div id="doctorFields" class="type-specific-fields" style="display:none;">
+                            <h4 class="mt-4 mb-3">Doctor Information</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Input.DoctorName" class="form-label">Name</label>
+                                    <input asp-for="Input.DoctorName" class="form-control" placeholder="Full Name" />
+                                    <span asp-validation-for="Input.DoctorName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Input.DoctorJobTitle" class="form-label">Job Title</label>
+                                    <select asp-for="Input.DoctorJobTitle" class="form-select">
+                                        <option disabled><--Select--></></option>
+                                        <option value="@JobTitle.Prof_Doctor">Professor Doctor</option>
+                                        <option value="@JobTitle.Doctor">Doctor</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Input.DoctorAddress" class="form-label">Address</label>
+                                <input asp-for="Input.DoctorAddress" class="form-control" placeholder="Address" />
+                                <span asp-validation-for="Input.DoctorAddress" class="text-danger"></span>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Input.DoctorGender" class="form-label">Gender</label>
+                                    <select asp-for="Input.DoctorGender" class="form-select">
+                                        <option disabled><--Select--></></option>
+                                        <option value="@Gender.Male">Male</option>
+                                        <option value="@Gender.Female">Female</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Input.DoctorReligion" class="form-label">Religion</label>
+                                    <select asp-for="Input.DoctorReligion" class="form-select">
+                                        <option disabled><--Select--></></option>
+                                        <option value="@Religion.Muslim">Muslim</option>
+                                        <option value="@Religion.Christian">Christian</option>
+                                        <option value="@Religion.Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- High Board Fields -->
+                        <div id="highboardFields" class="type-specific-fields" style="display:none;">
+                            <h4 class="mt-4 mb-3">High Board Information</h4>
+                            <div class="mb-3">
+                                <label asp-for="Input.HighBoardName" class="form-label">Name</label>
+                                <input asp-for="Input.HighBoardName" class="form-control" placeholder="Full Name" />
+                                <span asp-validation-for="Input.HighBoardName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Input.HighBoardDescription" class="form-label">Description</label>
+                                <textarea asp-for="Input.HighBoardDescription" class="form-control" rows="3" placeholder="Description"></textarea>
+                                <span asp-validation-for="Input.HighBoardDescription" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Input.HighBoardJobTitle" class="form-label">Job Title</label>
+                                <select asp-for="Input.HighBoardJobTitle" class="form-select">
+                                    <option disabled><--Select--></></option>
+                                    <option value="@JobTitle.VP_For_Finance">VP For Finance</option>
+                                    <option value="@JobTitle.DeanOfFaculty">Dean of Faculty</option>
+                                    <option value="@JobTitle.VicePrecident">Vice President</option>
+                                    <option value="@JobTitle.HeadOfDepartment">Head of Department</option>
+                                    <option value="@JobTitle.President">President</option>
+                                    <option value="@JobTitle.VP_For_AcademicAffairs">VP For Academic Affairs</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Input.Role" class="form-label">Role</label>
+                            <select asp-for="Input.Role" asp-items="@Model.Input.ListOfRoles" class="form-select">
+                                <option disabled selected value="">-- Select --</option>
+                            </select>
+                            <span asp-validation-for="Input.Role" class="text-danger"></span>
+                        </div>
+
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="/js/Register.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>

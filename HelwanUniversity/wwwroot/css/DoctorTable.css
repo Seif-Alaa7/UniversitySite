@@ -1,0 +1,59 @@
+﻿body {
+    background-color: #f4f4f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-family: 'Roboto', sans-serif;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.filter-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #2c3e50;
+    border-radius: 5px;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+    .table th, .table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+.thead-dark th {
+    background-color: #2c3e50;
+    color: #fff;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+.action-link img {
+    transition: transform 0.3s ease;
+}
+
+    .action-link img:hover {
+        transform: scale(1.2);
+    }
+
+.btn-danger {
+    background-color: #e74c3c;
+    border: none;
+}
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+    }

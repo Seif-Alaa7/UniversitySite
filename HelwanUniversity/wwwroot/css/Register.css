@@ -1,0 +1,47 @@
+.iti {
+    width: 100%;
+}
+
+.iti__country-list {
+    max-height: 300px;
+    overflow-y: auto;
+    width: 400%;
+}
+
+    .iti__country-list .iti__country {
+        display: block;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+        .iti__country-list .iti__country:hover,
+        .iti__country-list .iti__country:focus {
+            background-color: #e6e6e6;
+        }
+
+    .iti__country-list .iti__country-name {
+        display: inline-block;
+    }
+
+    .iti__country-list .iti__dial-code {
+        display: inline-block;
+        float: right;
+    }
+.custom-file-upload {
+    display: inline-block;
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    text-align: center;
+}
+
+    .custom-file-upload i {
+        margin-right: 5px;
+    }
+
+    .custom-file-upload:hover {
+        background-color: #e2e6ea; 
+    }

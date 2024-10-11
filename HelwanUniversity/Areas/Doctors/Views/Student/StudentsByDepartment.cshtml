@@ -1,0 +1,119 @@
+﻿@model IEnumerable<Models.Student>
+@using Models.Enums;
+@{
+    ViewData["Title"] = "Students";
+    var records = ViewBag.Records as Dictionary<int, (Level Level, Semester Semester)>;
+}
+
+<h1 class="my-4 text-center">@ViewData["Title"]</h1>
+<h3 class="my-4 text-center">
+    @ViewData["DepartmentName"] Department - @ViewData["FacultyName"] Faculty
+</h3>
+
+<!-- Styles -->
+<style>
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+        .table td a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .table td a:hover {
+                color: #0056b3;
+            }
+</style>
+
+<div class="container">
+    <table class="table table-hover table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Id)</th>
+                <th>@Html.DisplayNameFor(model => model.Name)</th>
+                <th>Level</th>
+                <th>Semester</th>
+                <th>Register Subjects</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                        <a href="@Url.Action("Details", "Student", new { id = item.Id })" class="ml-2" title="View Student">
+                            <i class="fas fa-user"></i>
+                        </a>
+                    </td>
+                    <td>
+                        @if (records != null && records.ContainsKey(item.Id))
+                        {
+                            @records[item.Id].Level
+                        }
+                        else
+                        {
+                            @:N/A
+                        }
+                    </td>
+                    <td>
+                        @if (records != null && records.ContainsKey(item.Id))
+                        {
+                            @records[item.Id].Semester
+                        }
+                        else
+                        {
+                            @:N/A
+                        }
+                    </td>
+                    <td>
+                        @if(ViewBag.Doctor is Doctor)
+                        {
+                            <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" title="Register Subject">
+                                <i class="fas fa-plus fa-lg"></i>
+                            </a>
+                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" title="Registered Subjects">
+                                <i class="fas fa-book"></i>
+                            </a>
+                        }
+                        else if(ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.DeanOfFaculty)
+                        {
+                            <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" title="Register Subject">
+                                <i class="fas fa-plus fa-lg"></i>
+                            </a>
+                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" title="Registered Subjects">
+                                <i class="fas fa-book"></i>
+                            </a>
+                            <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" title="View Degrees">
+                                <i class="fas fa-eye icon-lg"></i>
+                            </a>
+                            <a href="@Url.Action("ResultsRegisteration", "Subject", new { id = item.Id })" title="Register Results">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                        }
+                        else if(ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.HeadOfDepartment)
+                        {
+                            <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" title="Register Subject">
+                                <i class="fas fa-plus fa-lg"></i>
+                            </a>
+                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" title="Registered Subjects">
+                                <i class="fas fa-book"></i>
+                            </a>
+                            <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" title="View Degrees">
+                                <i class="fas fa-eye icon-lg"></i>
+                            </a>
+                            <a href="@Url.Action("ResultsRegisteration", "Subject", new { id = item.Id })" title="Register Results">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

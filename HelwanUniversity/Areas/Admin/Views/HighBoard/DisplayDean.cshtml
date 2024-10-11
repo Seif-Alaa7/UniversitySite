@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Models.HighBoard>
+
+@{
+    ViewData["Title"] = "All Deans";
+}
+<!-- Stylesheet -->
+<link rel="stylesheet" href="/css/DisplayDeanHead.css">
+
+<h1 class="text-center my-4 Title">
+    All Deans
+</h1>
+
+<input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by name" class="form-control mb-4 Fiter">
+
+<table class="table table-hover table-striped Column" id="deansTable">
+    <thead class="thead-light">
+        <tr>
+            <th>Picture</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Faculty</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr style="">
+                <td>
+                    <img src="@item.Picture" alt="Current Image" class="img-fluid rounded-circle HighboardPhoto">
+                </td>
+                <td class="name-column" style="vertical-align: middle;">@Html.DisplayFor(modelItem => item.Name)</td>
+                <td style="vertical-align: middle;">@Html.DisplayFor(modelItem => item.Description)</td>
+                @if (ViewBag.Faculty.ContainsKey(item.Id) && ViewBag.Faculty[item.Id] != null)
+                {
+                    <td>@ViewBag.Faculty[item.Id]</td>
+                }
+                else
+                {
+                    <td>
+                        No Faculty Determined
+                    </td>
+                }
+                <td style="vertical-align: middle;">
+                    @Html.ActionLink(
+                             "Edit",
+                             "Edit",
+                             new { id = item.Id },
+                             new { @class = "btn btn-primary btn-sm rounded-pill px-3" }
+                             )
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: inline;" class="mx-1">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3" onclick="return confirm('Are you sure you want to delete this Dean?');">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Script -->
+<script src="/js/Highboard.js"></script>
+

@@ -1,0 +1,63 @@
+﻿@model Models.Student
+@{
+    ViewData["Title"] = "Personal Data";
+}
+
+<!-- Styles -->
+<style>
+    .badge-danger {
+        color: white !important;
+        background-color: red !important;
+    }
+
+    .badge-success {
+        color: white !important;
+        background-color: green !important;
+    }
+</style>
+<div class="container py-5">
+    <h2 class="text-center mb-5 font-weight-bold">Personal Data</h2>
+    <div class="card shadow-lg rounded-lg overflow-hidden">
+        <div class="row no-gutters">
+            @if (!string.IsNullOrEmpty(Model.Picture))
+            {
+                <div class="col-lg-4">
+                    <img src="@Model.Picture" class="card-img h-100 object-fit-cover" alt="@Model.Name">
+                </div>
+            }
+            <div class="@(string.IsNullOrEmpty(Model.Picture) ? "col-lg-12" : "col-lg-8")">
+                <div class="card-body p-5">
+                    <h3 class="card-title mb-4 text-primary">@Model.Name</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="card-text"><i class="fas fa-id-badge mr-2"></i><strong>Id:</strong> @Model.Id</p>
+                            <p class="card-text"><i class="fas fa-flag mr-2"></i><strong>Nationality:</strong> @Model.Nationality</p>
+                            <p class="card-text"><i class="fas fa-venus-mars mr-2"></i><strong>Gender:</strong> @Model.Gender</p>
+                            <p class="card-text"><i class="fas fa-pray mr-2"></i><strong>Religion:</strong> @Model.Religion</p>
+                            <p class="card-text"><i class="fas fa-birthday-cake mr-2"></i><strong>Birth Date:</strong> @Model.BirthDate.ToString("d")</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="card-text"><i class="fas fa-map-marker-alt mr-2"></i><strong>Address:</strong> @Model.Address</p>
+                            <p class="card-text"><i class="fas fa-phone mr-2"></i><strong>Phone Number:</strong> @Model.PhoneNumber</p>
+                            <p class="card-text"><i class="fas fa-calendar-check mr-2"></i><strong>Admission Date:</strong> @Model.AdmissionDate.ToString("d")</p>
+                            <p class="card-text">
+                                <i class="fas fa-money-bill-wave mr-2"></i><strong>Fees:</strong>
+                                <span class="badge @(Model.PaymentFees ? "badge-success" : "badge-danger")">
+                                    @(Model.PaymentFees ? "Paid" : "Unpaid")
+                                </span>
+                            </p>
+                            @if (Model.PaymentFees)
+                            {
+                                <p class="card-text"><i class="fas fa-calendar-alt mr-2"></i><strong>Payment Date:</strong> @Model.PaymentFeesDate?.ToString("d")</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

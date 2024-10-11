@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Models.DepartmentSubjects>
+
+@{
+    ViewData["Title"] = "Academic Registration";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>@ViewData["Title"] - Helwan University</title>
+    <link rel="icon" href="@ViewBag.LogoTitle" type="image/png">
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/SubjectRegisteration.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/SideBar.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Sidebar Partial -->
+    @await Html.PartialAsync("~/Areas/Students/Views/Shared/StudentSidebar.cshtml")
+
+    <div id="main-content" class="container">
+        <h1 class="custom-header">Academic Registration</h1>
+        <br />
+        <table class="table table-striped table-bordered custom-table">
+            <thead>
+                <tr>
+                        <th style="color: black">@Html.DisplayNameFor(model => model.Subject.Name)</th>
+                        <th style="color: black">@Html.DisplayName("Summer Status")</th>
+                        <th style ="color: black">@Html.DisplayName("Summer Allowed")</th>
+                        <th style="color: black">@Html.DisplayName("Subject Type")</th>
+                        <th style="color: black">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Subject.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Subject.summerStatus)</td>
+                        @if (item.Subject.summerStatus == Models.Enums.SummerStatus.Open)
+                        {
+                            <td>@Html.DisplayFor(modelItem => item.Subject.StudentsAllowed)</td>
+                        }
+                        else
+                        {
+                            <td>0</td>
+                        }
+                        <td>@Html.DisplayFor(modelItem => item.Subject.subjectType)</td>
+                        <td>
+                            @Html.ActionLink("+", "AddSubject", "StudentSubjects", new { Studentid = ViewBag.StudentId, Subjectid = item.Subject.Id }, new { @class = "btn btn-success btn-sm" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+

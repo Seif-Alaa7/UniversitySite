@@ -1,0 +1,53 @@
+﻿@model Faculty
+
+@{
+    ViewData["Title"] = $"{Model.Name} - Faculty Details";
+}
+
+<!-- StyleSheet -->
+<link rel="stylesheet" href="/css/Faculty.css">
+
+<div class="container faculty-details-container">
+    <div class="faculty-card">
+        @if (!string.IsNullOrEmpty(Model.Logo))
+        {
+            <img src="@Model.Logo" class="faculty-logo" alt="@Model.Name Logo">
+        }
+        <h2 class="text-center">@Model.Name Faculty</h2>
+        <div class="faculty-detail mt-4">
+            <div class="faculty-image-wrapper">
+                @if (!string.IsNullOrEmpty(Model.Picture))
+                {
+                    <img src="@Model.Picture" class="faculty-image img-fluid" alt="@Model.Name Image">
+                }
+            </div>
+            <div class="faculty-info-wrapper">
+                <p class="faculty-description">@Model.Description</p>
+                <div class="faculty-info">
+                    <i class="fa fa-eye"></i> <strong>Visitors:</strong> <span>@Model.ViewCount</span>
+                </div>
+                <div class="faculty-info">
+                    <strong>Departments Count:</strong> <span>@Model.Departments.Count</span>
+                </div>
+                <div class="faculty-info">
+                    <i class="fa fa-user-tie"></i> <strong>Dean:</strong> <span>@ViewBag.Dean</span>
+                </div>
+                <br />
+                <h3 class="section-title">Departments:</h3>
+                <ul class="department-list">
+                    @if (Model.Departments != null && Model.Departments.Any())
+                    {
+                        @foreach (var department in Model.Departments)
+                        {
+                            <li>@department.Name</li>
+                        }
+                    }
+                    else
+                    {
+                        <li>No departments available.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

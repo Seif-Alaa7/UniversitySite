@@ -1,0 +1,86 @@
+﻿@model ViewModels.FacultyVMs.FacultyVm
+
+@{
+    ViewData["Title"] = "Edit Faculty";
+}
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="/css/AddEntity.css">
+<link rel="stylesheet" href="/css/EditFaculty.css">
+
+<h1>Update Faculty</h1>
+<h4>Form Edit</h4>
+<hr />
+<div class="card-container">
+    <div class="card-content">
+
+        <!-- Form -->
+        <form asp-action="SaveEdit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input type="hidden" asp-for="Id" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="DeanId" class="form-label">Dean</label>
+                <select asp-for="DeanId" class="form-select" asp-items="@ViewBag.Deans">
+                    <option disabled><--Select--></></option>
+                </select>
+                <span asp-validation-for="DeanId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <label class="control-label">Current Logo</label>
+            <div>
+                <img src="@Model.Logo" alt="Current Image" style="max-width: 150px; max-height: 150px;" />
+            </div>
+            <div class="form-group">
+                <label asp-for="LogoFile" class="control-label"></label>
+                <input asp-for="LogoFile" type="file" class="form-control-file" id="logoInput" style="display:none;" />
+                <div id="logoPreview" class="mt-2"></div>
+                <label for="logoInput" class="custom-file-upload">
+                    <i class="fa fa-upload"></i> Upload Logo
+                </label>                
+                <span asp-validation-for="Logo" class="text-danger"></span>
+            </div>
+            <label class="control-label">Current Picture</label>
+            <div>
+                <img src="@Model.Picture" alt="Current Image" style="max-width: 150px; max-height: 150px;" />
+            </div>
+            <div class="form-group">
+                <label asp-for="PictureFile" class="control-label"></label>
+                <input asp-for="PictureFile" type="file" class="form-control-file" id="pictureInput" style="display:none;" />
+                <div id="picturePreview" class="mt-2"></div>
+                <label for="pictureInput" class="custom-file-upload">
+                    <i class="fa fa-upload"></i> Upload Picture
+                </label>
+                <span asp-validation-for="PictureFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" style="height: 150px;"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="hidden" asp-for="ViewCount" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+    <div class="card-image">
+        @if (!string.IsNullOrEmpty(Model.Picture))
+        {
+            <img src="@ViewBag.iMGUpdate" class="img-fluid" alt="Faculty Image">
+        }
+    </div>
+</div>
+
+<!-- Script -->
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="/js/addEntity.js"></script>
+}

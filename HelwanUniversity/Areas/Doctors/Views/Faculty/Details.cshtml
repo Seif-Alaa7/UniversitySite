@@ -1,0 +1,59 @@
+﻿@model Faculty
+
+@{
+    ViewData["Title"] = $"{Model.Name} Faculty";
+}
+
+<!-- StyleSheet -->
+<link rel="stylesheet" href="/css/Faculty.css">
+
+<div class="container faculty-details-container">
+    <div class="faculty-card">
+        @if (!string.IsNullOrEmpty(Model.Logo))
+        {
+            <img src="@Model.Logo" class="faculty-logo" alt="Logo">
+        }
+        <h2 class="text-center">@Model.Name Faculty</h2>
+        <div class="faculty-detail mt-4">
+            <div class="faculty-image-wrapper">
+                @if (!string.IsNullOrEmpty(Model.Picture))
+                {
+                    <img src="@Model.Picture" class="faculty-image img-fluid" alt="@Model.Name">
+                }
+            </div>
+            <div class="faculty-info-wrapper">
+                <p class="faculty-description">@Model.Description</p>
+                <div class="faculty-info">
+                    <i class="fa fa-eye"></i> <strong>Visitors:</strong> <span>@Model.ViewCount</span>
+                </div>
+                <div class="faculty-info">
+                    <strong>Departments Count:</strong> <span>@Model.Departments.Count</span>
+                </div>
+                <div class="faculty-info">
+                    <i class="fa fa-user-tie"></i><strong> Dean:</strong> <span>@ViewBag.Dean</span>
+                </div>
+                <br/>
+                <h3 class="section-title">Departments:</h3>
+                <ul class="department-list">
+
+                    @foreach (var department in Model.Departments)
+                    {
+                        <li>
+                            @department.Name     <a asp-controller="Department" asp-action="Details" asp-route-id="@department.Id">
+                                <img width="30" height="30" src="https://img.icons8.com/wired/64/1A1A1A/about.png" alt="about" />
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+

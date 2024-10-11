@@ -1,0 +1,110 @@
+﻿@using Models.Enums
+@model Models.Department
+
+@{
+    ViewData["Title"] = $"{Model.Name} Department";
+    Layout = null;
+}
+<title>@ViewData["Title"] - Helwan University</title>
+<link rel="icon" href="@ViewBag.LogoTitle" type="image/png">
+
+<!-- External Stylesheets -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/SideBar.css" />
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/Department.css">
+
+<!-- Sidebar Partial -->
+@await Html.PartialAsync("~/Areas/Students/Views/Shared/StudentSidebar.cshtml")
+
+<div id="main-content" class="container mt-4" style="font-family: 'Roboto', sans-serif; padding-bottom: 120px;">
+    <h1 class="text-center mb-4">@Model.Name Department</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>
+                <img src="@ViewBag.Head.Picture" class="HeadPicture" alt="@ViewBag.Head.Name">
+                <span class="DepartmentInfo">Head:</span> @ViewBag.Head.Name
+            </h4>
+            <br style="margin-top: 10px;"/>
+            <h4>
+                <i class="fas fa-user-graduate" style="margin-right: 5px"></i>
+                <span class="DepartmentInfo">Number Allowed of Students:</span>@Model.Allowed
+            </h4>
+            <h4>
+                <i class="fas fa-user-check" style="margin-right: 5px;"></i>
+                <span class="DepartmentInfo">Number Registered Students:</span> @ViewBag.Students
+            </h4>
+        </div>
+    </div>
+    <div class="filters mb-4">
+        <div class="form-group">
+            <label for="filterSemester" class="filter-label">
+                <i class="fas fa-calendar-alt" style="margin-right: 5px;"></i>
+                Filter by Semester:
+            </label>
+            <select id="filterSemester" class="form-control filter-select" onchange="filterSubjects()">
+                <option value="All">All Semesters</option>
+                <option value="@Semester.First">Semester 1</option>
+                <option value="@Semester.Second">Semester 2</option>
+                <option value="@Semester.Third">Semester 3</option>
+                <option value="@Semester.Fourth">Semester 4</option>
+                <option value="@Semester.Fifth">Semester 5</option>
+                <option value="@Semester.Sixth">Semester 6</option>
+                <option value="@Semester.Seventh">Semester 7</option>
+                <option value="@Semester.Eighth">Semester 8</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="filterLevel" class="filter-label">
+                <i class="fas fa-level-up-alt" style="margin-right: 5px;"></i>
+                Filter by Level:
+            </label>
+            <select id="filterLevel" class="form-control filter-select" onchange="filterSubjects()">
+                <option value="All">All Levels</option>
+                <option value="@Level.First">Level 1</option>
+                <option value="@Level.Second">Level 2</option>
+                <option value="@Level.Third">Level 3</option>
+                <option value="@Level.Fourth">Level 4</option>
+            </select>
+        </div>
+    </div>
+
+    <h3>Subjects</h3>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Subjects.First().Name)</th>
+                <th>@Html.DisplayNameFor(model => model.Subjects.First().Level)</th>
+                <th>@Html.DisplayNameFor(model => model.Subjects.First().Semester)</th>
+                <th>Doctor Name</th>
+                <th>@Html.DisplayName("Subject Hours")</th>
+                <th>@Html.DisplayName("Students Allowed")</th>
+                <th>@Html.DisplayNameFor(model => model.Subjects.First().Salary)</th>
+                <th>@Html.DisplayName("Subject Type")</th>
+                <th>Registered Students</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subject in ViewBag.Subjects)
+            {
+                <tr data-semester="@subject.Subject.Semester" data-level="@subject.Subject.Level">
+                    <td>@subject.Subject.Name</td>
+                    <td>@subject.Subject.Level</td>
+                    <td>@subject.Subject.Semester</td>
+                    <td>@ViewBag.DoctorNames[subject.Subject.DoctorId]</td>
+                    <td>@subject.Subject.SubjectHours</td>
+                    <td>@subject.Subject.StudentsAllowed</td>
+                    <td>@subject.Subject.Salary$</td>
+                    <td>@subject.Subject.subjectType</td>
+                    <td>@ViewBag.StudentsBySubject[subject.Subject.Id]</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Script -->
+<script src="~/js/Department.js"></script>

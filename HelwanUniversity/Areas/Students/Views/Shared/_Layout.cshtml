@@ -1,0 +1,129 @@
+﻿@using Data.Repository.IRepository
+@using System.Security.Claims
+@inject IStudentRepository studentRepository
+@inject IUniFileRepository UniFileRepository
+
+<!-- Server-side Logic -->
+@{
+    var Images = UniFileRepository.GetAllImages();
+    ViewData["LogoTitle"] = Images[0].File;
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var Student = studentRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    if (Student != null)
+    {
+        ViewData["Student"] = Student;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Helwan University</title>
+    <link rel="icon" href="@ViewBag.LogoTitle" type="image/png">
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HelwanUniversity.styles.css" asp-append-version="true" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="main-content">
+        <header>
+            <!-- NavBar -->
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container-fluid">
+                    <a class="navbar-brand" asp-area="Students" asp-controller="University" asp-action="Index">
+                        <img src="@ViewBag.LogoTitle" alt="Logo" height="100" width="60" style="margin-right: 5px" />
+                    </a>
+                    <a class="navbar-brand" asp-area="Students" asp-controller="University" asp-action="Index">Helwan University</a>
+                    <button id="nav-toggle-label" class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <div id="nav-toggle-burger"></div>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item" style="margin-top: 5px">
+                                <a class="nav-link text-dark" asp-area="Students" asp-controller="University" asp-action="Index">
+                                    <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/48/home-page.png" alt="external-college-building-fauzidea-detailed-outline-fauzidea-2" />
+                                    Home
+                                </a>
+                            </li>
+                            <li class="nav-item NavPadding">
+                                <a class="nav-link NavItems text-dark" asp-area="Students" asp-controller="Faculty" asp-action="Index">
+                                    <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/external-fauzidea-detailed-outline-fauzidea/64/036bb8/external-college-building-fauzidea-detailed-outline-fauzidea-2.png" alt="Facilities" />
+                                    Facilities
+                                </a>
+                            </li>
+                            <li class="nav-item NavPadding">
+                                <a class="nav-link NavItems text-dark" asp-area="Students" asp-controller="UniFile" asp-action="News">
+                                    <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/48/news.png" alt="News" />
+                                    News
+                                </a>
+                            </li>
+                            <li class="nav-item NavPadding">
+                                <a class="nav-link NavItems text-dark" asp-area="Students" asp-controller="Student" asp-action="Details" asp-route-id="@ViewBag.Student.Id">
+                                    <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/228BE6/student-male--v1.png" alt="student--v1" />
+                                    Student Portal
+                                </a>
+                            </li>
+                        </ul>
+
+                        <!-- Account Icon -->
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li class="nav-item dropdown dropDownPadding">
+                                <a class="nav-link dropdown-toggle" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img style="margin-bottom: 10px;" width="55" height="55" src="https://img.icons8.com/3d-fluency/94/user-male-circle.png" alt="User" />
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="userDropdown">
+                                        <div class="dropdown-item text-center">
+                                            <img class="img-thumbnail rounded-circle"
+                                                 width="100"
+                                                 height="100"
+                                                 src="@ViewBag.Student.Picture"
+                                                 alt="Student Picture" />
+                                        </div>
+                                        <p class="mt-2 mb-0 text-center">@ViewBag.Student.Name</p>
+                                        <p class="text-muted text-center" style="margin-top: 2px;">Student</p>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" href="/Identity/Account/Manage">
+                                            <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/user-male-circle.png" alt="Account" />
+                                            <span style="margin-left: 2px;">Account</span>
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item text-danger d-flex align-items-center" style="color: black;text-decoration: none" href="/Identity/Account/Logout">
+                                            <img width="20" height="20" src="https://img.icons8.com/ios/50/logout-rounded--v1.png" alt="Logout" />
+                                            <span style="margin-left: 10px;">Logout</span>
+                                        </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2024 - HelwanUniversity
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

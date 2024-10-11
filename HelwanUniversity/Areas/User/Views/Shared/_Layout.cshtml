@@ -1,0 +1,89 @@
+﻿@using Data.Repository.IRepository
+@inject IUniFileRepository UniFileRepository
+
+@{
+    var Images = UniFileRepository.GetAllImages();
+    ViewBag.LogoTitle = Images[0].File;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HelwanUniversity</title>
+    <link rel="icon" href="@ViewBag.LogoTitle" type="image/png">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HelwanUniversity.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" asp-area="User" asp-controller="University" asp-action="Index">
+                    <img src="@ViewBag.LogoTitle" alt="Logo" height="60" width="60" class="me-2" />
+                    Helwan University
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="User" asp-controller="University" asp-action="Index">
+                                <img class="me-1" width="25" height="25" src="https://img.icons8.com/pulsar-color/48/home-page.png" alt="Home" />
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="User" asp-controller="Faculty" asp-action="Index">
+                                <img class="me-1" width="25" height="25" src="https://img.icons8.com/external-fauzidea-detailed-outline-fauzidea/64/036bb8/external-college-building-fauzidea-detailed-outline-fauzidea-2.png" alt="Facilities" />
+                                Facilities
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="User" asp-controller="UniFile" asp-action="News">
+                                <img class="me-1" width="25" height="25" src="https://img.icons8.com/pulsar-color/48/news.png" alt="News" />
+                                News
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img width="55" height="55" src="https://img.icons8.com/3d-fluency/94/user-male-circle.png" alt="User" />
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <a class="dropdown-item d-flex align-items-center text-dark" asp-area="Identity" asp-controller="Account" asp-action="Login">
+                                    <img width="15" height="15" src="https://img.icons8.com/ios/50/1A1A1A/enter-2.png" alt="Login" />
+                                    <span class="ms-2">Login</span>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - HelwanUniversity
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

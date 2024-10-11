@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Models.Department>
+@{
+    ViewData["Title"] = "Departments";
+}
+
+<div class="container">
+    <h1 class="text-center my-4" style="font-family: 'Roboto', sans-serif; color: #2c3e50;">
+        Departments of @ViewBag.FacultyName Faculty
+    </h1>
+
+    <table class="table table-hover table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th class="text-center" style="width: 70%;">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th class="text-center" style="width: 30%;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-center align-middle" style="font-size: 1.25rem; font-weight: bold;">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td class="text-center align-middle">
+                        <a href="@Url.Action("Details", "Department", new { id = item.Id })" class="btn btn-info mx-1" title="Details">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                        <a href="@Url.Action("StudentsByDepartment", "Student", new { id= item.Id})" class="btn btn-primary mx-1" title="View Students">
+                            <i class="fas fa-user-graduate"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

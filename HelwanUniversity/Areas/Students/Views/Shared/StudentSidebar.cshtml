@@ -1,0 +1,127 @@
+﻿@using Data.Repository.IRepository
+@using System.Security.Claims
+@inject IStudentRepository studentRepository
+@inject IDepartmentRepository departmentRepository
+@inject IFacultyRepository FacultyRepository
+@inject IUniversityRepository University
+
+
+
+@{
+    <!-- Retrieve the user ID from the current claim -->
+   
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    var Student = studentRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    if (Student != null)
+    {
+        ViewData["Student"] = Student;
+        ViewData["DepartmentId"] = departmentRepository.DepartmentByStudent(Student.Id)?.Id;
+        ViewData["FacultyId"] = FacultyRepository.FacultyByDepartment(ViewBag.DepartmentId)?.Id;
+    };
+    ViewData["FormGoogle"] = University.Get()?.GoogleForm;
+}
+
+@{
+    var studentName = ViewBag.Student?.Name ?? "Student Name";
+    var studentId = ViewBag.Student?.Id ?? "Student ID";
+    var studentPicture = ViewBag.Student?.Picture ?? "/images/default-avatar.png";
+    var hasPaidFees = ViewBag.Student.PaymentFees ?? false;
+    var Form = ViewBag.FormGoogle ?? "https:/WWW.Google.com";
+
+    Layout = null;
+}
+
+<!-- External Stylesheet -->
+<link rel="stylesheet" href="/css/SideBar.css" />
+
+<!-- NavBar -->
+<div id="nav-bar">
+    <input id="nav-toggle" type="checkbox" />
+    <div id="nav-header" class="nav-header">
+        <a id="nav-title" class="nav-title" asp-area="Students" asp-controller="Home" asp-action="Index">
+            HU
+        </a>
+        <label for="nav-toggle" class="nav-toggle-label">
+            <span id="nav-toggle-burger" class="nav-toggle-burger"></span>
+        </label>
+    </div>
+    <div id="nav-content" class="nav-content">
+        <hr class="nav-divider" />
+        <a class="nav-button" asp-area="Students" asp-controller="University" asp-action="Index">
+            <i class="fas fa-home"></i><span>Home</span>
+        </a>
+        <a class="nav-button" asp-area="Students" asp-controller="Faculty" asp-action="DetailsStudent" asp-route-id="@ViewBag.FacultyId">
+            <i class="fas fa-school"></i><span>Faculty</span>
+        </a>
+        <a class="nav-button" asp-area="Students" asp-controller="Department" asp-action="Details" asp-route-id="@ViewBag.DepartmentId">
+            <i class="fas fa-school"></i><span>Department</span>
+        </a>
+        <a class="nav-button" asp-area="Students" asp-controller="Student" asp-action="Details" asp-route-id="@ViewBag.Student.Id">
+            <i class="fas fa-user"></i><span>Personal Data</span>
+        </a>
+        <a class="nav-button" asp-area="Students" asp-controller="DepartmentSubjects" asp-action="DisplaySubjects" asp-route-id="@ViewBag.Student.Id">
+            <i class="fas fa-clipboard-list"></i><span>Registeration</span>
+        </a>
+        <a class="nav-button" asp-area="Students" asp-controller="StudentSubjects" asp-action="SubjectRegsitered" asp-route-id="@ViewBag.Student.Id">
+            <i class="fas fa-book"></i><span>Courses</span>
+        </a>
+        <a class="nav-button" href="@Form">
+            <i class="fas fa-envelope"></i><span>Add Request</span>
+        </a>
+        @if (hasPaidFees)        
+        {
+            <a class="nav-button" asp-area="Students" asp-controller="StudentSubjects" asp-action="DisplayDegrees" asp-route-id="@ViewBag.Student.Id">
+                <i class="fas fa-graduation-cap"></i><span>Grades</span>
+            </a>
+        }
+        <a class="nav-button" asp-area="Identity" asp-controller="Account" asp-action="Logout">
+            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+        </a>
+        <div id="nav-content-highlight" class="nav-content-highlight"></div>
+    </div>
+    <input id="nav-footer-toggle" type="checkbox" />
+    <div id="nav-footer" class="nav-footer">
+        <div id="nav-footer-heading" class="nav-footer-heading">
+            <div id="nav-footer-avatar" class="nav-footer-avatar">
+                <img src="@studentPicture" alt="Student Picture" />
+            </div>
+            <div id="nav-footer-titlebox" class="nav-footer-titlebox">
+                <a id="nav-footer-title" class="nav-footer-title" asp-area="Students" asp-controller="Student" asp-action="Details" asp-route-id="@ViewBag.Student.Id">@studentName</a>
+                <span id="nav-footer-subtitle" class="nav-footer-subtitle">Student</span>
+            </div>
+            <label for="nav-footer-toggle" class="nav-footer-toggle-label">
+                <i class="fas fa-caret-up"></i>
+            </label>
+        </div>
+
+        <!-- Reminder -->
+        @if (!hasPaidFees)
+        {
+            <div id="nav-footer-content" class="nav-footer-content">
+                Student ID: @studentId
+                <i id="alert-icon" class="fas fa-bell" onclick="showModal()"></i>
+            </div>
+            <div style="margin-top: 20px;" id="alert-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="hideModal()">&times;</span>
+
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <i class="fas fa-exclamation-circle" style="color: red; font-size: 50px;"></i>
+                    </div>
+                    <h2 style="text-align: center;">Payment Reminder</h2>
+                    <p style="text-align: center;">You have pending fees. Please make the payment to avoid penalties.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div id="nav-footer-content" class="nav-footer-content">
+                Student ID: @studentId
+                <i class="fas fa-bell"></i>
+            </div>
+        }
+    </div>
+    </div>
+
+<script src="/js/SideBar.js"></script>

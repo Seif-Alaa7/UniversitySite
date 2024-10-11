@@ -1,0 +1,62 @@
+﻿@model Models.University
+
+@{
+    ViewData["Title"] = "About Us";
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="/css/DetailsUni.css">
+</head>
+<body>
+    <div class="container">
+        <div class="university-header">
+            <img src="@ViewBag.LogoTitle" alt="University Logo"/>
+            <p style="margin-top: 10px;"><strong>Our University Logo</strong></p>
+        </div>
+
+        <div class="university-details">
+            <h4>
+                @Model.Name</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2 text-Arabic">@Html.DisplayName("University description:")</dt>
+                <dd class="col-sm-10 text-Arabic" style="margin-top: 10px; overflow-wrap: break-word;">@Html.DisplayFor(model => model.Description)</dd>
+
+                <dt class="col-sm-2 text-Arabic">@Html.DisplayName("University image:")</dt>
+                <dd class="col-sm-10" style="margin-top: 20px;">
+                    <img src="@Model.MainPicture" alt="University Image" style="max-width: 100%; height: auto;" />
+                </dd>
+
+                <!-- Buttons FrontEnd -->
+                <dt class="col-sm-2 text-Arabic">@Html.DisplayName("Contact us on Facebook:")</dt>
+                <dd class="col-sm-10" style="margin-top: 20px; overflow-wrap: break-word;"><a href="@Model.FacebookPage" target="_blank">@Model.FacebookPage</a></dd>
+
+                <dt class="col-sm-2 text-Arabic">@Html.DisplayName("Contact us on LinkedIn:")</dt>
+                <dd class="col-sm-10" style="margin-top: 20px; overflow-wrap: break-word;"><a href="@Model.LinkedInPage" target="_blank">@Model.LinkedInPage</a></dd>
+
+                <dt class="col-sm-2 text-Arabic">@Html.DisplayName("Our homepage:")</dt>
+                <dd class="col-sm-10" style="margin-top: 9px; overflow-wrap: break-word;"><a href="@Model.MainPage" target="_blank">@Model.MainPage</a></dd>
+
+                <dt class="col-sm-2 text-Arabic" style="font-size: 16px;">@Html.DisplayName("Contact us:")</dt>
+                <dd class="col-sm-10" style="margin-top: 10px; overflow-wrap: break-word;"><a href="mailto:@Model.ContactMail">@Model.ContactMail</a></dd>
+
+                <dt class="col-sm-2 text-Arabic">@Html.DisplayName("Foundation:")</dt>
+                <dd class="col-sm-10 text-Arabic" style="margin-top: 9px; overflow-wrap: break-word;">@Html.DisplayFor(model => model.HistoricalBackground)</dd>
+            </dl>
+        </div>
+        <div class="action-links">
+            <!-- Button as Icon -->
+            <a href="@Url.Action("Update", "University")" class="edit-button">
+                <i class="fa fa-edit"></i>
+            </a>
+        </div>
+
+    </div>
+</body>
+</html>

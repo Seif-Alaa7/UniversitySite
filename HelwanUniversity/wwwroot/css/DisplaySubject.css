@@ -1,0 +1,27 @@
+﻿.centered-content {
+    text-align: center;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.list-unstyled li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .list-unstyled li a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        .list-unstyled li a:hover {
+            color: #0056b3;
+        }
+
+.alert-info {
+    text-align: center;
+}

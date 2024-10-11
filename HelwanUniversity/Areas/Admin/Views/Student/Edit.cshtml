@@ -1,0 +1,120 @@
+﻿@using Models.Enums
+@model ViewModels.StudentVM
+@{
+    ViewData["Title"] = "Edit Student";
+}
+
+<!-- Stylesheet -->
+<link rel="stylesheet" href="/css/EditPerson.css">
+
+<h2 class="mt-4 mb-4">Edit Student Information</h2>
+
+<!-- Form -->
+<form asp-action="SaveEdit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="Name" class="form-label">Name</label>
+            <input asp-for="Name" class="form-control" placeholder="Full Name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+            <input asp-for="PhoneNumber" id="PhoneNumber" name="PhoneNumber" class="form-control" type="tel" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label">Address</label>
+        <input asp-for="Address" class="form-control" placeholder="Address" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label asp-for="Nationality" class="form-label">Nationality</label>
+            <input asp-for="Nationality" class="form-control" placeholder="Egyptian" />
+            <span asp-validation-for="Nationality" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Gender" class="form-label">Gender</label>
+            <select asp-for="Gender" class="form-select">
+                <option value="@Gender.Male">Male</option>
+                <option value="@Gender.Female">Female</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Religion" class="form-label">Religion</label>
+            <select asp-for="Religion" class="form-select">
+                <option value="@Religion.Muslim">Muslim</option>
+                <option value="@Religion.Christian">Christian</option>
+                <option value="@Religion.Other">Other</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="BirthDate" class="form-label">Birth Date</label>
+            <input asp-for="BirthDate" class="form-control" type="date" />
+            <span asp-validation-for="BirthDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="DepartmentId" class="form-label">Department</label>
+            <select asp-for="DepartmentId" class="form-select" asp-items="ViewBag.Departments">
+                <option disabled selected>-- Select Department --</option>
+            </select>
+            <span asp-validation-for="DepartmentId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="AdmissionDate" class="form-label">Admission Date</label>
+            <input asp-for="AdmissionDate" class="form-control" type="date" />
+            <span asp-validation-for="AdmissionDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="PaymentFeesDate" class="form-label">Payment Fees Date</label>
+            <input asp-for="PaymentFeesDate" class="form-control" type="date" />
+            <span asp-validation-for="PaymentFeesDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="PaymentFees" class="form-label">PaymentFees</label>
+        <select asp-for="PaymentFees" class="form-select">
+            <option value="True">Paid</option>
+            <option value="False">Not Paid</option>
+        </select>
+    </div>
+    <div class="form-group" style="margin-top: 30px;">
+        <label style="font-size: 20px" class="control-label">Current Picture:</label>
+        <div id="currentPicturePreview">
+            <img src="@Model.Picture" alt="Current Image" class="img-fluid" />
+        </div>
+    </div>
+    <hr class="Divider">
+    <div class="mb-4">
+        <input asp-for="FormFile" type="file" class="form-control-file" id="pictureInput" style="display:none;" />
+        <div id="picturePreview" class="mt-2"></div>
+        <label for="pictureInput" class="custom-file-upload">
+            <i class="fa fa-upload"></i> Upload Profile Picture
+        </label>
+        <span asp-validation-for="FormFile" class="text-danger"></span>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script src="/js/File.js"></script>

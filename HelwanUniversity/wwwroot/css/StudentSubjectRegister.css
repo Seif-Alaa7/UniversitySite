@@ -1,0 +1,54 @@
+﻿.header-container {
+    background: linear-gradient(to right, #007bff, #00d2d3); 
+    color: white;
+    padding: 2rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
+}
+
+    .header-container h1, .header-container h3, .header-container h4 {
+        margin-bottom: 1rem;
+    }
+
+    .header-container h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+
+    .header-container h3 {
+        font-size: 1.75rem;
+    }
+
+    .header-container h4 {
+        font-size: 1.25rem;
+    }
+
+    .header-container i {
+        font-size: 1.25rem; 
+    }
+
+.icon-spacing {
+    margin-right: 10px; 
+}
+
+.badge-info {
+    background-color: #20c997; 
+    color: white;
+}
+.table {
+    text-align: center; 
+}
+
+    .table th, .table td {
+        vertical-align: middle; 
+    }
+
+        .table td a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .table td a:hover {
+                color: #0056b3;
+            }

@@ -1,0 +1,83 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SignIn - Helwan University</title>
+    <link rel="icon" href="@ViewBag.TitleLogo" type="image/png">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/login.css">
+    <style>
+        body, html {
+            background-image: url('@ViewBag.ImgSignIn');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            height: 105%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                 <a class="navbar-brand" asp-area="" asp-controller="University" asp-action="Index">
+                    <img src="@ViewBag.TitleLogo" alt="Logo" height="45" width="45">
+                </a>
+                <a class="navbar-brand" asp-area="" asp-controller="University" asp-action="Index">HelwanUniversity</a>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item" style="margin-top: 5px">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="University" asp-action="Index">Home</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+<div class="login-container">
+        <img src="@ViewBag.TitleLogo" alt="HU Logo" class="login-logo">
+    <h2 style="text-align: center; margin-bottom: 20px;">Sign In</h2>
+    <form id="account" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div class="form-group">
+            <label asp-for="Input.Email">Email</label>
+            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="StudentId@Faculty.helwan.edu.eg" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Input.Password">Password</label>
+            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="*********" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <div class="remember-me">
+            <label asp-for="Input.RememberMe" class="form-label">
+                <input class="form-check-input" asp-for="Input.RememberMe" />
+                @Html.DisplayNameFor(m => m.Input.RememberMe)
+            </label>
+        </div>
+        <div>
+            <button id="login-submit" type="submit" class="btn-primary">Sign In</button>
+        </div>
+        <div class="additional-options">
+            <p>
+                <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+            </p>
+        </div>
+    </form>
+</div>
+</body>
+</html>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

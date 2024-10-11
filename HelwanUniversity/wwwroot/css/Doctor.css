@@ -1,0 +1,40 @@
+﻿.badge-info {
+    color: white !important;
+    background-color: #17a2b8 !important;
+}
+
+.card-img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.personal-data-card {
+    max-width: 900px;
+    margin: auto;
+}
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #007bff;
+}
+
+.card-text {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+}
+
+.icon-text {
+    margin-right: 0.5rem;
+    color: #6c757d;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card {
+    border-radius: 15px;
+    border: none;
+}

@@ -1,0 +1,65 @@
+﻿.custom-file-upload {
+    display: inline-block;
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    text-align: center;
+}
+
+    .custom-file-upload i {
+        margin-right: 5px;
+    }
+
+    .custom-file-upload:hover {
+        background-color: #e2e6ea;
+    }
+
+#logoPreview img, #mainPicturePreview img {
+    max-width: 150px;
+    max-height: 150px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+    border-bottom: 0;
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+.form-control-file {
+    margin-top: 10px;
+}
+
+.img-preview {
+    margin-top: 20px;
+    max-width: 100%;
+    height: auto;
+}

@@ -1,0 +1,65 @@
+﻿@using Models.Enums
+@model ViewModels.HighBoardVM
+@{
+    ViewData["Title"] = "Edit Leader";
+}
+<!-- Stylesheet -->
+<link rel="stylesheet" href="/css/EditPerson.css">
+
+<h2>Edit</h2>
+
+<!-- Form -->
+<form asp-action="SaveEdit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="JobTitle" class="form-label">Job Title</label>
+        <select asp-for="JobTitle" class="form-select">
+            <option value="@JobTitle.VP_For_Finance">VP For Finance</option>
+            <option value="@JobTitle.DeanOfFaculty">Dean of Faculty</option>
+            <option value="@JobTitle.VicePrecident">Vice President</option>
+            <option value="@JobTitle.HeadOfDepartment">Head of Department</option>
+            <option value="@JobTitle.President">President</option>
+            <option value="@JobTitle.VP_For_AcademicAffairs">VP For Academic Affairs</option>
+        </select>
+        <span asp-validation-for="JobTitle" class="text-danger"></span>
+    </div>
+
+    <div class="form-group" style="margin-top: 30px;">
+        <label style="font-size: 20px" class="control-label">Current Picture:</label>
+        <div id="currentPicturePreview">
+            <img src="@Model.Picture" alt="Current Image" class="img-fluid" />
+        </div>
+    </div>
+    <hr class="Divider">
+    <div class="mb-4">
+        <input asp-for="FormFile" type="file" class="form-control-file" id="pictureInput" style="display:none;" />
+        <div id="picturePreview" class="mt-2"></div>
+        <label for="pictureInput" class="custom-file-upload">
+            <i class="fa fa-upload"></i> Upload Profile Picture
+        </label>
+        <span asp-validation-for="FormFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+<!-- Scripts -->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script src="/js/File.js"></script>

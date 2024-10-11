@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Models.UniFile>
+
+@{
+    ViewData["Title"] = "News";
+}
+
+<!-- External Stylesheets -->
+<link rel="stylesheet" href="/css/News.css">
+
+<h1>News</h1>
+
+<div class="container" style="padding-bottom: 170px;">
+    <div class="row video-list">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="card video-card">
+                    <iframe src="@item.File" allowfullscreen></iframe>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

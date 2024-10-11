@@ -1,0 +1,27 @@
+﻿header img {
+    max-width: 100%;
+    height: auto;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.map-container {
+    margin: 20px auto;
+    max-width: 1000px;
+    border: 2px solid #34495e;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.arabic-text {
+    font-family: "Cairo", sans-serif;
+    font-size: 3rem;
+    color: rgb(0, 0, 0);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}

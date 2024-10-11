@@ -1,0 +1,56 @@
+﻿@model Models.HighBoard
+
+@{
+    ViewData["Title"] = "Personal Data";
+}
+
+<!-- Styles -->
+<style>
+    .badge-danger {
+        color: white !important;
+        background-color: red !important;
+    }
+
+    .badge-success {
+        color: white !important;
+        background-color: green !important;
+    }
+</style>
+<div class="container py-5">
+    <h2 class="text-center mb-5 font-weight-bold">Personal Data</h2>
+    <div class="card shadow-lg rounded-lg overflow-hidden">
+        <div class="row no-gutters">
+            @if (!string.IsNullOrEmpty(Model.Picture))
+            {
+                <div class="col-lg-4">
+                    <img src="@Model.Picture" class="card-img h-100 object-fit-cover" alt="@Model.Name">
+                </div>
+            }
+            <div class="@(string.IsNullOrEmpty(Model.Picture) ? "col-lg-12" : "col-lg-8")">
+                <div class="card-body p-5">
+                    <h3 class="card-title mb-4 text-primary">@Model.Name</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @if(Model.JobTitle == Models.Enums.JobTitle.DeanOfFaculty)
+                            {
+                                <p class="card-text"><i class="fas fa-briefcase mr-2"></i><strong>Job Title:</strong> Dean of Faculty</p>
+                            }
+                            else
+                            {
+                                <p class="card-text"><i class="fas fa-briefcase mr-2"></i><strong>Job Title:</strong> Head of Department</p>
+                            }
+                            <p class="card-text"><i class="fas fa-align-left mr-2"></i><strong>Description:</strong> @Model.Description</p>
+                            <a href="@Url.Action("ChangePicture", "HighBoard", new { id = Model.Id })" class="btn btn-primary mr-2">
+                                <i class="fas fa-camera mr-1"></i> Change Personal Picture
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

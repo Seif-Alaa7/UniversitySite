@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Models.Student>
+@using Models.Enums;
+
+@{
+    ViewData["Title"] = "Fees Status";
+    var records = ViewBag.Records as Dictionary<int, (Level Level, Semester Semester)>;
+    Layout = "~/Areas/Doctors/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Fees Status</h1>
+
+<!-- Display Total Count -->
+<p class="font-weight-bold">Total Students: @ViewBag.TotalCount</p>
+
+<!-- Filter Buttons -->
+<div class="btn-group mb-3" role="group" aria-label="Filter Buttons">
+    <a href="@Url.Action("FeesPaid", "Student")" class="btn btn-success">Show Paid</a>
+    <a href="@Url.Action("FeesUnpaid", "Student")" class="btn btn-danger">Show Unpaid</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().Id)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Name)</th>
+            <th>@Html.DisplayName("Level")</th>
+            <th>@Html.DisplayName("Semester")</th>
+            <th>@Html.DisplayName("Faculty")</th>
+            <th>@Html.DisplayName("Department")</th>
+            <th>@Html.DisplayNameFor(model => model.First().PaymentFees)</th>
+            <th>@Html.DisplayNameFor(model => model.First().PaymentFeesDate)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>
+                    @if (records != null && records.ContainsKey(item.Id))
+                    {
+                        @records[item.Id].Level.ToString()
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+                <td>
+                    @if (records != null && records.ContainsKey(item.Id))
+                    {
+                        @records[item.Id].Semester.ToString()
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+                <td>
+                    @if (ViewBag.FacultyNames != null && ViewBag.FacultyNames.ContainsKey(item.DepartmentId))
+                    {
+                        @ViewBag.FacultyNames[item.DepartmentId]
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+                <td>
+                    @if (ViewBag.DepartmentNames != null && ViewBag.DepartmentNames.ContainsKey(item.DepartmentId))
+                    {
+                        @ViewBag.DepartmentNames[item.DepartmentId]
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+                <td>
+                    <span class="badge @(item.PaymentFees ? "badge-success" : "badge-danger")">
+                        @(item.PaymentFees ? "Paid" : "Unpaid")
+                    </span>
+                </td>
+                <td>
+                    @if (item.PaymentFees)
+                    {
+                        <p class="card-text"><i class="fas fa-calendar-alt mr-2"></i><strong>Payment Date:</strong> @item.PaymentFeesDate?.ToString("d")</p>
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("Details", "Student", new { id = item.Id })" title="Details Student">
+                        <i class="fas fa-info"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+

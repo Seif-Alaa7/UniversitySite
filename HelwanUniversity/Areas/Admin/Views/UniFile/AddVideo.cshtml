@@ -1,0 +1,59 @@
+﻿@model ViewModels.UniFileVMs.UniFileVM
+
+@{
+    ViewData["Title"] = "Add Video";
+}
+
+<div class="min-h-screen py-12 flex flex-col justify-center sm:py-16">
+    <div class="relative py-6 sm:max-w-xl sm:mx-auto">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-800 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
+        </div>
+        <div class="relative px-6 py-12 bg-white shadow-lg sm:rounded-3xl sm:p-24">
+            <div class="max-w-md mx-auto text-center">
+                <div class="mb-6">
+                    <i class="fas fa-video text-6xl text-blue-600"></i>
+                </div>
+                <h1 class="text-3xl font-semibold">Add Video</h1>
+                <div class="divide-y divide-gray-200 mt-8">
+                    <div class="py-10 text-base leading-6 space-y-6 text-gray-700 sm:text-lg sm:leading-7">
+
+                        <!-- Form -->
+                        <form asp-action="SaveVideo" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-red-500"></div>
+                            <div class="relative">
+                                <input asp-for="File" class="peer placeholder-transparent h-12 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 text-lg" placeholder="Embeded Link From Facebook" />
+                                <label for="File" class="absolute left-0 -top-4 text-gray-600 text-lg peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-3 transition-all peer-focus:-top-4 peer-focus:text-gray-600 peer-focus:text-lg">Embeded Link From Facebook</label>
+                                <span asp-validation-for="File" class="text-red-500"></span>
+                            </div>
+                            <div class="form-group mt-6">
+                                <input type="hidden" asp-for="ContentType" class="form-control" />
+                            </div>
+                            <div class="relative text-center mt-12 flex justify-center space-x-4">
+                                <button type="submit" class="bg-blue-600 text-white rounded-md px-6 py-3 text-lg hover:bg-blue-700 transition duration-300 ease-in-out">
+                                    Add
+                                </button>
+                                <button type="button" onclick="cancelForm()" class="bg-gray-600 text-white rounded-md px-6 py-3 text-lg hover:bg-gray-700 transition duration-300 ease-in-out">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                        <br />
+                        <a asp-action="EmbededLink" class="text-blue-600 hover:underline text-lg">
+                            How to Obtain On Embeded Link?
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function cancelForm() {
+            window.location.href = 'News';
+        }
+    </script>
+}

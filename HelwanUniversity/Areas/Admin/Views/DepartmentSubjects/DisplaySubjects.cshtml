@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Models.DepartmentSubjects>
+
+@{
+    ViewData["Title"] = "Academic Registration";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- StyleSheet -->
+    <link rel="stylesheet" href="/css/SubjectRegisteration.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="custom-header">Academic Registration</h1>
+        <br />
+        <h3 class="department-name">
+            Department Name: @ViewBag.departmentName
+        </h3>
+        <table class="table table-striped table-bordered custom-table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Subject.Name)</th>
+                    <th>@Html.DisplayName("Summer Status")</th>
+                    <th>@Html.DisplayName("Summer Allowed")</th>
+                    <th>@Html.DisplayName("Subject Type")</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Subject.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Subject.summerStatus)</td>
+                        @if (item.Subject.summerStatus == Models.Enums.SummerStatus.Open)
+                        {
+                            <td>@Html.DisplayFor(modelItem => item.Subject.StudentsAllowed)</td>
+                        }
+                        else
+                        {
+                            <td>0</td>
+                        }
+                        <td>@Html.DisplayFor(modelItem => item.Subject.subjectType)</td>
+                        <td>
+                            @Html.ActionLink("+", "AddSubject", "StudentSubjects", new { Studentid = ViewBag.StudentId, Subjectid = item.Subject.Id }, new { @class = "btn btn-success btn-sm" }) |
+                            @Html.ActionLink("-", "DeleteSubject", "StudentSubjects", new { Studentid = ViewBag.StudentId, Subjectid = item.Subject.Id }, new { @class = "btn btn-danger btn-sm" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+

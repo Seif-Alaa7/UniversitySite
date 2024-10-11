@@ -1,0 +1,79 @@
+﻿@model ViewModels.DepartmentVM
+
+@{
+    ViewData["Title"] = "Edit Department";
+}
+
+<!-- StyleSheet -->
+<link rel="stylesheet" href="/css/Department.css">
+
+<h1 class="text-center mb-4">Edit Department</h1>
+<div class="container">
+    <h4 class="text-muted mb-3 text-center">Edit Form</h4>
+    <hr />
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <!-- Form -->
+            <form asp-action="SaveEdit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="form-group">
+                    <input type="hidden" asp-for="Id" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="HeadId" class="control-label">Head</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                        </div>
+                        <select asp-for="HeadId" class="form-control" asp-items="@ViewBag.Heads">
+                            <option disabled selected>Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="HeadId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label">Name</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-building"></i></span>
+                        </div>
+                        <input asp-for="Name" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FacultyId" class="control-label">Faculty</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-university"></i></span>
+                        </div>
+                        <select asp-for="FacultyId" class="form-control" asp-items="@ViewBag.Faculities">
+                            <option disabled selected>Select</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="FacultyId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Allowed" class="control-label">Students Allowed</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-users"></i></span>
+                        </div>
+                        <input asp-for="Allowed" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Allowed" class="text-danger"></span>
+                </div>
+                <div class="form-group text-center">
+                    <input type="submit" value="Save" class="btn btn-primary btn-lg" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
