@@ -41,11 +41,12 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         {
             var subjects = subjectRepository.SubjectsByDoctor(id).ToList();
 
-            if (subjects == null || !subjects.Any())
+            /*if (subjects == null || !subjects.Any())
             {
                 ViewBag.Message = "There are No Subjects For this Doctor";
                 return NotFound();
-            }
+                return View(subjects);
+            }*/
 
             var subjectIds = subjectRepository.GetIds(subjects);
             var departmentSubjects = departmentSubjectsRepository.GetDepartmentSubjects(subjectIds);
