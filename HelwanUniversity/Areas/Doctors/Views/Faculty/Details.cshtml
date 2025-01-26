@@ -13,7 +13,7 @@
         {
             <img src="@Model.Logo" class="faculty-logo" alt="Logo">
         }
-        <h2 class="text-center">@Model.Name Faculty</h2>
+        <h2 class="text-CENTER">@Model.Name Faculty</h2>
         <div class="faculty-detail mt-4">
             <div class="faculty-image-wrapper">
                 @if (!string.IsNullOrEmpty(Model.Picture))
@@ -39,9 +39,7 @@
                     @foreach (var department in Model.Departments)
                     {
                         <li>
-                            @department.Name     <a asp-controller="Department" asp-action="Details" asp-route-id="@department.Id">
-                                <img width="30" height="30" src="https://img.icons8.com/wired/64/1A1A1A/about.png" alt="about" />
-                            </a>
+                            @department.Name
                         </li>
                     }
                 </ul>

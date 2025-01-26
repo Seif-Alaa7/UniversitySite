@@ -83,6 +83,12 @@
                                 News
                             </a>
                         </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a class="nav-link NavItems text-dark" asp-area="Doctors" asp-controller="Doctor" asp-action="DisplaySubject" asp-route-id="@ViewBag.doctor.Id">
+                                <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/50/wordbook.png" alt="book--v1" />
+                                Subjects
+                            </a>
+                        </li>
                     </ul>
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -129,10 +135,6 @@
                                     </a>
                                     @if (ViewBag.Doctor is Doctor doctor)
                                     {
-                                        <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Doctor" asp-action="DisplaySubject" asp-route-id="@doctor.Id">
-                                            <img width="20" height="20" src="https://img.icons8.com/ios/50/1A1A1A/book--v1.png" alt="book--v1" />
-                                            <span style="margin-left: 2px;">Subjects</span>
-                                        </a>
                                         <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Doctor" asp-action="Details" asp-route-id="@doctor.Id">
                                             <img width="20" height="20" src="https://img.icons8.com/parakeet-line/48/1A1A1A/person-male.png" alt="book--v1" />
                                             <span style="margin-left: 2px;">Personal Data</span>

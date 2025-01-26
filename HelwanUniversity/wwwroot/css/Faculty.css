@@ -135,17 +135,6 @@
     max-width: 800px;
 }
 
-.text-center {
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 20px;
-    font-size: 2.5em;
-    padding: 10px 20px;
-    background: linear-gradient(90deg, #007bff, #00d2ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
 .LogoIndex {
     height: 50px;
     margin-bottom: 10px;
@@ -160,4 +149,15 @@
 .Department {
     display: inline-block;
     vertical-align: middle;
+}
+.text-CENTER {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #007bff, #00d2ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }

@@ -28,4 +28,13 @@
     <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="Areas\Doctors\Views\DepartmentSubjects\" />
+		<Folder Include="Areas\Doctors\Views\Subject\" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Doctors\Views\Subject\" />
+  </ItemGroup>
+
 </Project>
