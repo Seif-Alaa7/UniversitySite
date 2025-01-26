@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Faculty Info";
+}
+<!-- StyleSheets -->
+<link rel="stylesheet" href="/css/DepartmentInfo.css">
+<h3 class="my-4 text-center" style="font-size: 40px; font-family: 'Roboto', sans-serif; color: #2c3e50;">
+    @ViewBag.FacultyName Faculty
+</h3>
+<div style="margin-top: 50px;"></div>
+<center>
+    <a href="@Url.Action("Students", "Department", new { id = ViewBag.ID })">
+        <div class="card" style="background-image: url('https://img.freepik.com/free-photo/book-library-with-open-textbook_1150-5920.jpg?t=st=1737894264~exp=1737897864~hmac=6266f3c109eea15571be4752aea7e9fc3dd30de6e1600a2922b4484516a96f05&w=1060');">
+            <div class="card-content">
+                <p class="card-title">Departments</p>
+                <p class="card-para">This page highlights the diverse departments and the students excelling in their respective fields, driving academic and professional growth</p>
+            </div>
+        </div>
+    </a>
+</center>
+<div class="cards-container">
+    <a href="https://example.com/courses" target="_blank">
+        <div class="card" style="background-image: url('https://img.freepik.com/free-vector/business-performance-analysis-with-graphs_53876-66260.jpg?t=st=1737894411~exp=1737898011~hmac=be3f3382d5434dc6a92ff6f47cde729c2cc6f7eead37d0707b32a228806825f5&w=1060');">
+            <div class="card-content">
+                <p class="card-title">Student Results Statistics</p>
+                <p class="card-para">Data showcasing student performance in exams and courses</p>
+            </div>
+        </div>
+    </a>
+    <a href="@Url.Action("Details", "Faculty", new { id = ViewBag.FacultyId })">
+        <div class="card" style="background-image: url('https://th.bing.com/th/id/OIP.sjW0KjFv2sPM9bj5dH00mAHaFS?rs=1&pid=ImgDetMain');">
+            <div class="card-content">
+                <p class="card-title">Faculty Information</p>
+                <p class="card-para">Brief details about the faculty, its vision, and academic offerings</p>
+            </div>
+        </div>
+    </a>
+</div>

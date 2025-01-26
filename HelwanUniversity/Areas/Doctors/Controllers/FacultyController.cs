@@ -41,5 +41,17 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             return View(faculty);
         }
+        public IActionResult FacultyInfo(int id)
+        {
+            var Faculty = facultyRepository.GetFacultybyDean(id);
+            if (Faculty == null)
+            {
+                return NotFound();
+            };
+            ViewData["FacultyName"] = Faculty.Name;
+            ViewData["FacultyId"] = Faculty.Id;
+            ViewBag.ID = id;
+            return View();
+        }
     }
 }

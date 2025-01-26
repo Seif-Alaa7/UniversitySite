@@ -4,6 +4,9 @@
     ViewData["Title"] = "Department Students";
     var records = ViewBag.Records as Dictionary<int, (Level Level, Semester Semester)>;
 }
+<h3 class="my-4 text-center" style="font-size: 40px; font-family: 'Roboto', sans-serif; color: #2c3e50;">
+    @ViewBag.DepartmentName Department - @ViewBag.FacultyName Faculty
+</h3>
 
 <style>
     .table th, .table td {
