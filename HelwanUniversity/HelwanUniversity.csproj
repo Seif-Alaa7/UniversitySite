@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Areas\Doctors\Views\DepartmentSubjects\Add.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Areas\Doctors\Views\DepartmentSubjects\Add.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.7" />
@@ -26,15 +34,6 @@
     <ProjectReference Include="..\Data\Data.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
-  </ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Areas\Doctors\Views\DepartmentSubjects\" />
-		<Folder Include="Areas\Doctors\Views\Subject\" />
-	</ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Areas\Doctors\Views\Subject\" />
   </ItemGroup>
 
 </Project>

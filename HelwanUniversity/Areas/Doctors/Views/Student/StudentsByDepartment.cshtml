@@ -115,29 +115,4 @@
         </tbody>
     </table>
 </div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const filterLevel = document.getElementById("filterLevel");
-        const filterSemester = document.getElementById("filterSemester");
-        const tableRows = document.querySelectorAll("#studentsTable tbody tr");
-        function filterTable() {
-            const selectedLevel = filterLevel.value;
-            const selectedSemester = filterSemester.value;
-            tableRows.forEach(row => {
-                const rowLevel = row.getAttribute("data-level");
-                const rowSemester = row.getAttribute("data-semester");
-                const levelMatch = selectedLevel === "" || rowLevel === selectedLevel;
-                const semesterMatch = selectedSemester === "" || rowSemester === selectedSemester;
-                if (levelMatch && semesterMatch) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        }
-        filterLevel.addEventListener("change", filterTable);
-        filterSemester.addEventListener("change", filterTable);
-    });
-</script>
-
-
+<script src="/js/student.js" defer></script>

@@ -21,5 +21,6 @@ namespace Data.Repository.IRepository
         Dictionary<int, List<(int Id, string Name)>> GetDepartmentsByFaculty(List<Faculty> facultyList);
         Dictionary<int, string> GetDepartments(List<Department> departments);
         Department GetDepartbyHead(int id);
+        public List<SelectListItem> SelectDepartsByFaculty(int id);
     }
 }

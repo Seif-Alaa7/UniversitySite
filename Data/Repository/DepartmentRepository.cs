@@ -8,10 +8,12 @@ namespace Data.Repository
     public class DepartmentRepository : IDepartmentRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IFacultyRepository facultyRepository;
 
-        public DepartmentRepository(ApplicationDbContext context)
+        public DepartmentRepository(ApplicationDbContext context, IFacultyRepository facultyRepository)
         {
             this.context = context;
+            this.facultyRepository = facultyRepository;
         }
         public void Add(Department department)
         {
@@ -50,6 +52,15 @@ namespace Data.Repository
 
             }).ToList();
             return options;
+        }
+        public List<SelectListItem> SelectDepartsByFaculty(int id)
+        {
+            var departments = facultyRepository.GetDepartments(id).Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.Name,
+            }).ToList();
+            return departments;
         }
         public void Save()
         {

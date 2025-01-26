@@ -20,5 +20,6 @@ namespace Data.Repository.IRepository
         Semester GetSemester(int id);
         Dictionary<int, string> GetName(List<Subject> subjects);
         List<int> GetIds(List<Subject> subjects);
+        List<SelectListItem> SelectSubjectsByFaculty(int id);
     }
 }

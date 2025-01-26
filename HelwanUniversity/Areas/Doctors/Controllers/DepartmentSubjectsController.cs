@@ -2,6 +2,7 @@
 using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -14,18 +15,53 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IAcademicRecordsRepository academicRecordsRepository;
         private readonly ISubjectRepository subjectRepository;
         private readonly IDoctorRepository doctorRepository;
+        private readonly IFacultyRepository facultyRepository;
         public DepartmentSubjectsController(IDepartmentRepository departmentRepository, IDepartmentSubjectsRepository departmentSubjectsRepository
-            , IAcademicRecordsRepository academicRecordsRepository, ISubjectRepository subjectRepository, IDoctorRepository doctorRepository)
+            , IAcademicRecordsRepository academicRecordsRepository, ISubjectRepository subjectRepository, IDoctorRepository doctorRepository
+            , IFacultyRepository facultyRepository)
         {
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
             this.subjectRepository = subjectRepository;
             this.doctorRepository = doctorRepository;
+            this.facultyRepository = facultyRepository;
         }
         public IActionResult Index()
         {
             return View();
+        }
+        [HttpGet]
+        public IActionResult Add(int id)
+        {
+            ViewData["DepartId"] = id;
+            var faculty = facultyRepository.FacultyByDepartment(id);
+            ViewData["Subjects"] = subjectRepository.SelectSubjectsByFaculty(faculty.Id);
+            return View();
+        }
+        [HttpPost]
+        public IActionResult SaveAdd(DepartmentSubjects model)
+        {
+            var ExistDepartmentSubject = departmentSubjectsRepository.Exist(model);
+            if (ExistDepartmentSubject)
+            {
+                ViewData["DepartId"] = model.DepartmentId;
+                ModelState.AddModelError("SubjectId", "This Subject is Already Exist in this Department..");
+                var faculty = facultyRepository.FacultyByDepartment(model.DepartmentId);
+                ViewData["Subjects"] = subjectRepository.SelectSubjectsByFaculty(faculty.Id);
+                return View("Add");
+            }
+            else
+            {
+                var DepartmentSubject = new DepartmentSubjects()
+                {
+                    DepartmentId = model.DepartmentId,
+                    SubjectId = model.SubjectId,
+                };
+                departmentSubjectsRepository.Add(DepartmentSubject);
+                departmentSubjectsRepository.Save();
+            }
+            return RedirectToAction("Details", "Department", new { area = "Doctors", id = model.DepartmentId });
         }
         public IActionResult DisplaySubjects(int Studentid)
         {
@@ -60,6 +96,18 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 ViewBag.Subjects = Subjects;
                 return View(StudentSubjects);
             }
+        }
+        public IActionResult Delete(int subjectId, int departmentId)
+        {
+            var link = departmentSubjectsRepository.DeleteRelation(subjectId, departmentId);
+            if (link == null)
+            {
+                TempData["ErrorMessage"] = "The relationship between the subject and department could not be found.";
+                return RedirectToAction("Details", "Department", new { area = "Doctors", id = departmentId });
+            }
+            departmentSubjectsRepository.Delete(link);
+            departmentSubjectsRepository.Save();
+            return RedirectToAction("Details", "Department", new { area = "Doctors", id = departmentId });
         }
     }
 }
