@@ -1,16 +1,10 @@
 ﻿@model IEnumerable<Models.Student>
 @using Models.Enums;
 @{
-    ViewData["Title"] = "Students";
+    ViewData["Title"] = "Department Students";
     var records = ViewBag.Records as Dictionary<int, (Level Level, Semester Semester)>;
 }
 
-<h1 class="my-4 text-center">@ViewData["Title"]</h1>
-<h3 class="my-4 text-center">
-    @ViewData["DepartmentName"] Department - @ViewData["FacultyName"] Faculty
-</h3>
-
-<!-- Styles -->
 <style>
     .table th, .table td {
         text-align: center;
@@ -25,22 +19,62 @@
             .table td a:hover {
                 color: #0056b3;
             }
+
+    .filters {
+        margin-bottom: 20px;
+    }
+
+        .filters select {
+            margin-right: 10px;
+            padding: 5px;
+        }
 </style>
 
 <div class="container">
-    <table class="table table-hover table-bordered">
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <div class="alert alert-success">
+            @ViewBag.SuccessMessage
+        </div>
+    }
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+    <!-- Filters -->
+    <div class="filters">
+        <select id="filterLevel">
+            <option value="">All Levels</option>
+            @foreach (var level in Enum.GetValues(typeof(Level)))
+            {
+                <option value="@level">@level</option>
+            }
+        </select>
+        <select id="filterSemester">
+            <option value="">All Semesters</option>
+            @foreach (var semester in Enum.GetValues(typeof(Semester)))
+            {
+                <option value="@semester">@semester</option>
+            }
+        </select>
+    </div>
+    <!-- Table -->
+    <table class="table table-hover table-bordered" id="studentsTable">
         <thead class="thead-dark">
             <tr>
                 <th>@Html.DisplayNameFor(model => model.Id)</th>
                 <th>@Html.DisplayNameFor(model => model.Name)</th>
                 <th>Level</th>
                 <th>Semester</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
+                <tr data-level="@records[item.Id].Level" data-semester="@records[item.Id].Semester">
                     <td>@Html.DisplayFor(modelItem => item.Id)</td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
@@ -59,6 +93,14 @@
                         }
                     </td>
                     <td>
+                        <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" class="ml-2" title="Display Degrees">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" class="ml-2" title="Register Subjects">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                    </td>
+                    <td>
                         @if (records != null && records.ContainsKey(item.Id))
                         {
                             @records[item.Id].Semester
@@ -73,5 +115,29 @@
         </tbody>
     </table>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterLevel = document.getElementById("filterLevel");
+        const filterSemester = document.getElementById("filterSemester");
+        const tableRows = document.querySelectorAll("#studentsTable tbody tr");
+        function filterTable() {
+            const selectedLevel = filterLevel.value;
+            const selectedSemester = filterSemester.value;
+            tableRows.forEach(row => {
+                const rowLevel = row.getAttribute("data-level");
+                const rowSemester = row.getAttribute("data-semester");
+                const levelMatch = selectedLevel === "" || rowLevel === selectedLevel;
+                const semesterMatch = selectedSemester === "" || rowSemester === selectedSemester;
+                if (levelMatch && semesterMatch) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+        filterLevel.addEventListener("change", filterTable);
+        filterSemester.addEventListener("change", filterTable);
+    });
+</script>
 
 

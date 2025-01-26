@@ -83,12 +83,45 @@
                                 News
                             </a>
                         </li>
-                        <li class="nav-item" style="margin-left: 30px;">
-                            <a class="nav-link NavItems text-dark" asp-area="Doctors" asp-controller="Doctor" asp-action="DisplaySubject" asp-route-id="@ViewBag.doctor.Id">
-                                <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/50/wordbook.png" alt="book--v1" />
-                                Subjects
-                            </a>
-                        </li>
+                        @if (ViewBag.Doctor is Doctor doctor)
+                        {
+                            <li class="nav-item" style="margin-left: 30px;">
+                                <a class="nav-link NavItems text-dark" asp-area="Doctors" asp-controller="Doctor" asp-action="DisplaySubject" asp-route-id="@ViewBag.doctor.Id">
+                                    <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/ios/50/FFFFFF/book--v1.png" alt="Subject--v1" />
+                                    Subjects
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.DeanOfFaculty)
+                            {
+                                <li class="nav-item" style="margin-left: 30px;">
+                                    <a class="nav-link NavItems text-dark" asp-area="Doctors" asp-controller="Department" asp-action="Students" asp-route-id="@ViewBag.Doctor.Id">
+                                        <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/parakeet-line/48/FFFFFF/safety-collection-place.png" alt="add-user-male" />
+                                        Faculty Students
+                                    </a>
+                                </li>
+                            }
+                            else if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.HeadOfDepartment)
+                            {
+                                <li class="nav-item" style="margin-left: 30px;">
+                                    <a class="nav-link NavItems text-dark" asp-area="Doctors" asp-controller="Department" asp-action="DepartmentInfo" asp-route-id="@ViewBag.Department.Id">
+                                        <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/50/conference-call.png" alt="group-foreground-selected" />
+                                        Department Info
+                                    </a>
+                                </li>
+                            }
+                            else if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.VP_For_Finance)
+                            {
+                                <li class="nav-item" style="margin-left: 30px;">
+                                    <a class="nav-link NavItems text-dark" asp-area="Doctors" asp-controller="Student" asp-action="FeesStatus">
+                                        <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/parakeet-line/48/FFFFFF/safety-collection-place.png" alt="add-user-male" />
+                                        Fees Status
+                                    </a>
+                                </li>
+                            }
+                        }
                     </ul>
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -133,49 +166,19 @@
                                         <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/user-male-circle.png" alt="add-user-male" />
                                         <span style="margin-left: 2px;">Account</span>
                                     </a>
-                                    @if (ViewBag.Doctor is Doctor doctor)
+                                    @if (ViewBag.Doctor is Doctor doc)
                                     {
-                                        <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Doctor" asp-action="Details" asp-route-id="@doctor.Id">
+                                        <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Doctor" asp-action="Details" asp-route-id="@doc.Id">
                                             <img width="20" height="20" src="https://img.icons8.com/parakeet-line/48/1A1A1A/person-male.png" alt="book--v1" />
                                             <span style="margin-left: 2px;">Personal Data</span>
                                         </a>
                                     }
                                     else if (ViewBag.Doctor is HighBoard highBoard)
                                     {
-                                        if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.DeanOfFaculty)
-                                        {
-
-                                            <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Department" asp-action="Students" asp-route-id="@highBoard.Id">
-                                                <img width="18" height="18" src="https://img.icons8.com/parakeet-line/48/1A1A1A/safety-collection-place.png" alt="add-user-male" />
-                                                <span style="font-size: 15px">Faculty Students</span>
-                                            </a>
-                                            <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="HighBoard" asp-action="Details" asp-route-id="@highBoard.Id">
-                                                <img width="20" height="20" src="https://img.icons8.com/parakeet-line/48/1A1A1A/person-male.png" alt="book--v1" />
-                                                <span>Personal Data</span>
-                                            </a>
-                                        }
-                                        else if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.HeadOfDepartment && ViewBag.Department != null)
-                                        {
-                                            <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Student" asp-action="StudentsByDepartment" asp-route-id="@ViewBag.Department.Id">
-                                                <img width="15" height="15" src="https://img.icons8.com/parakeet-line/48/1A1A1A/safety-collection-place.png" alt="add-user-male" />
-                                                <span style="font-size: 12px;">Department Students</span>
-                                            </a>
-                                            <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="HighBoard" asp-action="Details" asp-route-id="@highBoard.Id">
-                                                <img width="20" height="20" src="https://img.icons8.com/parakeet-line/48/1A1A1A/person-male.png" alt="book--v1" />
-                                                <span style="margin-left: 2px;">Personal Data</span>
-                                            </a>
-                                        }
-                                        else if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.VP_For_Finance)
-                                        {
-                                            <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Student" asp-action="FeesStatus">
-                                                <img width="25" height="25" src="https://img.icons8.com/parakeet-line/48/1A1A1A/safety-collection-place.png" alt="add-user-male" />
-                                                <span style="margin-left: 2px;">Fees Status</span>
-                                            </a>
-                                            <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="HighBoard" asp-action="Details" asp-route-id="@highBoard.Id">
-                                                <img width="20" height="20" src="https://img.icons8.com/parakeet-line/48/1A1A1A/person-male.png" alt="book--v1" />
-                                                <span style="margin-left: 2px;">Personal Data</span>
-                                            </a>
-                                        }
+                                        <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="HighBoard" asp-action="Details" asp-route-id="@highBoard.Id">
+                                            <img width="20" height="20" src="https://img.icons8.com/parakeet-line/48/1A1A1A/person-male.png" alt="book--v1" />
+                                            <span style="margin-left: 2px;">Personal Data</span>
+                                        </a>
                                     }
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger d-flex align-items-center" style="color: black;text-decoration: none" asp-area="Identity" asp-controller="Account" asp-action="Logout">

@@ -1,7 +1,22 @@
 ﻿@model Models.Department
+@using Data.Repository.IRepository
+@inject IDoctorRepository doctorRepository
+@using System.Security.Claims
+@inject IHighBoardRepository highBoardRepository
 
 @{
     ViewData["Title"] = $"{Model.Name} Department";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var Highboard = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    var Doctor = doctorRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    if (Doctor != null)
+    {
+        ViewData["Doctor"] = Doctor;
+    }
+    else
+    {
+        ViewData["Doctor"] = Highboard;
+    }
 }
 
 <!-- StyleSheet -->
@@ -15,14 +30,16 @@
             <h4>
                 <i class="fas fa-user-tie TitleInfo"></i><span class="DepartmentInfo">Head:</span> @ViewBag.Head
             </h4>
-            <h4>
-                <i class="fas fa-user-graduate TitleInfo"></i><span class="DepartmentInfo">Number Allowed of Students:</span>@Model.Allowed
-
-            </h4>
-            <h4>
-                <i class="fas fa-user-check TitleInfo"></i><span class="DepartmentInfo">Number Registered Students:</span> @ViewBag.Students
-
-            </h4>
+            @if (ViewBag.Doctor is HighBoard HighBoard)
+            {
+                <h4>
+                    <i class="fas fa-user-graduate TitleInfo"></i><span class="DepartmentInfo">Number Allowed of Students:</span>@Model.Allowed
+            
+                </h4>
+                <h4>
+                    <i class="fas fa-user-check TitleInfo"></i><span class="DepartmentInfo">Number Registered Students:</span> @ViewBag.Students
+                </h4>
+            }
         </div>
     </div>
 
@@ -35,8 +52,11 @@
                 <th>@Html.DisplayNameFor(model => model.Subjects.First().Semester)</th>
                 <th>Doctor Name</th>
                 <th>@Html.DisplayName("Subject Hours")</th>
-                <th>@Html.DisplayName("Students Allowed")</th>
-                <th>@Html.DisplayNameFor(model => model.Subjects.First().Salary)</th>
+                @if (ViewBag.Doctor is HighBoard High)
+                {
+                    <th>@Html.DisplayName("Students Allowed")</th>
+                    <th>@Html.DisplayNameFor(model => model.Subjects.First().Salary)</th>
+                }
                 <th>@Html.DisplayName("subject Type")</th>
                 <th>Registered Students</th>
             </tr>
@@ -50,8 +70,11 @@
                     <td>@subject.Subject.Semester</td>
                     <td>@ViewBag.DoctorNames[subject.Subject.DoctorId]</td>
                     <td>@subject.Subject.SubjectHours</td>
-                    <td>@subject.Subject.StudentsAllowed</td>
-                    <td>@subject.Subject.Salary</td>
+                    @if (ViewBag.Doctor is HighBoard highBoard)
+                    {
+                        <td>@subject.Subject.StudentsAllowed</td>
+                        <td>@subject.Subject.Salary</td>
+                    }
                     <td>@subject.Subject.subjectType</td>
                     <td>@ViewBag.StudentsBySubject[subject.Subject.Id]</td>
                 </tr>

@@ -39,7 +39,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var exists = studentSubjectsRepository.Exist(studentId, subjectId);
             if (exists)
             {
-                ModelState.AddModelError("", "This subject is already registered.");
+                TempData["ErrorMessage"] = "This subject is already registered.";
                 return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
             }
 
@@ -58,9 +58,10 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             // Calculate Academic Records
             UpdateAcademicRecords(studentId);
 
-            return RedirectToAction("SubjectRegsitered", new { id = studentId });
+            TempData["Success"] = "Subject has been successfully added.";
+            return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
-        public IActionResult DeleteSubject(int studentId, int subjectId)
+        public IActionResult DeleteSubject(int studentId, int subjectId, int departmentId)
         {
             var links = studentSubjectsRepository.FindStudent(studentId);
             if (links.Count() == 1)
@@ -79,14 +80,15 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 // Update Academic Records
                 UpdateAcademicRecords(studentId);
 
-                return RedirectToAction("SubjectRegsitered", new { id = studentId });
+                TempData["ErrorMessage"] = "The student and all associated subjects have been successfully deleted.";
+                return RedirectToAction("StudentsByDepartment", "Student", new { id = departmentId });
             }
             else
             {
                 var link = studentSubjectsRepository.GetOne(studentId, subjectId);
                 if (link == null)
                 {
-                    ModelState.AddModelError("", "you Can't Delete Subject because you Did not Add");
+                    TempData["ErrorMessage"] = "you Can't Delete Subject because you Did not Add";
                     return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
                 }
                 else
@@ -98,7 +100,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                     UpdateAcademicRecords(studentId);
                 }
             }
-            return RedirectToAction("SubjectRegsitered", new { id = studentId });
+            TempData["Success"] = "Subject has been successfully Deleted.";
+            return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
         public IActionResult SubjectRegsitered(int id)
         {
