@@ -85,7 +85,7 @@
                         <li class="nav-item" style="margin-left: 30px;">
                             <a class="nav-link NavItems" style="color: white;" asp-area="Doctors" asp-controller="Faculty" asp-action="Index">
                                 <img style="margin-bottom: 4px;" width="25" height="25" src="https://img.icons8.com/external-fauzidea-detailed-outline-fauzidea/64/FFFFFF/external-college-building-fauzidea-detailed-outline-fauzidea-2.png" alt="external-college-building-fauzidea-detailed-outline-fauzidea-2" />
-                                Facilities
+                                Faculties
                             </a>
                         </li>
                         <li class="nav-item" style="margin-left: 30px;">
@@ -98,6 +98,12 @@
                             <a class="nav-link NavItems" style="color: white;" href="@ViewBag.Mail">
                                 <img width="23" height="23" src="https://img.icons8.com/ios/25/FFFFFF/email.png" alt="email" />
                                 Contact Us
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a class="nav-link NavItems" style="color: white;" asp-area="Doctors" asp-controller="Doctor" asp-action="DisplaySubject" asp-route-id="@ViewBag.doctor.Id">
+                                <img width="23" height="23" src="https://img.icons8.com/ios/50/FFFFFF/book--v1.png" alt="Subject--v1" />
+                                Subjects
                             </a>
                         </li>
                     </ul>
@@ -146,10 +152,6 @@
                                 </a>
                                 @if (ViewBag.Doctor is Doctor doctor)
                                 {
-                                    <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Doctor" asp-action="DisplaySubject" asp-route-id="@doctor.Id">
-                                        <img width="20" height="20" src="https://img.icons8.com/ios/50/1A1A1A/book--v1.png" alt="Subject--v1" />
-                                        <span style="margin-left: 2px;">Subjects</span>
-                                    </a>
                                     <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" asp-area="Doctors" asp-controller="Doctor" asp-action="Details" asp-route-id="@doctor.Id">
                                         <img width="20" height="20" src="https://img.icons8.com/parakeet-line/48/1A1A1A/person-male.png" alt="Personal--v1" />
                                         <span style="margin-left: 2px;">Personal Data</span>

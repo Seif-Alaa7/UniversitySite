@@ -38,9 +38,6 @@ else
                                 {
                                     <li>
                                         @ViewBag.DepartmentDictionary[departmentId]
-                                        <a href="@Url.Action("StudentsByDepartment", "Student", new { id = departmentId })" class="ml-2" title="View Students">
-                                            <i class="fas fa-user"></i>
-                                        </a>
                                     </li>
                                 }
                             </ul>

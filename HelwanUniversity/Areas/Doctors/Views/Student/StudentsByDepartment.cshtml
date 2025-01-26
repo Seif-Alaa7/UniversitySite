@@ -35,7 +35,6 @@
                 <th>@Html.DisplayNameFor(model => model.Name)</th>
                 <th>Level</th>
                 <th>Semester</th>
-                <th>Register Subjects</th>
             </tr>
         </thead>
         <tbody>
@@ -67,47 +66,6 @@
                         else
                         {
                             @:N/A
-                        }
-                    </td>
-                    <td>
-                        @if(ViewBag.Doctor is Doctor)
-                        {
-                            <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" title="Register Subject">
-                                <i class="fas fa-plus fa-lg"></i>
-                            </a>
-                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" title="Registered Subjects">
-                                <i class="fas fa-book"></i>
-                            </a>
-                        }
-                        else if(ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.DeanOfFaculty)
-                        {
-                            <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" title="Register Subject">
-                                <i class="fas fa-plus fa-lg"></i>
-                            </a>
-                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" title="Registered Subjects">
-                                <i class="fas fa-book"></i>
-                            </a>
-                            <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" title="View Degrees">
-                                <i class="fas fa-eye icon-lg"></i>
-                            </a>
-                            <a href="@Url.Action("ResultsRegisteration", "Subject", new { id = item.Id })" title="Register Results">
-                                <i class="fas fa-pencil-alt"></i>
-                            </a>
-                        }
-                        else if(ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.HeadOfDepartment)
-                        {
-                            <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" title="Register Subject">
-                                <i class="fas fa-plus fa-lg"></i>
-                            </a>
-                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" title="Registered Subjects">
-                                <i class="fas fa-book"></i>
-                            </a>
-                            <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" title="View Degrees">
-                                <i class="fas fa-eye icon-lg"></i>
-                            </a>
-                            <a href="@Url.Action("ResultsRegisteration", "Subject", new { id = item.Id })" title="Register Results">
-                                <i class="fas fa-pencil-alt"></i>
-                            </a>
                         }
                     </td>
                 </tr>
