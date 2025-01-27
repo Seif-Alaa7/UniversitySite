@@ -35,20 +35,19 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public IActionResult Add(int id)
         {
             ViewData["DepartId"] = id;
-            var faculty = facultyRepository.FacultyByDepartment(id);
-            ViewData["Subjects"] = subjectRepository.SelectSubjectsByFaculty(faculty.Id);
+            ViewData["Subjects"] = subjectRepository.Select();
             return View();
         }
         [HttpPost]
         public IActionResult SaveAdd(DepartmentSubjects model)
         {
             var ExistDepartmentSubject = departmentSubjectsRepository.Exist(model);
+
             if (ExistDepartmentSubject)
             {
                 ViewData["DepartId"] = model.DepartmentId;
                 ModelState.AddModelError("SubjectId", "This Subject is Already Exist in this Department..");
-                var faculty = facultyRepository.FacultyByDepartment(model.DepartmentId);
-                ViewData["Subjects"] = subjectRepository.SelectSubjectsByFaculty(faculty.Id);
+                ViewData["Subjects"] = subjectRepository.Select();
                 return View("Add");
             }
             else
@@ -60,6 +59,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 };
                 departmentSubjectsRepository.Add(DepartmentSubject);
                 departmentSubjectsRepository.Save();
+
             }
             return RedirectToAction("Details", "Department", new { area = "Doctors", id = model.DepartmentId });
         }

@@ -41,6 +41,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             if (ExistDepartmentSubject)
             {
+                ViewData["DepartId"] = model.DepartmentId;
                 ModelState.AddModelError("SubjectId", "This Subject is Already Exist in this Department..");
                 ViewData["Subjects"] = subjectRepository.Select();
                 return View("Add");
