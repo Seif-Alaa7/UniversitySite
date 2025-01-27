@@ -1,4 +1,11 @@
-﻿function applyFilters() {
+﻿const btn = document.querySelector("#btn");
+const btnText = document.querySelector("#btnText");
+
+btn.onclick = () => {
+    btnText.innerHTML = "Thanks";
+    btn.classList.add("active");
+};
+function applyFilters() {
     var idFilter = document.getElementById('idFilter').value.toLowerCase().trim();
     var nameFilter = document.getElementById('nameFilter').value.toLowerCase().trim();
     var levelFilter = document.getElementById('levelFilter').value.trim();
@@ -30,35 +37,26 @@
             row.style.display = 'none';
         }
     });
-    const btn = document.querySelector("#btn");
-    const btnText = document.querySelector("#btnText");
-
-    btn.onclick = () => {
-        btnText.innerHTML = "Thanks";
-        btn.classList.add("active");
-    };
 }
-document.addEventListener("DOMContentLoaded", function () {
-    const filterLevel = document.getElementById("filterLevel");
-    const filterSemester = document.getElementById("filterSemester");
-    const tableRows = document.querySelectorAll("#studentsTable tbody tr");
-    function filterTable() {
-        const selectedLevel = filterLevel.value;
-        const selectedSemester = filterSemester.value;
-        tableRows.forEach(row => {
-            const rowLevel = row.getAttribute("data-level");
-            const rowSemester = row.getAttribute("data-semester");
-            const levelMatch = selectedLevel === "" || rowLevel === selectedLevel;
-            const semesterMatch = selectedSemester === "" || rowSemester === selectedSemester;
-            if (levelMatch && semesterMatch) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-    }
-    filterLevel.addEventListener("change", filterTable);
-    filterSemester.addEventListener("change", filterTable);
-});
-
-
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterLevel = document.getElementById("filterLevel");
+        const filterSemester = document.getElementById("filterSemester");
+        const tableRows = document.querySelectorAll("#studentsTable tbody tr");
+        function filterTable() {
+            const selectedLevel = filterLevel.value;
+            const selectedSemester = filterSemester.value;
+            tableRows.forEach(row => {
+                const rowLevel = row.getAttribute("data-level");
+                const rowSemester = row.getAttribute("data-semester");
+                const levelMatch = selectedLevel === "" || rowLevel === selectedLevel;
+                const semesterMatch = selectedSemester === "" || rowSemester === selectedSemester;
+                if (levelMatch && semesterMatch) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+        filterLevel.addEventListener("change", filterTable);
+        filterSemester.addEventListener("change", filterTable);
+    });

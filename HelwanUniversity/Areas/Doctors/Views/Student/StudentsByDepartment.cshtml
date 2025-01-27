@@ -96,14 +96,6 @@
                         }
                     </td>
                     <td>
-                        <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" class="ml-2" title="Display Degrees">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" class="ml-2" title="Register Subjects">
-                            <i class="fas fa-pen"></i>
-                        </a>
-                    </td>
-                    <td>
                         @if (records != null && records.ContainsKey(item.Id))
                         {
                             @records[item.Id].Semester
@@ -112,6 +104,14 @@
                         {
                             @:N/A
                         }
+                    </td>
+                    <td>
+                        <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" class="ml-2" title="Display Degrees">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" class="ml-2" title="Register Subjects">
+                            <i class="fas fa-pen"></i>
+                        </a>
                     </td>
                 </tr>
             }
