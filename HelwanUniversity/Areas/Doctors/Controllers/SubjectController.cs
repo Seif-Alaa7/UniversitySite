@@ -131,5 +131,10 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             departmentSubjectsRepository.Save();
             return RedirectToAction("Details", "Department", new { id = Departmentid });
         }
+        public IActionResult ChartData()
+        {
+
+            return View();
+        }
     }
 }

@@ -125,5 +125,18 @@ namespace Data.Repository
             var Ids =  subjects.Select(s => s.Id).ToList();
             return Ids;
         }
+        public List<StudentSubjects> GetStudentGrades(int subjectId)
+        {
+            var grades = context.StudentSubjects
+                .Where(ss => ss.SubjectId == subjectId)
+        .Include(ss => ss.Student)
+        .Select(ss => new StudentSubjects
+        {
+            StudentId = ss.Student.Id,
+            Degree = ss.Degree
+        })
+        .ToList();
+            return grades;
+        }
     }
 }
