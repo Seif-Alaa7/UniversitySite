@@ -1,15 +1,18 @@
 ﻿using Data.Repository.IRepository;
 using Models;
+using Models.Enums;
 
 namespace Data.Repository
 {
     public class StudentRepository : IStudentRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IStudentSubjectsRepository studentSubjectsRepository;
 
-        public StudentRepository(ApplicationDbContext context)
+        public StudentRepository(ApplicationDbContext context, IStudentSubjectsRepository studentSubjectsRepository)
         {
             this.context = context;
+            this.studentSubjectsRepository = studentSubjectsRepository;
         }
         public void Update(Student student)
         {
@@ -76,6 +79,32 @@ namespace Data.Repository
         {
             var Students = context.Students.Where(x => x.PaymentFees == false).ToList();
             return Students;
+        }
+        public Dictionary<int, int> ReturnDegrees(IQueryable<Student> students, int Subjectid)
+        {
+            Dictionary<int, int> studentDegree = new Dictionary<int, int>();
+            foreach (var student in students)
+            {
+                var studentSubjects = studentSubjectsRepository.GetOne(student.Id, Subjectid);
+                if (studentSubjects != null)
+                {
+                    studentDegree[student.Id] = studentSubjects.Degree ?? 0;
+                }
+            }
+            return studentDegree;
+        }
+        public Dictionary<int, Models.Enums.Grade> ReturnGrades(IQueryable<Student> students, int Subjectid)
+        {
+            Dictionary<int, Models.Enums.Grade> studentGrade = new Dictionary<int, Models.Enums.Grade>();
+            foreach (var student in students)
+            {
+                var studentSubjects = studentSubjectsRepository.GetOne(student.Id, Subjectid);
+                if (studentSubjects != null)
+                {
+                    studentGrade[student.Id] = studentSubjects.Grade ?? Models.Enums.Grade.F;
+                }
+            }
+            return studentGrade;
         }
     }
 }

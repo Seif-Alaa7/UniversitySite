@@ -9,10 +9,12 @@ namespace Data.Repository
     public class SubjectRepository : ISubjectRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IFacultyRepository facultyRepository;
 
-        public SubjectRepository(ApplicationDbContext context)
+        public SubjectRepository(ApplicationDbContext context, IFacultyRepository facultyRepository)
         {
             this.context = context;
+            this.facultyRepository = facultyRepository;
         }
         public void Add(Subject subject)
         {
@@ -44,6 +46,15 @@ namespace Data.Repository
             }).ToList();
 
             return list;
+        }
+        public List<SelectListItem> SelectSubjectsByFaculty(int id)
+        {
+            var subjects = facultyRepository.GetSubjects(id).Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.Name
+            }).ToList();
+            return subjects;
         }
         public void Save()
         {
@@ -113,6 +124,19 @@ namespace Data.Repository
         {
             var Ids =  subjects.Select(s => s.Id).ToList();
             return Ids;
+        }
+        public List<StudentSubjects> GetStudentGrades(int subjectId)
+        {
+            var grades = context.StudentSubjects
+                .Where(ss => ss.SubjectId == subjectId)
+        .Include(ss => ss.Student)
+        .Select(ss => new StudentSubjects
+        {
+            StudentId = ss.Student.Id,
+            Degree = ss.Degree
+        })
+        .ToList();
+            return grades;
         }
     }
 }

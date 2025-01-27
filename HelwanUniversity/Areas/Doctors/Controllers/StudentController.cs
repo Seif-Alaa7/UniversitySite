@@ -65,6 +65,15 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         }
         public IActionResult StudentsByDepartment(int id)
         {
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["ErrorMessage"];
+            }
+            else
+            {
+                ViewBag.SuccessMessage = TempData["Success"];
+            }
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var Highboard = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
@@ -85,6 +94,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewBag.Records = academicRecordsRepository.GetLevelANDSemester(students);
             ViewData["DepartmentName"] = departmentRepository.GetOne(id)?.Name;
             ViewData["FacultyName"] = facultyRepository.FacultyByDepartment(id).Name;
+            ViewBag.ID = id;
 
             return View(students);
         }

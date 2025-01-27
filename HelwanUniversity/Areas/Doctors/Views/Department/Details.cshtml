@@ -1,33 +1,77 @@
 ﻿@model Models.Department
+@using Data.Repository.IRepository
+@inject IDoctorRepository doctorRepository
+@using System.Security.Claims
+@inject IHighBoardRepository highBoardRepository
+@using Models.Enums;
 
 @{
     ViewData["Title"] = $"{Model.Name} Department";
+    var records = ViewBag.Records as Dictionary<int, (Level Level, Semester Semester)>;
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var Highboard = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    var Doctor = doctorRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    if (Doctor != null)
+    {
+        ViewData["Doctor"] = Doctor;
+    }
+    else
+    {
+        ViewData["Doctor"] = Highboard;
+    }
 }
 
 <!-- StyleSheet -->
 <link rel="stylesheet" href="/css/Department.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 <div class="container mt-4 containerStyle">
     <h1 class="text-center mb-4">@Model.Name Department</h1>
-
+    @if (ViewBag.Doctor is HighBoard High1)
+    {
+        <div class="d-flex justify-content-between mb-3">
+            <a href="@Url.Action("Add","DepartmentSubjects", new { id = Model.Id })" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    }
+    <!-- Filters -->
+    <div class="Filters">
+        <select id="filterLevel">
+            <option value="">All Levels</option>
+            @foreach (var level in Enum.GetValues(typeof(Level)))
+            {
+                <option value="@level">@level</option>
+            }
+        </select>
+        <select id="filterSemester">
+            <option value="">All Semesters</option>
+            @foreach (var semester in Enum.GetValues(typeof(Semester)))
+            {
+                <option value="@semester">@semester</option>
+            }
+        </select>
+    </div>
     <div class="card mb-4">
         <div class="card-body">
             <h4>
                 <i class="fas fa-user-tie TitleInfo"></i><span class="DepartmentInfo">Head:</span> @ViewBag.Head
             </h4>
-            <h4>
-                <i class="fas fa-user-graduate TitleInfo"></i><span class="DepartmentInfo">Number Allowed of Students:</span>@Model.Allowed
-
-            </h4>
-            <h4>
-                <i class="fas fa-user-check TitleInfo"></i><span class="DepartmentInfo">Number Registered Students:</span> @ViewBag.Students
-
-            </h4>
+            @if (ViewBag.Doctor is HighBoard HighBoard)
+            {
+                <h4>
+                    <i class="fas fa-user-graduate TitleInfo"></i><span class="DepartmentInfo">Number Allowed of Students:</span>@Model.Allowed
+            
+                </h4>
+                <h4>
+                    <i class="fas fa-user-check TitleInfo"></i><span class="DepartmentInfo">Number Registered Students:</span> @ViewBag.Students
+                </h4>
+            }
         </div>
     </div>
 
     <h3>Subjects</h3>
-    <table class="table table-striped">
+    <table class="table table-striped" id="studentsTable">
         <thead class="thead-dark">
             <tr>
                 <th>@Html.DisplayNameFor(model => model.Subjects.First().Name)</th>
@@ -35,30 +79,54 @@
                 <th>@Html.DisplayNameFor(model => model.Subjects.First().Semester)</th>
                 <th>Doctor Name</th>
                 <th>@Html.DisplayName("Subject Hours")</th>
-                <th>@Html.DisplayName("Students Allowed")</th>
-                <th>@Html.DisplayNameFor(model => model.Subjects.First().Salary)</th>
+                @if (ViewBag.Doctor is HighBoard High)
+                {
+                    <th>@Html.DisplayName("Students Allowed")</th>
+                    <th>@Html.DisplayNameFor(model => model.Subjects.First().Salary)</th>
+                }
                 <th>@Html.DisplayName("subject Type")</th>
                 <th>Registered Students</th>
+                @if (ViewBag.Doctor is HighBoard high)
+                {
+                    <th>Actions</th>
+                }
             </tr>
         </thead>
         <tbody>
             @foreach (var subject in ViewBag.Subjects)
             {
-                <tr>
+                <tr data-level="@subject.Subject.Level" data-semester="@subject.Subject.Semester">
                     <td>@subject.Subject.Name</td>
                     <td>@subject.Subject.Level</td>
                     <td>@subject.Subject.Semester</td>
                     <td>@ViewBag.DoctorNames[subject.Subject.DoctorId]</td>
                     <td>@subject.Subject.SubjectHours</td>
-                    <td>@subject.Subject.StudentsAllowed</td>
-                    <td>@subject.Subject.Salary</td>
+                    @if (ViewBag.Doctor is HighBoard highBoard)
+                    {
+                        <td>@subject.Subject.StudentsAllowed</td>
+                        <td>@subject.Subject.Salary</td>
+                    }
                     <td>@subject.Subject.subjectType</td>
                     <td>@ViewBag.StudentsBySubject[subject.Subject.Id]</td>
+                    @if (ViewBag.Doctor is HighBoard highboard)
+                    {
+                        <td>
+                            <a href="@Url.Action("Edit", "Subject", new { id = @subject.Subject.Id, departmentId = Model.Id })" class="action-link edit-link" title="Edit Subject">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="@Url.Action("DeleteForever", "Subject", new { id = @subject.Subject.Id, departmentId = Model.Id })" class="action-link delete-forever-link" onclick="handleDelete(event, 'Do you want delete this Subject Forever?');" id="delete-forever" title="Delete Forever">
+                                <i class="fas fa-trash-alt text-danger"></i>
+                            </a>
+                            <a href="@Url.Action("Delete", "DepartmentSubjects", new { subjectId = subject.Subject.Id, departmentId = Model.Id })" class="action-link delete-link" onclick="handleDelete(event, 'Do you want delete this Subject From this Department?');" id="delete-from-department" title="Delete from Department">
+                                <i class="fas fa-minus-circle text-danger"></i>
+                            </a>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
     </table>
 </div>
-
-
-
+<!-- Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@latest/dist/sweetalert2.all.min.js"></script>
+<script src="/js/site.js" defer></script>

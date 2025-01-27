@@ -1,14 +1,15 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelwanUniversity", "HelwanUniversity\HelwanUniversity.csproj", "{AC521E33-957D-47E6-9284-339179AB7191}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelwanUniversity", "HelwanUniversity\HelwanUniversity.csproj", "{AC521E33-957D-47E6-9284-339179AB7191}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{CE02FFA8-9B86-45BD-A578-387EE0237460}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{CE02FFA8-9B86-45BD-A578-387EE0237460}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModels", "ViewModels\ViewModels.csproj", "{0CA4A11A-821E-4BB0-8319-A56F67D5A673}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModels", "ViewModels\ViewModels.csproj", "{0CA4A11A-821E-4BB0-8319-A56F67D5A673}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{A7D8B33D-D1B3-4C0D-994F-9A376BA6B2DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{A7D8B33D-D1B3-4C0D-994F-9A376BA6B2DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

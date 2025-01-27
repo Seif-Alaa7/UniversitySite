@@ -1,5 +1,4 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
-    // دمج جميع الوظائف التي تعمل عند تحميل الصفحة
     const loader = document.querySelector('.loader-container');
     const header = document.querySelector('header');
     const main = document.querySelector('main');
@@ -9,7 +8,6 @@
     const body = document.body;
     const fadeElements = document.querySelectorAll('.fade-in');
 
-    // إخفاء Loader وإظهار العناصر الأخرى
     setTimeout(function () {
         loader.style.display = 'none';
         header.style.display = 'block';
@@ -17,14 +15,12 @@
         footer.style.display = 'block';
     }, 3000);
 
-    // التعامل مع التمرير
     function handleScroll() {
         if (window.scrollY > 50) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
-        // التحقق من رؤية العناصر
         fadeElements.forEach(element => {
             const rect = element.getBoundingClientRect();
             if (rect.top < window.innerHeight && rect.bottom > 0) {
@@ -36,7 +32,6 @@
     window.addEventListener('scroll', handleScroll);
     handleScroll();
 
-    // التعامل مع تبديل الثيم
     if (localStorage.getItem('theme') === 'dark') {
         body.classList.add('dark-theme');
         toggle.classList.replace('fa-sun', 'fa-moon');
@@ -52,14 +47,12 @@
             toggle.classList.replace('fa-moon', 'fa-sun');
         }
     });
-    // تحميل الصورة
     var img = new Image();
     img.src = '/img9.png';
     img.onload = function () {
         document.querySelector('.header').classList.add('loaded');
     };
 
-    // إضافة مستمعي الأحداث لأزرار الحذف
     ['delete-forever', 'delete-from-department', 'delete-button'].forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -117,3 +110,25 @@ function confirmDelete() {
         }
     });
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const filterLevel = document.getElementById("filterLevel");
+    const filterSemester = document.getElementById("filterSemester");
+    const tableRows = document.querySelectorAll("#studentsTable tbody tr");
+    function filterTable() {
+        const selectedLevel = filterLevel.value;
+        const selectedSemester = filterSemester.value;
+        tableRows.forEach(row => {
+            const rowLevel = row.getAttribute("data-level");
+            const rowSemester = row.getAttribute("data-semester");
+            const levelMatch = selectedLevel === "" || rowLevel === selectedLevel;
+            const semesterMatch = selectedSemester === "" || rowSemester === selectedSemester;
+            if (levelMatch && semesterMatch) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+    filterLevel.addEventListener("change", filterTable);
+    filterSemester.addEventListener("change", filterTable);
+});

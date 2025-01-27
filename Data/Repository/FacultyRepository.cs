@@ -112,5 +112,19 @@ namespace Data.Repository
             var Faculty = context.Faculties.FirstOrDefault(x=>x.DeanId == id);
             return Faculty;
         }
+        public List<Department> GetDepartments(int FacultyId)
+        {
+            return context.Departments.Where(d => d.FacultyId == FacultyId).ToList();
+        }
+        public List<Subject> GetSubjects(int FacultyId)
+        {
+            var departmentIds = context.Departments
+                .Where(d => d.FacultyId == FacultyId)
+                .Select(d => d.Id)
+                .ToList();
+            return context.Subjects
+                .Where(s => s.Departments.Any(d => departmentIds.Contains(d.Id)))
+                .ToList();
+        }
     }
 }

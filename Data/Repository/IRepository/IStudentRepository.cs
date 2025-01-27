@@ -16,5 +16,7 @@ namespace Data.Repository.IRepository
         public void DeleteUser(string id);
         List<Student> TrueFees();
         List<Student> FalseFees();
+        Dictionary<int, int> ReturnDegrees(IQueryable<Student> students, int Subjectid);
+        Dictionary<int, Models.Enums.Grade> ReturnGrades(IQueryable<Student> students, int Subjectid);
     }
 }

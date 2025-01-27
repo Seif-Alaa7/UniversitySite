@@ -351,6 +351,7 @@ body {
 .dropdown-menu {
     left: auto;
     right: 0;
+    width: 165px;
 }
 
 .dropdown-toggle::after {
