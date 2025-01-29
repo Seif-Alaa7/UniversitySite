@@ -18,14 +18,17 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly ICloudinaryService cloudinaryService;
         private readonly IFacultyRepository facultyRepository;
         private readonly IDepartmentRepository departmentRepository;
+        private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
 
         public HighBoardController(IHighBoardRepository highBoardRepository,
-            ICloudinaryService cloudinaryService,IFacultyRepository facultyRepository,IDepartmentRepository departmentRepository)
+            ICloudinaryService cloudinaryService,IFacultyRepository facultyRepository,IDepartmentRepository departmentRepository
+            ,IDepartmentSubjectsRepository departmentSubjectsRepository)
         {
             this.highBoardRepository = highBoardRepository;
             this.cloudinaryService = cloudinaryService;
             this.facultyRepository = facultyRepository;
-            this.departmentRepository = departmentRepository;   
+            this.departmentRepository = departmentRepository;
+            this.departmentSubjectsRepository = departmentSubjectsRepository;
         }
         public IActionResult Index()
         {
@@ -126,9 +129,18 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             if (jop == Models.Enums.JobTitle.DeanOfFaculty)
             {
                 var faculty = facultyRepository.GetFacultybyDean(id);
-
                 if (faculty != null)
                 {
+                    var departments = facultyRepository.GetDepartments(faculty.Id);
+                    if(departments.Count > 0)
+                    {
+                        foreach (var department in departments)
+                        {
+                            departmentSubjectsRepository.DeleteRelations(department.Id);
+                            departmentRepository.Delete(department);
+                            facultyRepository.Save();
+                        }
+                    }
                     facultyRepository.Delete(faculty);
                     facultyRepository.Save();
                 }
@@ -143,8 +155,10 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             else if (jop == Models.Enums.JobTitle.HeadOfDepartment)
             {
                 var department = departmentRepository.GetDepartbyHead(id);
+
                 if (department != null)
                 {
+                    departmentSubjectsRepository.DeleteRelations(department.Id);
                     departmentRepository.Delete(department);
                     departmentRepository.Save();
                 }

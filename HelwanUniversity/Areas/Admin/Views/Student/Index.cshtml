@@ -103,9 +103,9 @@
                             <a href="@Url.Action("Edit", "Student", new { id = @item.Id })" class="btn btn-outline-primary btn-sm" title="Edit">
                                 <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/create-new--v2.png" alt="edit" />
                             </a>
-                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: inline;">
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="delete-form" style="display: inline;">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this Student?');">
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" title="Delete">
                                     <img width="20" height="20" src="https://img.icons8.com/ios/50/1A1A1A/delete-sign--v1.png" alt="delete" />
                                 </button>
                             </form>
@@ -127,7 +127,11 @@
 
 <!-- script -->
 <script src="/js/student.js" defer></script>
-
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/Delete.js" defer></script>
 
 
 

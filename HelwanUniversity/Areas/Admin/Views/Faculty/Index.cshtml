@@ -41,11 +41,10 @@
                             </a>
                         </div>
                         <div class="d-inline-block">
-                            <!-- Form -->
                             <form asp-action="Delete" method="post" class="d-inline" id="delete-form">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@faculty.Id" />
-                                <button type="submit" class="btn btn-outline-danger Action" title="Delete" onclick="return confirm('Are you sure you want to delete this Faculty?');">
+                                <button type="button" class="btn btn-outline-danger Action delete-btn" title="Delete">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
@@ -60,6 +59,10 @@
 
 <!-- Stylesheets -->
 <script src="/js/site.js"></script>
-
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/Delete.js" defer></script>
 
 

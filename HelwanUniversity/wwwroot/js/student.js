@@ -60,3 +60,4 @@ function applyFilters() {
         filterLevel.addEventListener("change", filterTable);
         filterSemester.addEventListener("change", filterTable);
     });
+

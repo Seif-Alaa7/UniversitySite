@@ -17,5 +17,7 @@ namespace Data.Repository.IRepository
         List<DepartmentSubjects> GetDepartmentSubjects(List<int> subjectIds);
         Dictionary<int, List<int>> GetDepartmentsSubject(List<Subject> subjects, List<DepartmentSubjects> departmentSubjects);
         Dictionary<int, int> StudentCounts(List<DepartmentSubjects> subjects);
+        public void DeleteRelations(int id);
+
     }
 }
