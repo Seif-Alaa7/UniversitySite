@@ -122,80 +122,67 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         public IActionResult Delete(int id)
         {
             var highBoard = highBoardRepository.GetOne(id);
-            var UserId = highBoard.ApplicationUserId;
+            if (highBoard == null)
+            {
+                return NotFound();
+            }
 
-            var jop = highBoard.JobTitle;
+            var userId = highBoard.ApplicationUserId;
+            var job = highBoard.JobTitle;
 
-            if (jop == Models.Enums.JobTitle.DeanOfFaculty)
+            if (job == Models.Enums.JobTitle.DeanOfFaculty)
             {
                 var faculty = facultyRepository.GetFacultybyDean(id);
                 if (faculty != null)
                 {
                     var departments = facultyRepository.GetDepartments(faculty.Id);
-                    if(departments.Count > 0)
+                    if (departments.Count > 0)
                     {
-                        foreach (var department in departments)
-                        {
-                            departmentSubjectsRepository.DeleteRelations(department.Id);
-                            departmentRepository.Delete(department);
-                            facultyRepository.Save();
-                        }
+                        ViewBag.Faculty = facultyRepository.GetFaculty(facultyRepository.GetAll());
+                        ViewBag.Error = "Cannot delete the dean. The faculty has linked departments.";
+                        return View("DisplayDean", highBoardRepository.GetDeans());
                     }
-                    facultyRepository.Delete(faculty);
-                    facultyRepository.Save();
+                    ViewBag.Faculty = facultyRepository.GetFaculty(facultyRepository.GetAll());
+                    ViewBag.Error = "Cannot delete the dean. The faculty is linked.";
+                    return View("DisplayDean", highBoardRepository.GetDeans());
                 }
-                highBoardRepository.Delete(id);
-                highBoardRepository.Save();
-
-                highBoardRepository.DeleteUser(UserId);
-                highBoardRepository.Save();
-
-                return RedirectToAction("DisplayDean");
             }
-            else if (jop == Models.Enums.JobTitle.HeadOfDepartment)
+            else if (job == Models.Enums.JobTitle.HeadOfDepartment)
             {
-                var department = departmentRepository.GetDepartbyHead(id);
-
+                var department = departmentRepository.GetDepartbyHead(id);  
                 if (department != null)
                 {
-                    departmentSubjectsRepository.DeleteRelations(department.Id);
-                    departmentRepository.Delete(department);
-                    departmentRepository.Save();
+                    ViewBag.Department = departmentRepository.GetDepartments(departmentRepository.GetAll());
+                    ViewBag.Error = "Cannot delete the department head. The department is linked.";
+                    return View("DisplayHead", highBoardRepository.GetHeads());
                 }
-                highBoardRepository.Delete(id);
-                highBoardRepository.Save();
-
-                highBoardRepository.DeleteUser(UserId);
-                highBoardRepository.Save();
-
-                return RedirectToAction("DisplayHead");
             }
-            else
-            {
-                highBoardRepository.Delete(id);
-                highBoardRepository.Save();
 
-                highBoardRepository.DeleteUser(UserId);
-                highBoardRepository.Save();
+            highBoardRepository.Delete(id);
+            highBoardRepository.Save();
 
-                return RedirectToAction("Index");
-            }
+            highBoardRepository.DeleteUser(userId);
+            highBoardRepository.Save();
+
+            TempData["SuccessMessage"] = "The member has been successfully deleted.";
+
+            return job == Models.Enums.JobTitle.DeanOfFaculty ? RedirectToAction("DisplayDean") :
+                   job == Models.Enums.JobTitle.HeadOfDepartment ? RedirectToAction("DisplayHead") :
+                   RedirectToAction("Index");
         }
+
         public IActionResult DisplayDean()
         {
             var deans = highBoardRepository.GetDeans();
-            var facultiies = facultyRepository.GetAll();
-            ViewBag.Faculty = facultyRepository.GetFaculty(facultiies);
-
+            ViewBag.Faculty = facultyRepository.GetFaculty(facultyRepository.GetAll());
             return View(deans);
         }
+
         public IActionResult DisplayHead()
         {
-            var Heads = highBoardRepository.GetHeads();
-            var Departments = departmentRepository.GetAll();    
-            ViewBag.Department = departmentRepository.GetDepartments(Departments);
-
-            return View(Heads);
+            var heads = highBoardRepository.GetHeads();
+            ViewBag.Department = departmentRepository.GetDepartments(departmentRepository.GetAll());
+            return View(heads);
         }
     }
 }

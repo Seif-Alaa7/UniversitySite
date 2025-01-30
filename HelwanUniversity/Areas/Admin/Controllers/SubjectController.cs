@@ -130,6 +130,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             subjectRepository.Delete(subject);
             departmentSubjectsRepository.Save();
 
+            TempData["SuccessMessage"] = "The Subject has been successfully deleted Forever.";
+
             return RedirectToAction("Details", "Department", new { id = Departmentid });
         }
         public IActionResult ResultsRegisteration(int id)

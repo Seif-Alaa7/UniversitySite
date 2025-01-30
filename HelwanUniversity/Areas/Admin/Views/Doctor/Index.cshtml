@@ -10,7 +10,18 @@
 <div class="container mt-5">
     <!-- Page Title -->
     <h1 class="text-center mb-4">All Doctors</h1>
-
+    @if (!string.IsNullOrEmpty(ViewBag.Error))
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
     <!-- Filter Input -->
     <div class="filter-container text-center mb-4">
         <input type="text" id="doctorNameFilter" class="filter-input form-control w-50 mx-auto" placeholder="Search by Doctor Name" onkeyup="filterDoctorsByName()" />

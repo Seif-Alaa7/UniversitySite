@@ -13,7 +13,13 @@
         {
             <img src="@Model.Logo" class="faculty-logo" alt="Logo">
         }
-        <h2 class="text-center">@Model.Name Faculty</h2>
+        <h2 class="text-CENTER">@Model.Name Faculty</h2>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
         <div class="faculty-detail mt-4">
             <div class="faculty-image-wrapper">
                 @if (!string.IsNullOrEmpty(Model.Picture))

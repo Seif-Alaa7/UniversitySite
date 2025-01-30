@@ -10,6 +10,18 @@
 <h1 class="text-center my-4">
     All Heads
 </h1>
+@if (!string.IsNullOrEmpty(ViewBag.Error))
+{
+    <div class="alert alert-danger">
+        @ViewBag.Error
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
 <div class="mb-3">
     <input type="text" id="SearchInput" class="form-control Filter" placeholder="Search by name..." />
 </div>
@@ -64,7 +76,7 @@
                                  alt="trash"
                                  width="20"
                                  height="20"
-                                 class="delete-btn"
+                                 class="delete-btnHead"
                                  style="cursor: pointer;" />
                         </form>
                     </div>
@@ -80,4 +92,4 @@
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 <!-- SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/js/Delete.js" defer></script>
+<script src="/js/DeleteHigh.js" defer></script>
