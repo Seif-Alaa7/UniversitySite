@@ -13,7 +13,12 @@
 }
 <h1 class="text-center">All Students</h1>
 <br />
-
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
 <div class="filter-container">
     <input type="text" id="idFilter" class="filter-input" placeholder="Filter by ID" />
     <input type="text" id="nameFilter" class="filter-input" placeholder="Filter by Name" />
