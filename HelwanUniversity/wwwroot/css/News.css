@@ -38,12 +38,20 @@
         cursor: pointer;
     }
 
-.add-image-button {
+.add-image-button a {
     display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+    align-items: center; 
+    text-decoration: none; 
+    gap: 8px; 
 }
 
-    .add-image-button img {
-        cursor: pointer;
-    }
+.add-text {
+    font-size: 30px; 
+    font-weight: bold;
+    color: #1A1A1A; 
+}
+
+.add-image-button a img {
+    width: 60px; 
+    height: 60px;
+}

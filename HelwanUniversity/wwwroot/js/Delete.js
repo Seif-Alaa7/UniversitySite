@@ -2,7 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const deleteButtons = document.querySelectorAll(".delete-btn");
 
     deleteButtons.forEach(button => {
-        button.addEventListener("click", function () {
+        button.addEventListener("click", function (event) {
+            event.preventDefault(); 
+
             const form = this.closest("form");
 
             Swal.fire({
@@ -15,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit();
+                    form.submit(); 
                 }
             });
         });

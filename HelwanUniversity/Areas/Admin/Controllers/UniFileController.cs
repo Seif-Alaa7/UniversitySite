@@ -99,7 +99,12 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         {
             var Video = uniFileRepository.GetFile(id);
 
-            //Mapping
+            if (Video == null)
+            {
+                return NotFound(); 
+            }
+
+            // Mapping
             var VideoVM = new UniFileVM2
             {
                 Id = Video.Id,
@@ -109,6 +114,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             return View(VideoVM);
         }
+
         [HttpPost]
         public IActionResult SaveUpdateVideo(UniFileVM2 newVideoVM)
         {

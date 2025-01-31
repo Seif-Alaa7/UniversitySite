@@ -103,7 +103,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             var UserId = doctor.ApplicationUserId;
 
             var subjects = subjectRepository.SubjectsByDoctor(id).ToList();
-            if (subjects != null)
+
+            if (subjects.Any())
             {
                 ViewBag.Error = "You cannot delete this doctor because they are linked to subjects.";
 
