@@ -112,3 +112,20 @@ h4 {
     margin-bottom: 20px;
     text-align: center;
 }
+.add-image-button a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 8px;
+}
+
+.add-text {
+    font-size: 30px;
+    font-weight: bold;
+    color: #1A1A1A;
+}
+
+.add-image-button a img {
+    width: 60px;
+    height: 60px;
+}
