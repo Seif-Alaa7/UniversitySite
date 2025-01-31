@@ -22,5 +22,7 @@ namespace Data.Repository.IRepository
         List<int> GetIds(List<Subject> subjects);
         List<SelectListItem> SelectSubjectsByFaculty(int id);
         public List<StudentSubjects> GetStudentGrades(int subjectId);
+        public Dictionary<int, int> ReturnDegrees(List<Subject> subjects, int studentid);
+        public Dictionary<int, Models.Enums.Grade> ReturnGrades(List<Subject> subjects, int studentid);
     }
 }

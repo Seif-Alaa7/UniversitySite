@@ -1,4 +1,5 @@
-﻿using Data.Repository.IRepository;
+﻿using Data.Repository;
+using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -142,6 +143,12 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             ViewData["StudentId"] = id;
             ViewData["departmentName"] = department.Name;
+
+            var subjectDegree = subjectRepository.ReturnDegrees(Subjects,id);
+            var subjectGrade = subjectRepository.ReturnGrades(Subjects,id);
+
+            ViewData["subjectDegree"] = subjectDegree;
+            ViewData["subjectGrade"] = subjectGrade;
 
             return View(Subjects);
         }

@@ -37,7 +37,6 @@
                 <th>@Html.DisplayNameFor(model => model.Name)</th>
                 <th>Level</th>
                 <th>Semester</th>
-                <th>Register Subjects</th>
             </tr>
         </thead>
         <tbody>
@@ -65,11 +64,6 @@
                         {
                             @:N/A
                         }
-                    </td>
-                    <td>
-                        <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new { Studentid = item.Id })" title="Register Subject">
-                            <i class="fas fa-plus fa-lg"></i>
-                        </a>
                     </td>
                 </tr>
             }

@@ -119,7 +119,6 @@
                     <td class="align-middle">
                         <div class="btn-group-vertical" role="group">
                             <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new {StudentId = item.Id })" class="btn btn-outline-primary btn-sm mb-1">Academic Registration</a>
-                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" class="btn btn-outline-info btn-sm mb-1">Show Registrations</a>
                             <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" class="btn btn-outline-success btn-sm mb-1">Degrees</a>
                             <a href="@Url.Action("ResultsRegisteration", "Subject", new { id = item.Id })" class="btn btn-outline-warning btn-sm">Result Registration</a>
                         </div>

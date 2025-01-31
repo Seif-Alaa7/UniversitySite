@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Enums;
+using System.Security.Claims;
 using ViewModels;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
@@ -38,7 +39,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             var exists = studentSubjectsRepository.Exist(studentId, subjectId);
             if (exists)
             {
-                ModelState.AddModelError("", "This subject is already registered.");
+                TempData["ErrorMessage"] = "This subject is already registered.";
                 return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
             }
 
@@ -57,35 +58,23 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             // Calculate Academic Records
             UpdateAcademicRecords(studentId);
 
-            return RedirectToAction("SubjectRegsitered", new { id = studentId });
+            TempData["Success"] = "Subject has been successfully added.";
+            return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
         public IActionResult DeleteSubject(int studentId, int subjectId)
         {
             var links = studentSubjectsRepository.FindStudent(studentId);
             if (links.Count() == 1)
             {
-                academicRecordsRepository.DeleteByStudent(studentId);
-                studentRepository.Delete(studentId);
-
-                studentRepository.Save();
-
-                foreach (var model in links)
-                {
-                    studentSubjectsRepository.Delete(model);
-                    studentSubjectsRepository.Save();
-                }
-
-                // Update Academic Records
-                UpdateAcademicRecords(studentId);
-
-                return RedirectToAction("SubjectRegsitered", new { id = studentId });
+                TempData["ErrorMessage"] = "You cannot delete this subject as it's the only one registered. Removing it will delete the student record.";
+                return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
             }
             else
             {
                 var link = studentSubjectsRepository.GetOne(studentId, subjectId);
                 if (link == null)
                 {
-                    ModelState.AddModelError("", "you Can't Delete Subject because you Did not Add");
+                    TempData["ErrorMessage"] = "you Can't Delete Subject because you Did not Add";
                     return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
                 }
                 else
@@ -97,18 +86,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                     UpdateAcademicRecords(studentId);
                 }
             }
-            return RedirectToAction("SubjectRegsitered", new { id = studentId });
-        }
-        public IActionResult SubjectRegsitered(int id)
-        {
-
-            var Subjects = subjectRepository.GetSubjects(id);
-            var department = departmentRepository.DepartmentByStudent(id);
-
-            ViewData["departmentName"] = department.Name;
-            ViewBag.DoctorNames = doctorRepository.GetName(Subjects);
-
-            return View(Subjects);
+            TempData["Success"] = "Subject has been successfully Deleted.";
+            return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
         public IActionResult DisplayDegrees(int id)
         {
@@ -121,77 +100,62 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             return View(studentSubjects);
         }
-        [HttpGet]
-        public IActionResult AddDegree(int Studentid, int Subjectid)
-        {
-            var ModelVM = new StudentSubjectsVM()
-            {
-                StudentId = Studentid,
-                SubjectId = Subjectid
-            };
-            return View(ModelVM);
-        }
         [HttpPost]
-        public IActionResult SaveAdd(StudentSubjectsVM modelVM)
+        public IActionResult SaveAllDegrees(int studentId, Dictionary<int, int> Degrees)
         {
-
-            var studentId = modelVM.StudentId;
             var academicRecords = academicRecordsRepository.GetStudent(studentId);
-            var CurrentLevel = academicRecordsRepository.GetStudent(studentId)?.Level;
+            var currentLevel = academicRecords?.Level;
 
-            var StudentSubject = studentSubjectsRepository.GetOne(modelVM.StudentId, modelVM.SubjectId);
-            StudentSubject.Degree = modelVM.Degree;
-            StudentSubject.Grade = studentSubjectsRepository.CalculateGrade(modelVM.Degree);
+            foreach (var subjectDegree in Degrees)
+            {
+                var subjectId = subjectDegree.Key;
+                var degree = subjectDegree.Value;
 
-            studentSubjectsRepository.Update(StudentSubject);
+                // Fetch student subject entry and update it
+                var studentSubject = studentSubjectsRepository.GetOne(studentId, subjectId);
+                if (studentSubject != null)
+                {
+                    studentSubject.Degree = degree;
+                    studentSubject.Grade = studentSubjectsRepository.CalculateGrade(degree);
+
+                    studentSubjectsRepository.Update(studentSubject);
+                }
+            }
+
             studentSubjectsRepository.Save();
 
-            UpdateAcademicRecords(modelVM.StudentId);
+            // Update Academic Records
+            UpdateAcademicRecords(studentId);
 
-            var credithours = studentSubjectsRepository.CalculateCreditHours(modelVM.StudentId);
-            var semester = studentSubjectsRepository.Calculatesemester(credithours);
+            var creditHours = studentSubjectsRepository.CalculateCreditHours(studentId);
+            var semester = studentSubjectsRepository.Calculatesemester(creditHours);
 
-            var gpaSemester = academicRecordsRepository.CalculateGpaSemester(modelVM.StudentId , semester);
-            var gpaTotal = academicRecordsRepository.CalculateGPATotal(modelVM.StudentId);
+            var gpaSemester = academicRecordsRepository.CalculateGpaSemester(studentId, semester);
+            var gpaTotal = academicRecordsRepository.CalculateGPATotal(studentId);
 
+            // Update GPA information
             if (academicRecords != null)
             {
                 academicRecords.GPASemester = gpaSemester;
                 academicRecords.GPATotal = gpaTotal;
+
                 academicRecordsRepository.Update(academicRecords);
                 academicRecordsRepository.Save();
 
-                if (academicRecords.Level != CurrentLevel)
+                if (academicRecords.Level != currentLevel)
                 {
                     var student = studentRepository.GetOne(studentId);
                     if (student != null)
                     {
-                        if (student.PaymentFees == true)
-                        {
-                            student.PaymentFees = false;
-                        }
-                        else
-                        {
-                            student.PaymentFees = true;
-                        }
+                        student.PaymentFees = !student.PaymentFees;
                         studentRepository.Update(student);
                         studentRepository.Save();
                     }
                 }
             }
-            return RedirectToAction("DisplayDegrees", new { id = modelVM.StudentId });
+            return RedirectToAction("Index", "Student");
         }
-        public IActionResult StudentSubjectRegistered(int id)
-        {
 
-            ViewData["SubjectName"] = subjectRepository.GetName(id);
-            ViewData["Level"] = subjectRepository.GetLevel(id);
-            ViewData["Semester"] = subjectRepository.GetSemester(id);
-            ViewData["id"] = id;
-
-            var students = studentRepository.StudentsBySubject(id); 
-            return View(students);
-        }
 
         private void UpdateAcademicRecords(int studentId)
         {

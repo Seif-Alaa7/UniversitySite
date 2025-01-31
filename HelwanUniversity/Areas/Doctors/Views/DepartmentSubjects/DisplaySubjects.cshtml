@@ -58,7 +58,7 @@
                         <td>@Html.DisplayFor(modelItem => item.Subject.subjectType)</td>
                         <td>
                             @Html.ActionLink("+", "AddSubject", "StudentSubjects", new { Studentid = ViewBag.StudentId, Subjectid = item.Subject.Id }, new { @class = "btn btn-success btn-sm" }) |
-                            @Html.ActionLink("-", "DeleteSubject", "StudentSubjects", new { Studentid = ViewBag.StudentId, Subjectid = item.Subject.Id, departmentId = ViewBag.ID }, new { @class = "btn btn-danger btn-sm" })
+                            @Html.ActionLink("-", "DeleteSubject", "StudentSubjects", new { Studentid = ViewBag.StudentId, Subjectid = item.Subject.Id}, new { @class = "btn btn-danger btn-sm" })
                         </td>
                     </tr>
                 }

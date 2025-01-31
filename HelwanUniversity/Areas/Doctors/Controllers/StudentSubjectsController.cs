@@ -61,27 +61,13 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             TempData["Success"] = "Subject has been successfully added.";
             return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
-        public IActionResult DeleteSubject(int studentId, int subjectId, int departmentId)
+        public IActionResult DeleteSubject(int studentId, int subjectId)
         {
             var links = studentSubjectsRepository.FindStudent(studentId);
             if (links.Count() == 1)
             {
-                academicRecordsRepository.DeleteByStudent(studentId);
-                studentRepository.Delete(studentId);
-
-                studentRepository.Save();
-
-                foreach (var model in links)
-                {
-                    studentSubjectsRepository.Delete(model);
-                    studentSubjectsRepository.Save();
-                }
-
-                // Update Academic Records
-                UpdateAcademicRecords(studentId);
-
-                TempData["ErrorMessage"] = "The student and all associated subjects have been successfully deleted.";
-                return RedirectToAction("StudentsByDepartment", "Student", new { id = departmentId });
+                TempData["ErrorMessage"] = "You cannot delete this subject as it's the only one registered. Removing it will delete the student record.";
+                return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
             }
             else
             {
