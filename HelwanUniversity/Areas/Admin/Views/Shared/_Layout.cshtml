@@ -65,7 +65,7 @@
                         </li>
                         <li class="nav-item dropdown" style="padding: 10px 0 0px 30px;">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" style="margin-bottom: 5px;" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img style="margin-right: 5px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/48/group.png" alt="members" />
+                                <img style="margin-right: 5px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/50/conference-call.png" alt="members" />
                                 Members
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="membersDropdown">
@@ -97,6 +97,24 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="nav-item dropdown" style="padding: 10px 0 0px 30px;">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" style="margin-bottom: 5px;" href="#" id="membersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img style="margin-right: 5px;" width="25" height="25" src="https://img.icons8.com/pulsar-color/50/new-by-copy.png" alt="members" />
+                                Entity Operations
+                            </a>
+                            <ul class="dropdown-menu" style="min-width: 200px;" aria-labelledby="membersDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="/Identity/Account/Register" style="color: black; text-decoration: none">
+                                        <i class="fas fa-user-plus"></i> Register member
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" style="color: black; text-decoration: none" asp-controller="Entity" asp-action="Add" asp-route-area="Admin">
+                                        <i class="fas fa-landmark"></i> Add Entity
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
 
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -120,14 +138,6 @@
                                         <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" href="/Identity/Account/Manage">
                                             <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/user-male-circle.png" alt="add-user-male" />
                                             <span style="margin-left: 2px;">Account</span>
-                                        </a>
-                                        <a class="dropdown-item d-flex align-items-center" style="color: black; text-decoration: none" href="/Identity/Account/Register">
-                                            <img width="20" height="20" src="https://img.icons8.com/ios/50/1A1A1A/add-user-male.png" alt="add-user-male" />
-                                            <span style="margin-left: 2px;">Register</span>
-                                        </a>
-                                        <a class="dropdown-item d-flex align-items-center" style="color: black;text-decoration: none" href="/Admin/entity/add">
-                                            <img width="20" height="20" src="https://img.icons8.com/ios/50/1A1A1A/signing-a-document.png" alt="signing-a-document" />
-                                            <span style="margin-left: 2px;">Register Entity</span>
                                         </a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item text-danger d-flex align-items-center" style="color: black;text-decoration: none" href="/Identity/Account/Logout">
