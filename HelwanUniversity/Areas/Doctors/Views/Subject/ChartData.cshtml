@@ -4,17 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/css/ChartData.css">
+    <link rel="stylesheet" href="~/css/ChartData.css" asp-append-version="true">
     <title>Charts</title>
 </head>
 <body>
-    <div class="chartCard">
-      <div class="chartBox">
-        <canvas id="NoOfStudentsPerGrade"></canvas>
-        <canvas id="histogramChart"></canvas>
-        
-      </div>
-    </div>    
+
+    <div class="maincontainer">
+        <div class="chartBox1">
+            <canvas id="NoOfStudentsPerGrade"></canvas>
+        </div>
+        <div class="chartBox2">
+            <canvas id="histogramChart"></canvas>
+        </div>
+        <div class="chartBox3">
+            <canvas id="Top10"></canvas>
+        </div>
+        <div class="chartBox4">
+            <canvas id="Bottom10"></canvas>
+        </div>
+        <div class="full-width"></div>
+    </div>
+          
     <script src="/js/GetGrades.js"></script>
 </body>
 </html>
