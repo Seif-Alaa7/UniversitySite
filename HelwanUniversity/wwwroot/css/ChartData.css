@@ -38,3 +38,11 @@ canvas {
     width: 100% !important; 
     grid-column: span 2; 
 }
+p{
+    font-size: 1.5rem;
+    justify-self: center;
+    font-family: "Outfit", serif;
+    font-optical-sizing: auto;
+    font-weight:500;
+    font-style: normal;
+}

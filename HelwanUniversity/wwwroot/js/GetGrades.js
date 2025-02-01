@@ -53,6 +53,12 @@ const config = {
   type: 'bar',
   data,
   options: {
+    plugins: {
+    legend: {
+        display: false,
+        
+    }
+},
       scales: {
           y: {
               beginAtZero: true,
@@ -103,6 +109,12 @@ const configHistogram = {
   type: 'bar',
   data:dataHistogram,
   options: {
+    plugins: {
+      legend: {
+          display: false,
+          
+      }
+  },
       scales: {
           y: {
               beginAtZero: true,
@@ -163,6 +175,12 @@ const configTop10 = {
   type: 'bar',
   data:Top10data,
   options: {
+    plugins: {
+      legend: {
+          display: false,
+          
+      }
+  },
       scales: {
           y: {
               beginAtZero: true,
@@ -211,6 +229,12 @@ const configBottom10 = {
   type: 'bar',
   data:Bottom10Data,
   options: {
+    plugins: {
+      legend: {
+          display: false,
+          
+      }
+  },
       scales: {
           y: {
               beginAtZero: true,
