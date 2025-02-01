@@ -131,10 +131,27 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             departmentSubjectsRepository.Save();
             return RedirectToAction("Details", "Department", new { id = Departmentid });
         }
+        
+        [HttpGet]
+        public IActionResult GetGrades(int subjectId)
+        {
+            var grades = subjectRepository.GetStudentGrades(subjectId);
+
+            var gradesViewModel = grades.Select(grade => new StudentSubjectsVM
+            {
+                StudentId = grade.StudentId,
+                SubjectId = subjectId,
+                Degree = grade.Degree,
+                Grade=grade.Grade
+            }).ToList();
+            return Json(gradesViewModel);
+        }
         public IActionResult ChartData()
         {
 
             return View();
         }
+
+        
     }
 }

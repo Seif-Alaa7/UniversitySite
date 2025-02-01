@@ -87,18 +87,6 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             return RedirectToAction("Details", new {id = doctor.Id});
         }
-        [HttpGet]
-        public IActionResult GetGrades(int subjectId)
-        {
-            var grades = subjectRepository.GetStudentGrades(subjectId);
-
-            var gradesViewModel = grades.Select(grade => new StudentSubjectsVM
-            {
-                StudentId = grade.StudentId,
-                SubjectId = subjectId,
-                Degree = grade.Degree
-            }).ToList();
-            return Json(gradesViewModel);
-        }
+        
     }
 }

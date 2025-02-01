@@ -8,5 +8,7 @@ namespace ViewModels
         public int StudentId { get; set; }
         public int SubjectId { get; set; }
         public int? Degree { get; set; }
+        public Models.Enums.Grade? Grade { get; set; }
+    
     }
 }

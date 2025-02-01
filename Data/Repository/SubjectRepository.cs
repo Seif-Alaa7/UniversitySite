@@ -133,7 +133,8 @@ namespace Data.Repository
         .Select(ss => new StudentSubjects
         {
             StudentId = ss.Student.Id,
-            Degree = ss.Degree
+            Degree = ss.Degree,
+            Grade=ss.Grade
         })
         .ToList();
             return grades;
