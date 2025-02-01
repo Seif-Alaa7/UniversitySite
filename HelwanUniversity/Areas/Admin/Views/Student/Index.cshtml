@@ -13,7 +13,12 @@
 }
 <h1 class="text-center">All Students</h1>
 <br />
-
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
 <div class="filter-container">
     <input type="text" id="idFilter" class="filter-input" placeholder="Filter by ID" />
     <input type="text" id="nameFilter" class="filter-input" placeholder="Filter by Name" />
@@ -103,9 +108,9 @@
                             <a href="@Url.Action("Edit", "Student", new { id = @item.Id })" class="btn btn-outline-primary btn-sm" title="Edit">
                                 <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/create-new--v2.png" alt="edit" />
                             </a>
-                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: inline;">
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="delete-form" style="display: inline;">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this Student?');">
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" title="Delete">
                                     <img width="20" height="20" src="https://img.icons8.com/ios/50/1A1A1A/delete-sign--v1.png" alt="delete" />
                                 </button>
                             </form>
@@ -114,7 +119,6 @@
                     <td class="align-middle">
                         <div class="btn-group-vertical" role="group">
                             <a href="@Url.Action("DisplaySubjects", "DepartmentSubjects", new {StudentId = item.Id })" class="btn btn-outline-primary btn-sm mb-1">Academic Registration</a>
-                            <a href="@Url.Action("SubjectRegsitered", "StudentSubjects", new { id = item.Id })" class="btn btn-outline-info btn-sm mb-1">Show Registrations</a>
                             <a href="@Url.Action("DisplayDegrees", "StudentSubjects", new { id = item.Id })" class="btn btn-outline-success btn-sm mb-1">Degrees</a>
                             <a href="@Url.Action("ResultsRegisteration", "Subject", new { id = item.Id })" class="btn btn-outline-warning btn-sm">Result Registration</a>
                         </div>
@@ -127,8 +131,25 @@
 
 <!-- script -->
 <script src="/js/student.js" defer></script>
-
-
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/Delete.js" defer></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var seen = {};  
+        $('#facultyFilter option').each(function () {
+            var facultyName = $(this).text().toLowerCase();  
+            if (seen[facultyName]) {
+                $(this).hide();
+            } else {
+                seen[facultyName] = true; 
+            }
+        });
+    });
+</script>
 
 
 

@@ -5,12 +5,13 @@
 }
 
 <!-- Stylesheet -->
-<link rel="stylesheet" href="/css/News.css">
+<link rel="stylesheet" href="~/css/News.css" asp-append-version="true">
 
 <h1>News</h1>
 
 <div class="container" style="padding-bottom: 170PX;">
     <div class="add-image-button">
+        <span class="add-text">Add New</span>
         <a asp-action="AddVideo">
             <img src="https://img.icons8.com/dotty/80/1A1A1A/add.png" alt="add" />
         </a>
@@ -27,10 +28,10 @@
                         </a>
 
                         <!-- Form -->
-                        <form asp-action="Delete" method="post" style="display:inline;">
+                        <form asp-action="Delete" method="post" class="d-inline" id="delete-form">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@item.Id" />
-                            <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;" onclick="return confirm('Are you sure you want to delete this video?');">
+                            <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;" class="delete-btn" title="Delete">
                                 <img src="https://img.icons8.com/dotty/80/1A1A1A/delete-forever.png" alt="delete" />
                             </button>
                         </form>
@@ -46,6 +47,10 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/Delete.js" defer></script>
 
 

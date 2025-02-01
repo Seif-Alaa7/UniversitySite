@@ -127,6 +127,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             departmentRepository.Delete(department);
             departmentRepository.Save();
 
+            TempData["SuccessMessage"] = "The Department has been successfully deleted.";
+
             return RedirectToAction("Details", "Faculty", new { id = department.FacultyId });
         }
     }

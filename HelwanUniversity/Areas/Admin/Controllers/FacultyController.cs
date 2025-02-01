@@ -127,6 +127,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             facultyRepository.Delete(faculty);
             facultyRepository.Save();
 
+            TempData["SuccessMessage"] = "The Faculty has been successfully deleted.";
+
             return RedirectToAction("Index");
         }
         public IActionResult AllFaculities()

@@ -150,6 +150,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             studentRepository.DeleteUser(UserId);
             studentRepository.Save();
 
+            TempData["SuccessMessage"] = "The Student has been successfully deleted";
+
             return RedirectToAction("Index");
         }
         public IActionResult StudentsByDepartment(int id)

@@ -10,11 +10,13 @@ namespace Data.Repository
     {
         private readonly ApplicationDbContext context;
         private readonly IFacultyRepository facultyRepository;
+        private readonly IStudentSubjectsRepository studentSubjectsRepository;
 
-        public SubjectRepository(ApplicationDbContext context, IFacultyRepository facultyRepository)
+        public SubjectRepository(ApplicationDbContext context, IFacultyRepository facultyRepository, IStudentSubjectsRepository studentSubjectsRepository)
         {
             this.context = context;
             this.facultyRepository = facultyRepository;
+            this.studentSubjectsRepository = studentSubjectsRepository;
         }
         public void Add(Subject subject)
         {
@@ -138,6 +140,32 @@ namespace Data.Repository
         })
         .ToList();
             return grades;
+        }
+        public Dictionary<int, int> ReturnDegrees(List<Subject> subjects, int studentid)
+        {
+            Dictionary<int, int> subjectDegree = new Dictionary<int, int>();
+            foreach (var subject in subjects)
+            {
+                var studentSubjects = studentSubjectsRepository.GetOne(studentid,subject.Id);
+                if (studentSubjects != null)
+                {
+                    subjectDegree[subject.Id] = studentSubjects.Degree ?? 0;
+                }
+            }
+            return subjectDegree;
+        }
+        public Dictionary<int, Models.Enums.Grade> ReturnGrades(List<Subject> subjects, int studentid)
+        {
+            Dictionary<int, Models.Enums.Grade> studentGrade = new Dictionary<int, Models.Enums.Grade>();
+            foreach (var subject in subjects)
+            {
+                var studentSubjects = studentSubjectsRepository.GetOne(studentid, subject.Id);
+                if (studentSubjects != null)
+                {
+                    studentGrade[subject.Id] = studentSubjects.Grade ?? Models.Enums.Grade.F;
+                }
+            }
+            return studentGrade;
         }
     }
 }

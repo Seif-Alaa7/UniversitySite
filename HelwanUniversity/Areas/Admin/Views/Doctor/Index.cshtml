@@ -10,7 +10,18 @@
 <div class="container mt-5">
     <!-- Page Title -->
     <h1 class="text-center mb-4">All Doctors</h1>
-
+    @if (!string.IsNullOrEmpty(ViewBag.Error))
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
     <!-- Filter Input -->
     <div class="filter-container text-center mb-4">
         <input type="text" id="doctorNameFilter" class="filter-input form-control w-50 mx-auto" placeholder="Search by Doctor Name" onkeyup="filterDoctorsByName()" />
@@ -88,9 +99,14 @@
                                 <a href="@Url.Action("Edit", "Doctor", new { id = @item.Id })" class="action-link mx-1">
                                     <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/create-new--v2.png" alt="Edit" />
                                 </a>
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: inline;" class="mx-1">
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: inline;" class="mx-1 delete-form">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this doctor?');">Delete</button>
+                                    <img src="https://img.icons8.com/ios/50/1A1A1A/delete-sign--v1.png"
+                                         alt="delete"
+                                         width="20"
+                                         height="20"
+                                         class="delete-btn"
+                                         style="cursor: pointer;" />
                                 </form>
                             </div>
                         </td>
@@ -103,3 +119,8 @@
 
 <!-- Script -->
 <script src="/js/Doctor.js"></script>
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/Delete.js" defer></script>

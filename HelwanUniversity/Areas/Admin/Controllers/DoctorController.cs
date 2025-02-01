@@ -102,11 +102,27 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             var doctor = doctorRepository.GetOne(id);
             var UserId = doctor.ApplicationUserId;
 
+            var subjects = subjectRepository.SubjectsByDoctor(id).ToList();
+
+            if (subjects.Any())
+            {
+                ViewBag.Error = "You cannot delete this doctor because they are linked to subjects.";
+
+                var Doctors = doctorRepository.GetAll();
+
+                ViewBag.Subjects = doctorRepository.GetSubjects(Doctors);
+                ViewBag.DoctorDepartments = doctorRepository.GetDepartments(Doctors);
+                ViewBag.DoctorColleges = doctorRepository.GetColleges(Doctors);
+
+                return View("Index",Doctors);
+            }
             doctorRepository.Delete(id);
             doctorRepository.Save();
 
             doctorRepository.DeleteUser(UserId);
             doctorRepository.Save();
+
+            TempData["SuccessMessage"] = "The Doctor has been successfully deleted.";
 
             return RedirectToAction("Index");
         }

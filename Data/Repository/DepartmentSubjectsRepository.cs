@@ -20,7 +20,6 @@ namespace Data.Repository
                           .Where(ds => ds.DepartmentId == id)
                           .Include(ds => ds.Subject)
                           .ToList();
-
             return subjects;
         }
 
@@ -55,6 +54,18 @@ namespace Data.Repository
         {
             var Relation = context.DepartmentSubjects.FirstOrDefault(x => x.SubjectId == subjectId && x.DepartmentId == DepartmentId);
             return Relation;
+        }
+        public void DeleteRelations(int id)
+        {
+            var RS = context.DepartmentSubjects
+                          .Where(ds => ds.DepartmentId == id)
+                          .Include(ds => ds.Subject)
+                          .ToList();
+
+            foreach(var R in RS)
+            {
+                context.DepartmentSubjects.Remove(R);
+            }
         }
         public List<DepartmentSubjects> StudentSubjects(Level level, Semester semester, int DepartmentId)
         {
