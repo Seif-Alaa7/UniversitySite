@@ -142,7 +142,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 StudentId = grade.StudentId,
                 SubjectId = subjectId,
                 Degree = grade.Degree,
-                Grade=grade.Grade
+                Grade=grade.Grade,
+                StudentName = grade.StudentName
             }).ToList();
             return Json(gradesViewModel);
         }

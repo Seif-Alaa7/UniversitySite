@@ -136,7 +136,8 @@ namespace Data.Repository
         {
             StudentId = ss.Student.Id,
             Degree = ss.Degree,
-            Grade=ss.Grade
+            Grade=ss.Grade,
+            StudentName = ss.Student.Name
         })
         .ToList();
             return grades;

@@ -17,6 +17,7 @@ namespace Models
             get => _DegreePoints;
             set => _DegreePoints = Math.Round(value, 3);
         }
+        public string? StudentName { get; set; }
         public Student Student { get; set; } = null!;
         public Subject Subject { get; set; } = null!;
 
