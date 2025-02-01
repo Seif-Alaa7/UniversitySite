@@ -1,7 +1,7 @@
 //fetching the data
 async function fetchData() {
   try {
-    const response = await fetch('/Doctors/Subject/GetGrades?SubjectId=12'); // Replace with your actual API URL
+    const response = await fetch('/Doctors/Subject/GetGrades?SubjectId=12'); 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -124,20 +124,20 @@ fetchData().then(data => {
       gradeCount[index.grade] = (gradeCount[index.grade] || 0) + 1;
   });
 
-  // Create unique labels and corresponding counts
+  
   const grades = [];
   const grades2 = [];
 
   gradesArray.forEach((grade, i) => {
-      if (gradeCount[i] !== undefined) { // If the grade index exists in data
-          grades.push(grade); // Push the grade label
-          grades2.push(gradeCount[i]); // Push the count of students with that grade
+      if (gradeCount[i] !== undefined) { 
+          grades.push(grade); 
+          grades2.push(gradeCount[i]); 
       }
   });
-  const degreeCounts = Array(10).fill(0); // For degree intervals 0-9, 10-19, ..., 90-100
+  const degreeCounts = Array(10).fill(0); 
       data.forEach(item => {
         const degree = item.degree;
-        const index = Math.floor(degree / 10); // Calculate interval
+        const index = Math.floor(degree / 10); 
         if (index < 10) {
           degreeCounts[index]++;
         }
