@@ -16,16 +16,18 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDepartmentRepository departmentRepository;
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
         private readonly IFacultyRepository facultyRepository;
+        private readonly IStudentRepository studentRepository;
 
         public SubjectController(ISubjectRepository subjectRepository,IDoctorRepository doctorRepository,
             IDepartmentRepository departmentRepository, IDepartmentSubjectsRepository departmentSubjectsRepository,
-            IFacultyRepository facultyRepository)
+            IFacultyRepository facultyRepository,IStudentRepository studentRepository)
         {
             this.subjectRepository = subjectRepository;
             this.doctorRepository = doctorRepository;
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.facultyRepository = facultyRepository;
+            this.studentRepository = studentRepository;
         }
         public IActionResult Index()
         {
@@ -143,8 +145,9 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 SubjectId = subjectId,
                 Degree = grade.Degree,
                 Grade=grade.Grade,
-                StudentName = grade.StudentName
+                StudentName = studentRepository.GetStudentName(grade.StudentId)
             }).ToList();
+
             return Json(gradesViewModel);
         }
         public IActionResult ChartData()
