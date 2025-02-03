@@ -30,62 +30,59 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/SubjectRegistered.css">
+    <link rel="stylesheet" href="/css/FeesPage.css">
 </head>
 
 <body>
     <!-- Sidebar Partial -->
     @await Html.PartialAsync("~/Areas/Students/Views/Shared/StudentSidebar.cshtml")
 
-    <div id="main-content" class="container">
-        <h1 class="custom-header">Subjects Registered</h1>
-        <br />
-        <table class="table table-striped table-bordered custom-table">
-            <thead>
-                <tr>
-                    <th>@Html.DisplayNameFor(model => model.Name)</th>
-                    <th>@Html.DisplayName("Doctor")</th>
-                    <th>@Html.DisplayName("Subject Hours")</th>
-                    <th>@Html.DisplayName("Summer Status")</th>
-                    <th>@Html.DisplayName("Summer Allowed")</th>
-                    <th>@Html.DisplayName("Subject Type")</th>
-                    <th>@Html.DisplayNameFor(model => model.Salary)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                        <td>@ViewBag.DoctorNames[item.DoctorId]</td>
-                        <td>@Html.DisplayFor(modelItem => item.SubjectHours)</td>
-                        <td>@Html.DisplayFor(modelItem => item.summerStatus)</td>
-                        <td>
-                            @if (item.summerStatus == Models.Enums.SummerStatus.Open)
-                            {
-                                @Html.DisplayFor(modelItem => item.StudentsAllowed)
-                            }
-                            else
-                            {
-                                @:0
-                            }
-                        </td>
-                        <td>@Html.DisplayFor(modelItem => item.subjectType)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Salary)</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="container">
+        <h2>Fees Status</h2>
         @if (!ViewBag.Student.PaymentFees)
         {
-            <!-- Centered Button -->
-            <div class="text-center mt-4">
-                <a class="btn btn-primary nav-button text-white mx-auto" style="max-width: 150px;" asp-area="Students" asp-controller="StudentSubjects" asp-action="Pay">
-                    <i class="fas fa-receipt"></i> Payment Fees
-                </a>
+        <div id="payment-status" class="status unpaid">لم يتم الدفع</div>
+        <div class="subject-list">
+            @foreach (var item in Model)
+            {
+                <div class="subject-item">
+                    <span>@item.Name</span>
+                    <span>@item.Salary</span>
+                    <i class="fas fa-times-circle text-danger icon"></i>
+                </div>
+            }
+            <div class="total-salary">
+                <span>Total Salary</span>
+                <span>@ViewBag.TotalSalary</span>
             </div>
+        </div>
+            <a id="pay-button" class="pay-button text-white d-flex align-items-center justify-content-center"
+               style="text-decoration: none;"
+               asp-area="Students" asp-controller="StudentSubjects" asp-action="Pay">
+                <i class="fas fa-receipt mr-2"></i> ادفع الآن
+            </a>
+        }
+        else
+        {
+            <div id="payment-status" class="status paid">تم الدفع</div>
+            <div class="subject-list">
+                @foreach (var item in Model)
+                {
+                    <div class="subject-item">
+                        <span>@item.Name</span>
+                        <span>@item.Salary</span>
+                        <i class="fas fa-check-circle text-success icon"></i>
+                    </div>
+                }
+                <div class="total-salary">
+                    <span>Total Salary</span>
+                    <span>@ViewBag.TotalSalary</span>
+                </div>
+            </div>
+            <button id="pay-button" class="pay-button text-white d-flex align-items-center justify-content-center" disabled>
+                ادفع الآن
+            </button>
         }
     </div>
 </body>
-
 </html>

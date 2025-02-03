@@ -40,7 +40,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
             var exists = studentSubjectsRepository.Exist(studentId, subjectId);
             if (exists)
             {
-                ModelState.AddModelError("", "This subject is already registered.");
+                TempData["ErrorMessage"] = "This subject is already registered.";
                 return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
             }
 
@@ -59,16 +59,43 @@ namespace HelwanUniversity.Areas.Students.Controllers
             // Calculate Academic Records
             UpdateAcademicRecords(studentId);
 
-            return RedirectToAction("SubjectRegsitered", new { id = studentId });
+            TempData["Success"] = "Subject has been successfully added.";
+            return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
+        }
+        public IActionResult DeleteSubject(int studentId, int subjectId)
+        {
+            var links = studentSubjectsRepository.FindStudent(studentId);
+            if (links.Count() == 1)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this subject as it's the only one registered. Removing it will delete the student record.";
+                return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
+            }
+            else
+            {
+                var link = studentSubjectsRepository.GetOne(studentId, subjectId);
+                if (link == null)
+                {
+                    TempData["ErrorMessage"] = "you Can't Delete Subject because you Did not Add";
+                    return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
+                }
+                else
+                {
+                    studentSubjectsRepository.Delete(link);
+                    studentSubjectsRepository.Save();
+
+                    // Update Academic Records
+                    UpdateAcademicRecords(studentId);
+                }
+            }
+            TempData["Success"] = "Subject has been successfully Deleted.";
+            return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
         }
         public IActionResult SubjectRegsitered(int id)
         {
             var Images = uniFileRepository.GetAllImages();
             var Subjects = subjectRepository.GetSubjects(id);
-            var department = departmentRepository.DepartmentByStudent(id);
-            ViewData["departmentName"] = department.Name;
-            ViewBag.DoctorNames = doctorRepository.GetName(Subjects);
             ViewData["LogoTitle"] = Images[0].File;
+            ViewBag.TotalSalary = Subjects.Select(x=>x.Salary).Sum();   
 
             var settings = new JsonSerializerSettings
             {
@@ -76,7 +103,6 @@ namespace HelwanUniversity.Areas.Students.Controllers
             };
 
             TempData["CartItems"] = JsonConvert.SerializeObject(Subjects,settings); 
-
             return View(Subjects);
         }
         public IActionResult Pay()

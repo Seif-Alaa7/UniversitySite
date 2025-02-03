@@ -87,7 +87,6 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 var semester = academicRecord.Semester;
                 var StudentSubjects = departmentSubjectsRepository.StudentSubjects(level, semester, department.Id);
                 ViewData["StudentId"] = Studentid;
-                ViewData["departmentName"] = department.Name;
                 ViewBag.ID = department.Id;
                 var Subjects = subjectRepository.GetSubjects(Studentid);
                 var Department = departmentRepository.DepartmentByStudent(Studentid);
