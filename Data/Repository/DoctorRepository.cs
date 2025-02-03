@@ -1,6 +1,9 @@
 ﻿using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Models;
+using Stripe;
+using System.Numerics;
 
 namespace Data.Repository
 {
@@ -159,6 +162,16 @@ namespace Data.Repository
                 doctorColleges[doctor.Id] = colleges;
             }
             return doctorColleges;
+        }
+        public async Task<Subject?> GetCourseForDoctorAsync(int doctorId, int courseId)
+        {
+            return await context.Subjects
+                .Where(c => c.Id == courseId && c.DoctorId == doctorId) // التأكد أن المادة تخص الدكتور
+                .FirstOrDefaultAsync();
+        }
+        public async Task<Doctor?> GetDoctorByUserIdAsync(string userId)
+        {
+            return await context.Doctors.FirstOrDefaultAsync(d => d.ApplicationUserId == userId);
         }
     }
 }

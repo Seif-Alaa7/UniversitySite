@@ -1,9 +1,12 @@
 ﻿using Data;
+using Data.Repository;
 using Data.Repository.IRepository;
 using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Security.Claims;
 using ViewModels;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
@@ -17,9 +20,10 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDepartmentRepository departmentRepository;
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
         private readonly ICloudinaryService cloudinaryService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DoctorController(IDoctorRepository doctorRepository,
-            ISubjectRepository subjectRepository, IDepartmentRepository departmentRepository,
+            ISubjectRepository subjectRepository, IDepartmentRepository departmentRepository, IHttpContextAccessor httpContextAccessor,
             IDepartmentSubjectsRepository departmentSubjectsRepository, ICloudinaryService cloudinaryService)
         {
             this.doctorRepository = doctorRepository;
@@ -27,6 +31,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.cloudinaryService = cloudinaryService;
+            _httpContextAccessor = httpContextAccessor;
         }
         public IActionResult Index()
         {
@@ -37,16 +42,21 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var DoctorDatails = doctorRepository.GetOne(id);
             return View(DoctorDatails);
         }
-        public IActionResult DisplaySubject(int id)
+        public async Task<IActionResult> DisplaySubject(int id)
         {
             var subjects = subjectRepository.SubjectsByDoctor(id).ToList();
-
-            /*if (subjects == null || !subjects.Any())
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var doctor = await doctorRepository.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
             {
-                ViewBag.Message = "There are No Subjects For this Doctor";
-                return NotFound();
-                return View(subjects);
-            }*/
+                return Forbid();
+            }
+            int doctorId = doctor.Id;
+            var course = await doctorRepository.GetCourseForDoctorAsync(doctorId,id);
+            if (course == null)
+            {
+                return Forbid(); // منع الوصول في حالة عدم تطابق المادة مع الدكتور
+            }
 
             var subjectIds = subjectRepository.GetIds(subjects);
             var departmentSubjects = departmentSubjectsRepository.GetDepartmentSubjects(subjectIds);
