@@ -60,3 +60,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".font-weight-bold").textContent = "Total Students: " + visibleCount;
     }
 });
+document.getElementById("exportExcel").addEventListener("click", function () {
+    let table = document.querySelector("table"); 
+    let wb = XLSX.utils.book_new(); 
+    let ws = XLSX.utils.table_to_sheet(table); 
+    XLSX.utils.book_append_sheet(wb, ws, "Fees Status"); 
+    XLSX.writeFile(wb, "Fees_Status.xlsx"); 
+});
+

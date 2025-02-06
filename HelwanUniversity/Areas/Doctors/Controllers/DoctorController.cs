@@ -55,7 +55,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var course = await doctorRepository.GetCourseForDoctorAsync(doctorId,id);
             if (course == null)
             {
-                return Forbid(); // منع الوصول في حالة عدم تطابق المادة مع الدكتور
+                return Forbid(); 
             }
 
             var subjectIds = subjectRepository.GetIds(subjects);

@@ -19,7 +19,14 @@
     </h4>
 </div>
 
-<div class="container">
+<input type="file" id="excelFileInput" accept=".xlsx, .xls" class="d-none">
+<div align="right">
+<button type="button" id="importExcelBtn" class="btn btn-success">
+    <i class="fas fa-file-import"></i>
+    Import from Excel
+    </button>
+</div>
+<div class="container" style="margin-top: 20px;">
     <form asp-action="SaveAllDegrees" method="post">
         <input type="hidden" name="SubjectId" value="@ViewBag.id" />
         <table class="table table-hover table-bordered">
@@ -101,4 +108,8 @@
     </form>
 </div>
 <script src="~/js/student.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script src="~/js/ImportExcel.js"></script>
+
+
 
