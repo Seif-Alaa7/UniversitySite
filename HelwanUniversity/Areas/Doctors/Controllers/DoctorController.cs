@@ -61,14 +61,9 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                     return Forbid();
                 }
             }
-            else if (entity is HighBoard highboard)
+            else
             {
-                int highboardId = highboard.Id;
-                var course = await doctorRepository.GetCourseForDoctorAsync(highboardId, id);
-                if (course == null)
-                {
-                    return Forbid();
-                }
+                return Forbid();
             }
             var subjectIds = subjectRepository.GetIds(subjects);
             var departmentSubjects = departmentSubjectsRepository.GetDepartmentSubjects(subjectIds);
