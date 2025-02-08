@@ -1,7 +1,24 @@
 ﻿@model Faculty
+@using System.Security.Claims
+@inject IHighBoardRepository highBoardRepository
+@inject IDoctorRepository doctorRepository
+@using Data.Repository.IRepository
 
 @{
     ViewData["Title"] = $"{Model.Name} Faculty";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    var Highboard = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    var Doctor = doctorRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+
+    if (Doctor != null)
+    {
+        ViewData["Doctor"] = Doctor;
+    }
+    else
+    {
+        ViewData["Doctor"] = Highboard;
+    }
 }
 
 <!-- StyleSheet -->
@@ -39,7 +56,18 @@
                     @foreach (var department in Model.Departments)
                     {
                         <li>
+                        <span class="Department">
                             @department.Name
+                        </span>                        
+                        @if (ViewData["Doctor"] is HighBoard highBoard)
+                        {
+                            if (highBoard.JobTitle == Models.Enums.JobTitle.DeanOfFaculty)
+                            {
+                                <a asp-controller="Department" asp-action="Details" asp-route-id="@department.Id" style="display: inline-block; vertical-align: middle;">
+                                    <img width="30" height="30" src="https://img.icons8.com/wired/64/1A1A1A/about.png" alt="about" />
+                                </a>
+                            }
+                        }
                         </li>
                     }
                 </ul>

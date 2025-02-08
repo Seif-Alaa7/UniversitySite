@@ -12,7 +12,7 @@
     };
 }
 @{
-    ViewData["Title"] = "Courses Registered";
+    ViewData["Title"] = "Fees Page";
     Layout = null;
 }
 
@@ -41,8 +41,8 @@
         <h2>Fees Status</h2>
         @if (!ViewBag.Student.PaymentFees)
         {
-        <div id="payment-status" class="status unpaid">لم يتم الدفع</div>
-        <div class="subject-list">
+            <div id="payment-status" class="status unpaid">Not Paid</div>
+            <div class="subject-list">
             @foreach (var item in Model)
             {
                 <div class="subject-item">
@@ -59,12 +59,12 @@
             <a id="pay-button" class="pay-button text-white d-flex align-items-center justify-content-center"
                style="text-decoration: none;"
                asp-area="Students" asp-controller="StudentSubjects" asp-action="Pay">
-                <i class="fas fa-receipt mr-2"></i> ادفع الآن
+                <i class="fas fa-receipt mr-2"></i> Pay Now
             </a>
         }
         else
         {
-            <div id="payment-status" class="status paid">تم الدفع</div>
+            <div id="payment-status" class="status paid">Paid</div>
             <div class="subject-list">
                 @foreach (var item in Model)
                 {
@@ -80,7 +80,7 @@
                 </div>
             </div>
             <button id="pay-button" class="pay-button text-white d-flex align-items-center justify-content-center" disabled>
-                ادفع الآن
+                Pay Now
             </button>
         }
     </div>
