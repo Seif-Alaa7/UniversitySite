@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Models;
+using System.Linq.Expressions;
 
 namespace Data.Repository.IRepository
 {
@@ -18,7 +19,10 @@ namespace Data.Repository.IRepository
         Dictionary<int, List<string>> GetDepartments(List<Doctor> doctors);
         Dictionary<int, List<string>> GetColleges(List<Doctor> doctors);
         void DeleteUser(string id);
+        Task<object?> GetEntityByUserIdAsync(string userId);
+        Task<T?> GetEntityForDoctorAsync<T>(int doctorId, int entityId, Expression<Func<T, bool>> condition) where T : class;
         Task<Subject?> GetCourseForDoctorAsync(int doctorId, int courseId);
-        Task<Doctor?> GetDoctorByUserIdAsync(string userId);
+        Task<Department?> GetDepartmentForDoctorAsync(int doctorId, int departmentId);
+        
     }
 }
