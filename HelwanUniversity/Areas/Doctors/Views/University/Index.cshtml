@@ -122,12 +122,15 @@
                             }
                             else if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.HeadOfDepartment)
                             {
-                                <li class="nav-item" style="margin-left: 30px;">
-                                    <a class="nav-link NavItems" style="color: white;" asp-area="Doctors" asp-controller="Department" asp-action="DepartmentInfo" asp-route-id="@ViewBag.Department.Id">
-                                        <img width="23" height="23" src="https://img.icons8.com/parakeet-line/48/FFFFFF/safety-collection-place.png" alt="add-user-male" />
-                                        Department Info
-                                    </a>
-                                </li>
+                                if (@ViewBag.Department != null)
+                                {
+                                    <li class="nav-item" style="margin-left: 30px;">
+                                        <a class="nav-link NavItems" style="color: white;" asp-area="Doctors" asp-controller="Department" asp-action="DepartmentInfo" asp-route-id="@ViewBag.Department.Id">
+                                            <img width="23" height="23" src="https://img.icons8.com/parakeet-line/48/FFFFFF/safety-collection-place.png" alt="add-user-male" />
+                                            Department Info
+                                        </a>
+                                    </li>
+                                }
                             }
                             else if (ViewBag.Doctor.JobTitle == Models.Enums.JobTitle.VP_For_Finance)
                             {

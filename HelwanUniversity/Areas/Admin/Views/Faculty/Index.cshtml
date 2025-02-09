@@ -15,6 +15,12 @@
             @TempData["SuccessMessage"]
         </div>
     }
+    else if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
     <div class="row">
         @foreach (var faculty in Model)
         {

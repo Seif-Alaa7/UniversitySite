@@ -27,12 +27,33 @@
     <div class="mb-3">
         <label asp-for="JobTitle" class="form-label">Job Title</label>
         <select asp-for="JobTitle" class="form-select">
-            <option value="@JobTitle.VP_For_Finance">VP For Finance</option>
-            <option value="@JobTitle.DeanOfFaculty">Dean of Faculty</option>
-            <option value="@JobTitle.VicePrecident">Vice President</option>
-            <option value="@JobTitle.HeadOfDepartment">Head of Department</option>
-            <option value="@JobTitle.President">President</option>
-            <option value="@JobTitle.VP_For_AcademicAffairs">VP For Academic Affairs</option>
+            @if (Model.JobTitle == JobTitle.HeadOfDepartment)
+            {
+                <option value="@JobTitle.HeadOfDepartment">Head of Department</option>
+                <option value="@JobTitle.DeanOfFaculty">Dean of Faculty</option>
+            }
+            else if (Model.JobTitle == JobTitle.DeanOfFaculty)
+            {
+                <option value="@JobTitle.DeanOfFaculty">Dean of Faculty</option>
+                <option value="@JobTitle.VicePrecident"> Vice President</option>
+            }
+            else if (Model.JobTitle == JobTitle.President)
+            {
+                <option value="@JobTitle.President">President</option>
+            }
+            else if (Model.JobTitle == JobTitle.VicePrecident)
+            {
+                <option value="@JobTitle.VicePrecident"> Vice President</option>
+                <option value="@JobTitle.President">President</option>
+            }
+            else if (Model.JobTitle == JobTitle.VP_For_AcademicAffairs)
+            {
+                <option value="@JobTitle.VP_For_AcademicAffairs">VP For Academic Affairs</option>
+            }
+            else if (Model.JobTitle == JobTitle.VP_For_Finance)
+            {
+                <option value="@JobTitle.VP_For_Finance">VP For Finance</option>
+            }
         </select>
         <span asp-validation-for="JobTitle" class="text-danger"></span>
     </div>

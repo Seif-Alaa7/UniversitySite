@@ -2,6 +2,7 @@
 using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Framework;
 using Models;
 using ViewModels.FacultyVMs;
 
@@ -124,11 +125,18 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(Faculty faculty)
         {
-            facultyRepository.Delete(faculty);
-            facultyRepository.Save();
+            var departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
+            if (!departments.Any())
+            {
+                facultyRepository.Delete(faculty);
+                facultyRepository.Save();
 
-            TempData["SuccessMessage"] = "The Faculty has been successfully deleted.";
-
+                TempData["SuccessMessage"] = "The Faculty has been successfully deleted.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Deletion is not allowed as the faculty is still associated with departments.";
+            }
             return RedirectToAction("Index");
         }
         public IActionResult AllFaculities()

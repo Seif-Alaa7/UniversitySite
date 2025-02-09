@@ -1,11 +1,13 @@
 ﻿using Data.Repository.IRepository;
 using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Models;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Security.Claims;
 using ViewModels;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
@@ -19,16 +21,20 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly IFacultyRepository facultyRepository;
         private readonly IDepartmentRepository departmentRepository;
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
+        private readonly UserManager<IdentityUser> _userManager;
+
 
         public HighBoardController(IHighBoardRepository highBoardRepository,
             ICloudinaryService cloudinaryService,IFacultyRepository facultyRepository,IDepartmentRepository departmentRepository
-            ,IDepartmentSubjectsRepository departmentSubjectsRepository)
+            ,IDepartmentSubjectsRepository departmentSubjectsRepository
+            , UserManager<IdentityUser> userManager)
         {
             this.highBoardRepository = highBoardRepository;
             this.cloudinaryService = cloudinaryService;
             this.facultyRepository = facultyRepository;
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
+            this._userManager = userManager;
         }
         public IActionResult Index()
         {
@@ -78,6 +84,26 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                         ModelState.AddModelError("JobTitle", "This job is already exists");
                         highBoardVM.Picture = highboard.Picture;
                         return View("Edit", highBoardVM);
+                    }
+                }
+                else if(highBoardVM.JobTitle == Models.Enums.JobTitle.VicePrecident
+                    && highboard.JobTitle == Models.Enums.JobTitle.DeanOfFaculty)
+                {
+                    highboard.JobTitle = Models.Enums.JobTitle.VicePrecident;
+
+                    var user = await _userManager.FindByIdAsync(highboard.ApplicationUserId);
+                    if (user != null)
+                    {
+                        if (await _userManager.IsInRoleAsync(user, "Doctor"))
+                        {
+                            await _userManager.RemoveFromRoleAsync(user, "Doctor");
+                        }
+
+                        if (!await _userManager.IsInRoleAsync(user, "Admin"))
+                        {
+                            await _userManager.AddToRoleAsync(user, "Admin");
+                        }
+                        await _userManager.UpdateAsync(user); 
                     }
                 }
             }
