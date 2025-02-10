@@ -1,4 +1,5 @@
 ﻿using Data.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Enums;
 
@@ -38,7 +39,13 @@ namespace Data.Repository
                 .Find(Id);
             return student;
         }
-
+        public string GetStudentName(int studentId)
+        {
+            return context.Students
+                .Where(s => s.Id == studentId)
+                .Select(s => s.Name)
+                .FirstOrDefault() ?? "Unknown"; 
+        }
         public List<Student> GetAll()
         {
             var students = context.Students

@@ -6,6 +6,7 @@ namespace Data.Repository.IRepository
     {
         List<Student> GetAll();
         Student GetOne(int Id);
+        string GetStudentName(int studentId);
         void Delete(int id);
         void Update(Student student);
         void Save();

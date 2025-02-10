@@ -1,0 +1,101 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    padding: 50px;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    width: 600px;
+    height: auto;
+}
+
+.status {
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.paid {
+    color: green;
+    background: #d4edda;
+}
+
+.total-salary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 15px 0px;
+    border-top: 2px solid #ddd;
+    margin-top: 10px;
+}
+
+.unpaid {
+    color: red;
+    background: #f8d7da;
+}
+
+.subject-list {
+    width: 100%;
+    text-align: left;
+    margin-top: 20px;
+}
+
+.subject-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+    .subject-item span:nth-child(2) {
+        margin-left: auto;
+        margin-right: 20px;
+    }
+
+.icon {
+    font-size: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pay-button {
+    background: blue;
+    color: white;
+    margin-top: 20px;
+    display: block;
+    width: 200px;
+    height: 50px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px auto;
+}
+
+    .pay-button:disabled {
+        background: gray;
+        cursor: not-allowed;
+        display: block;
+        width: 200px;
+        height: 50px;
+        border-radius: 5px;
+        font-size: 18px;
+        font-weight: bold;
+        margin: 20px auto;
+    }

@@ -174,6 +174,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var students = studentRepository.StudentsBySubject(id);
             var studentDegree = studentRepository.ReturnDegrees(students, id);
             var studentGrade = studentRepository.ReturnGrades(students, id);
+
             ViewData["StudentDegree"] = studentDegree;
             ViewData["StudentGrade"] = studentGrade;
             return View(students);

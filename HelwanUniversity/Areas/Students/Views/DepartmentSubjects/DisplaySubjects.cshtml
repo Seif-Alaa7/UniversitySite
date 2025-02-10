@@ -27,16 +27,69 @@
     @await Html.PartialAsync("~/Areas/Students/Views/Shared/StudentSidebar.cshtml")
 
     <div id="main-content" class="container">
-        <h1 class="custom-header">Academic Registration</h1>
         <br />
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success">
+                @ViewBag.SuccessMessage
+            </div>
+        }
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+        <!-- First Table -->
+        <h3 class="section-header">Subjects Registered</h3>
         <table class="table table-striped table-bordered custom-table">
             <thead>
                 <tr>
-                        <th style="color: black">@Html.DisplayNameFor(model => model.Subject.Name)</th>
-                        <th style="color: black">@Html.DisplayName("Summer Status")</th>
-                        <th style ="color: black">@Html.DisplayName("Summer Allowed")</th>
-                        <th style="color: black">@Html.DisplayName("Subject Type")</th>
-                        <th style="color: black">Actions</th>
+                    <th>Subject</th>
+                    <th>Doctor</th>
+                    <th>Subject Hours</th>
+                    <th>Summer Status</th>
+                    <th>Students Allowed</th>
+                    <th>Subject Type</th>
+                    <th>Salary</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.Subjects != null)
+                {
+                    foreach (var item in ViewBag.Subjects)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@ViewBag.DoctorNames[item.DoctorId]</td>
+                            <td>@item.SubjectHours</td>
+                            <td>@item.summerStatus</td>
+                            <td>
+                                @if (item.summerStatus == Models.Enums.SummerStatus.Open)
+                                {
+                                    @item.StudentsAllowed
+                                }
+                                else
+                                {
+                                    @:0
+                                }
+                            </td>
+                            <td>@item.subjectType</td>
+                            <td>@item.Salary</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <!-- Second Table -->
+        <table class="table table-striped table-bordered custom-table">
+            <thead>
+                <tr>
+                        <th>@Html.DisplayNameFor(model => model.Subject.Name)</th>
+                        <th>@Html.DisplayName("Summer Status")</th>
+                        <th>@Html.DisplayName("Summer Allowed")</th>
+                        <th>@Html.DisplayName("Subject Type")</th>
+                        <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,7 +108,8 @@
                         }
                         <td>@Html.DisplayFor(modelItem => item.Subject.subjectType)</td>
                         <td>
-                            @Html.ActionLink("+", "AddSubject", "StudentSubjects", new { Studentid = ViewBag.StudentId, Subjectid = item.Subject.Id }, new { @class = "btn btn-success btn-sm" })
+                            @Html.ActionLink("+", "AddSubject", "StudentSubjects", new { studentId = ViewBag.StudentId, subjectId = item.Subject.Id }, new { @class = "btn btn-success btn-sm" }) |
+                            @Html.ActionLink("-", "DeleteSubject", "StudentSubjects", new { studentId = ViewBag.StudentId, subjectId = item.Subject.Id }, new { @class = "btn btn-danger btn-sm" })
                         </td>
                     </tr>
                 }

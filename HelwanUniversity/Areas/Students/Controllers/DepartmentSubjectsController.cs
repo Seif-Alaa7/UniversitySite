@@ -3,6 +3,7 @@ using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using ViewModels;
 
 namespace HelwanUniversity.Areas.Students.Controllers
 {
@@ -14,16 +15,23 @@ namespace HelwanUniversity.Areas.Students.Controllers
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
         private readonly IAcademicRecordsRepository academicRecordsRepository;
         private readonly IUniFileRepository uniFileRepository;
+        private readonly ISubjectRepository subjectRepository;
+        private readonly IDoctorRepository doctorRepository;    
+
 
         public DepartmentSubjectsController(IDepartmentRepository departmentRepository,
             IDepartmentSubjectsRepository departmentSubjectsRepository
             , IAcademicRecordsRepository academicRecordsRepository,
-              IUniFileRepository uniFileRepository)
+              IUniFileRepository uniFileRepository,
+              ISubjectRepository subjectRepository,
+              IDoctorRepository doctorRepository)
         {
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
             this.uniFileRepository = uniFileRepository;
+            this.subjectRepository = subjectRepository;
+            this.doctorRepository = doctorRepository;
         }
         public IActionResult Index()
         {
@@ -31,17 +39,36 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult DisplaySubjects(int id)
         {
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["ErrorMessage"];
+            }
+            else
+            {
+                ViewBag.SuccessMessage = TempData["Success"];
+            }
 
             var department = departmentRepository.DepartmentByStudent(id);
-            var level = academicRecordsRepository.GetAll().FirstOrDefault(x => x.StudentId == id).Level;
-            var semester = academicRecordsRepository.GetAll().FirstOrDefault(x => x.StudentId == id).Semester;
-            var Images = uniFileRepository.GetAllImages();
+            var academicRecord = academicRecordsRepository.GetAll().FirstOrDefault(x => x.StudentId == id);
+            if (academicRecord == null || academicRecord.Level == null || academicRecord.Semester == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var level = academicRecord.Level;
+                var semester = academicRecord.Semester;
+                var StudentSubjects = departmentSubjectsRepository.StudentSubjects(level, semester, department.Id);
+                ViewData["StudentId"] = id;
+                var Subjects = subjectRepository.GetSubjects(id);
+                ViewBag.DoctorNames = doctorRepository.GetName(Subjects);
+                ViewBag.Subjects = Subjects;
+                var Images = uniFileRepository.GetAllImages();
+                ViewData["LogoTitle"] = Images[0].File;
 
-            ViewData["StudentId"] = id;
-            ViewData["LogoTitle"] = Images[0].File;
 
-            var StudentSubjects = departmentSubjectsRepository.StudentSubjects(level, semester, department.Id);
-            return View(StudentSubjects);
+                return View(StudentSubjects);
+            }
         }
     }
 }
