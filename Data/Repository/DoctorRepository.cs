@@ -196,12 +196,20 @@ namespace Data.Repository
                 c => c.Id == courseId && c.DoctorId == doctorId
             );
         }
-        public async Task<Department?> GetDepartmentForDoctorAsync(int doctorId, int departmentId)
+        public async Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId)
         {
             return await GetEntityForDoctorAsync<Department>(
                 doctorId,
                 departmentId,
                 c => c.Id == departmentId && c.HeadId == doctorId
+            );
+        }
+        public async Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int departmentId)
+        {
+            return await GetEntityForDoctorAsync<Faculty>(
+                doctorId,
+                departmentId,
+                c => c.Id == departmentId && c.DeanId == doctorId
             );
         }
     }

@@ -22,7 +22,7 @@ namespace Data.Repository.IRepository
         Task<object?> GetEntityByUserIdAsync(string userId);
         Task<T?> GetEntityForDoctorAsync<T>(int doctorId, int entityId, Expression<Func<T, bool>> condition) where T : class;
         Task<Subject?> GetCourseForDoctorAsync(int doctorId, int courseId);
-        Task<Department?> GetDepartmentForDoctorAsync(int doctorId, int departmentId);
-        
+        Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId);
+        Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int departmentId);
     }
 }

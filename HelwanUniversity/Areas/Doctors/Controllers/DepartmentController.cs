@@ -61,8 +61,10 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             else if (entity is HighBoard highboard)
             {
                 int highboardId = highboard.Id;
-                var department = await doctorRepository.GetDepartmentForDoctorAsync(highboardId, id);
-                if (department == null)
+                var headDepartment = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
+                var deanFaculty = await doctorRepository.GetDepartmentForDeanAsync(highboardId, id);
+
+                if (headDepartment == null && deanFaculty == null)
                 {
                     return Forbid();
                 }
@@ -76,15 +78,22 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             return View(Department);
         }
-        public IActionResult Students(int id)
+        public async Task<IActionResult> Students(int id)
         {
-            var Faculty = facultyRepository.GetFacultybyDean(id);
-            if(Faculty == null)
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+
+            if (entity is not HighBoard highboard)
             {
-                return NotFound();
+                return Forbid();
+            }
+            var faculty = facultyRepository.GetFacultybyDean(id);
+            if(faculty == null || faculty.DeanId != highboard.Id)
+            {
+                return Forbid();
             };
-            var Departments = departmentRepository.GetDepartmentsByCollegeId(Faculty.Id);
-            ViewData["FacultyName"] = Faculty.Name;
+            var Departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
+            ViewData["FacultyName"] = faculty.Name;
             return View(Departments);
         }
         public async Task<IActionResult> DepartmentInfo(int id)
@@ -95,19 +104,10 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 return Forbid();
             }
-            if (entity is Doctor doctor)
-            {
-                int doctorId = doctor.Id;
-                var course = await doctorRepository.GetDepartmentForDoctorAsync(doctorId, id);
-                if (course == null)
-                {
-                    return Forbid();
-                }
-            }
-            else if (entity is HighBoard highboard)
+            if (entity is HighBoard highboard)
             {
                 int highboardId = highboard.Id;
-                var course = await doctorRepository.GetDepartmentForDoctorAsync(highboardId, id);
+                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
                 if (course == null)
                 {
                     return Forbid();
