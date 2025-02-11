@@ -1,11 +1,8 @@
 ﻿using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Data.Repository;
 using System.Security.Claims;
-using Data.Repository.IRepository;
 using Models;
-using ViewModels;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -20,6 +17,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IFacultyRepository facultyRepository;
         private readonly IStudentRepository studentRepository;
         private readonly IAcademicRecordsRepository academicRecordsRepository;
+
 
 
         public DepartmentController(IDepartmentRepository departmentRepository, IDepartmentSubjectsRepository departmentSubjectsRepository,
@@ -41,7 +39,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var Department = departmentRepository.GetOne(id);
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
             if (entity == null)
             {
@@ -78,7 +76,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         }
         public async Task<IActionResult> Students(int id)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
 
             if (entity is not HighBoard highboard)
@@ -96,7 +94,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         }
         public async Task<IActionResult> DepartmentInfo(int id)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
             if (entity == null)
             {

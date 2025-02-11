@@ -11,16 +11,14 @@ namespace Data.Repository
         private readonly IFacultyRepository facultyRepository;
         private readonly ISubjectRepository subjectRepository;
         private readonly IStudentRepository studentRepository;
-        private readonly IAcademicRecordsRepository academicRecordsRepository;
         public DepartmentRepository(ApplicationDbContext context, IFacultyRepository facultyRepository
             ,ISubjectRepository subjectRepository,IStudentRepository studentRepository
-            ,IAcademicRecordsRepository academicRecordsRepository)
+            )
         {
             this.context = context;
             this.facultyRepository = facultyRepository;
             this.subjectRepository = subjectRepository;
             this.studentRepository = studentRepository;
-            this.academicRecordsRepository = academicRecordsRepository;
         }
         public void Add(Department department)
         {
