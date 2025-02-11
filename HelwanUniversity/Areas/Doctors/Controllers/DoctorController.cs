@@ -5,6 +5,7 @@ using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using System;
 using System.Security.Claims;
 using ViewModels;
@@ -46,18 +47,24 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         {
             var subjects = subjectRepository.SubjectsByDoctor(id).ToList();
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var doctor = await doctorRepository.GetDoctorByUserIdAsync(userId);
-            if (doctor == null)
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+            if (entity == null)
             {
                 return Forbid();
             }
-            int doctorId = doctor.Id;
-            var course = await doctorRepository.GetCourseForDoctorAsync(doctorId,id);
-            if (course == null)
+            if (entity is Doctor doctor)
             {
-                return Forbid(); 
+                int doctorId = doctor.Id;
+                var course = await doctorRepository.GetCourseForDoctorAsync(doctorId, id);
+                if (course == null)
+                {
+                    return Forbid();
+                }
             }
-
+            else
+            {
+                return Forbid();
+            }
             var subjectIds = subjectRepository.GetIds(subjects);
             var departmentSubjects = departmentSubjectsRepository.GetDepartmentSubjects(subjectIds);
             var departmentDictionary = departmentRepository.Dict();

@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Enums;
 using Stripe;
+using System.Linq.Expressions;
 using System.Numerics;
 
 namespace Data.Repository
@@ -163,15 +165,42 @@ namespace Data.Repository
             }
             return doctorColleges;
         }
+        public async Task<object?> GetEntityByUserIdAsync(string userId)
+        {
+            var doctor = await context.Doctors
+                .FirstOrDefaultAsync(d => d.ApplicationUserId == userId);
+            if (doctor != null && (doctor.JobTitle == JobTitle.Doctor || doctor.JobTitle == JobTitle.Prof_Doctor))
+            {
+                return doctor;
+            }
+            var highboard = await context.HighBoards
+                .FirstOrDefaultAsync(h => h.ApplicationUserId == userId);
+            if (highboard != null)
+            {
+                return highboard;
+            }
+            return null;
+        }
+        public async Task<T?> GetEntityForDoctorAsync<T>(int doctorId, int entityId, Expression<Func<T, bool>> condition) where T : class
+        {
+            return await context.Set<T>()
+                .Where(condition)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Subject?> GetCourseForDoctorAsync(int doctorId, int courseId)
         {
             return await context.Subjects
-                .Where(c => c.Id == courseId && c.DoctorId == doctorId) 
+                .Where(c => c.Id == courseId && c.DoctorId == doctorId) // التأكد أن المادة تخص الدكتور
                 .FirstOrDefaultAsync();
         }
-        public async Task<Doctor?> GetDoctorByUserIdAsync(string userId)
+        public async Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int departmentId)
         {
-            return await context.Doctors.FirstOrDefaultAsync(d => d.ApplicationUserId == userId);
+            return await GetEntityForDoctorAsync<Faculty>(
+                doctorId,
+                departmentId,
+                c => c.Id == departmentId && c.DeanId == doctorId
+            );
         }
     }
 }
