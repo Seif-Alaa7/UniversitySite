@@ -152,10 +152,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         }
         public IActionResult ChartData()
         {
-
-            return View();
+             return View();
         }
-
-        
     }
 }

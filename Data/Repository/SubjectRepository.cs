@@ -86,6 +86,12 @@ namespace Data.Repository
                 throw new Exception($"An error occurred while fetching subjects for student ID {studentID}", ex);
             }
         }
+        public List<Subject> GetSubjectsbyDepartment(int departmentId)
+        {
+            var subjects = context.DepartmentSubjects.Where(x => x.DepartmentId == departmentId).Select(x => x.Subject).ToList();
+            return subjects;
+        }
+
         public IQueryable<Subject> SubjectsByDoctor(int id)
         {
             var Subjects = context.Subjects.Where(x => x.DoctorId == id);

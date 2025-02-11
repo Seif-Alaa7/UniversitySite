@@ -166,7 +166,7 @@ namespace Data.Repository
         public async Task<Subject?> GetCourseForDoctorAsync(int doctorId, int courseId)
         {
             return await context.Subjects
-                .Where(c => c.Id == courseId && c.DoctorId == doctorId) // التأكد أن المادة تخص الدكتور
+                .Where(c => c.Id == courseId && c.DoctorId == doctorId) 
                 .FirstOrDefaultAsync();
         }
         public async Task<Doctor?> GetDoctorByUserIdAsync(string userId)

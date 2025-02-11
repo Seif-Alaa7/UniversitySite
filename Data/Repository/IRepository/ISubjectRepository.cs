@@ -14,6 +14,8 @@ namespace Data.Repository.IRepository
         void Save();
         bool ExistSubject(string Subject);
         List<Subject> GetSubjects(int studentID);
+        List<Subject> GetSubjectsbyDepartment(int departmentId);
+
         IQueryable<Subject> SubjectsByDoctor(int id);
         string GetName(int id);
         Level GetLevel(int id);

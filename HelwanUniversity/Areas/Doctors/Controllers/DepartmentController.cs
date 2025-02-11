@@ -18,10 +18,12 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IFacultyRepository facultyRepository;
         private readonly IStudentRepository studentRepository;
         private readonly IAcademicRecordsRepository academicRecordsRepository;
+        private readonly ISubjectRepository subjectRepository;
 
         public DepartmentController(IDepartmentRepository departmentRepository, IDepartmentSubjectsRepository departmentSubjectsRepository,
             IHighBoardRepository highBoardRepository, IDoctorRepository doctorRepository, IFacultyRepository facultyRepository,
-            IStudentRepository studentRepository, IAcademicRecordsRepository academicRecordsRepository)
+            IStudentRepository studentRepository, IAcademicRecordsRepository academicRecordsRepository,
+            ISubjectRepository subjectRepository)
         {
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
@@ -30,6 +32,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.facultyRepository = facultyRepository;
             this.studentRepository = studentRepository;
             this.academicRecordsRepository = academicRecordsRepository;
+            this.subjectRepository = subjectRepository;
         }
         public IActionResult Index()
         {
@@ -64,6 +67,22 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewData["DepartmentName"] = departmentRepository.GetOne(id)?.Name;
             ViewData["FacultyId"] = facultyRepository.FacultyByDepartment(id).Id;
             ViewBag.ID = id;
+            return View();
+        }
+        [HttpGet]
+        public IActionResult GetdegreesForDepartment(int DepartmentId)
+        {
+            var gradesData = academicRecordsRepository.GetChartData(DepartmentId);
+            return Json(gradesData);
+        }
+        [HttpGet]
+        public IActionResult GetSubjectPassRates(int departmentId)
+        {
+            var subjectPassRates = departmentRepository.GetSubjectPassRates(departmentId);
+            return Json(subjectPassRates);
+        }
+        public IActionResult ChartData()
+        {
             return View();
         }
     }

@@ -9,11 +9,18 @@ namespace Data.Repository
     {
         private readonly ApplicationDbContext context;
         private readonly IFacultyRepository facultyRepository;
-
-        public DepartmentRepository(ApplicationDbContext context, IFacultyRepository facultyRepository)
+        private readonly ISubjectRepository subjectRepository;
+        private readonly IStudentRepository studentRepository;
+        private readonly IAcademicRecordsRepository academicRecordsRepository;
+        public DepartmentRepository(ApplicationDbContext context, IFacultyRepository facultyRepository
+            ,ISubjectRepository subjectRepository,IStudentRepository studentRepository
+            ,IAcademicRecordsRepository academicRecordsRepository)
         {
             this.context = context;
             this.facultyRepository = facultyRepository;
+            this.subjectRepository = subjectRepository;
+            this.studentRepository = studentRepository;
+            this.academicRecordsRepository = academicRecordsRepository;
         }
         public void Add(Department department)
         {
@@ -160,6 +167,26 @@ namespace Data.Repository
         {
             var department = context.Departments.FirstOrDefault(x => x.HeadId == id);
             return department;
+        }
+        public List<Doctor> GetDoctors(int departmentId) 
+        {
+            var subjects = context.DepartmentSubjects.Where(x=>x.DepartmentId == departmentId).Select(x=>x.Subject).ToList();
+            return subjects.Select(x => x.Doctor).ToList();
+        }
+        public List<dynamic> GetSubjectPassRates(int departmentId)
+        {
+            var subjects = subjectRepository.GetSubjectsbyDepartment(departmentId);
+
+            var subjectPassRates = subjects.Select(subject => new
+            {
+                Subject = subject.Name,
+                PassRate = studentRepository.StudentsBySubject(subject.Id)
+                    .Where(student => subjectRepository.ReturnDegrees(new List<Subject> { subject }, student.Id)
+                    .GetValueOrDefault(subject.Id, 0) >= 60)
+                    .Count() * 100.0 / studentRepository.StudentsBySubject(subject.Id).Count()
+            }).ToList();
+
+            return subjectPassRates.Cast<dynamic>().ToList();
         }
     }
 }

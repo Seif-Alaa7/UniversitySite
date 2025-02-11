@@ -7,10 +7,17 @@ namespace Data.Repository
     public class AcademicRecordsRepository : IAcademicRecordsRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IDepartmentRepository departmentRepository;
+        private readonly ISubjectRepository subjectRepository;
+        private readonly IStudentRepository studentRepository;
 
-        public AcademicRecordsRepository(ApplicationDbContext context)
+        public AcademicRecordsRepository(ApplicationDbContext context,IDepartmentRepository departmentRepository
+            ,ISubjectRepository subjectRepository,IStudentRepository studentRepository)
         {
             this.context = context;
+            this.departmentRepository = departmentRepository;
+            this.studentRepository = studentRepository;
+            this.subjectRepository = subjectRepository;
         }
 
         public void Update(AcademicRecords academicRecords)
@@ -80,6 +87,36 @@ namespace Data.Repository
                 }
             }
             return records;
+        }
+        public List<object> GetChartData(int departmentId)
+        {
+            var chartData = new List<object>(); 
+
+            var doctors = departmentRepository.GetDoctors(departmentId);
+
+            foreach (var doctor in doctors)
+            {
+                var subjects = subjectRepository.SubjectsByDoctor(doctor.Id).ToList();
+
+                var doctorData = new
+                {
+                    Doctor = doctor.Name, 
+                    Subjects = subjects.Select(subject => new
+                    {
+                        Subject = subject.Name, 
+                        Average = studentRepository.StudentsBySubject(subject.Id)
+                            .Select(student => subjectRepository.ReturnDegrees(new List<Subject> { subject }, student.Id))
+                            .Where(subjectDegrees => subjectDegrees.ContainsKey(subject.Id))
+                            .Select(subjectDegrees => subjectDegrees[subject.Id])
+                            .DefaultIfEmpty(0)
+                            .Average()
+                    }).ToArray() 
+                };
+
+                chartData.Add(doctorData);
+            }
+
+            return chartData; 
         }
     }
 }

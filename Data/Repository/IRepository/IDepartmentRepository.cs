@@ -22,5 +22,7 @@ namespace Data.Repository.IRepository
         Dictionary<int, string> GetDepartments(List<Department> departments);
         Department GetDepartbyHead(int id);
         public List<SelectListItem> SelectDepartsByFaculty(int id);
+        public List<Doctor> GetDoctors(int departmentId);
+        public List<dynamic> GetSubjectPassRates(int departmentId);
     }
 }
