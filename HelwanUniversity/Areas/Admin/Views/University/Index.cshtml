@@ -111,21 +111,13 @@
                                 Members
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="membersDropdown">
-                                @if (ViewBag.Admin.JobTitle == Models.Enums.JobTitle.VP_For_AcademicAffairs)
+                                <li>
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Student" asp-action="Index" style="text-decoration: none;">
+                                        <i class="fas fa-user-graduate"></i> Students
+                                    </a>
+                                </li>
+                                @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
                                 {
-                                    <li>
-                                        <a class="dropdown-item" asp-area="Admin" asp-controller="Student" asp-action="Index" style="text-decoration: none;">
-                                            <i class="fas fa-user-graduate"></i> Students
-                                        </a>
-                                    </li>
-                                }
-                                else
-                                {
-                                    <li>
-                                        <a class="dropdown-item" asp-area="Admin" asp-controller="Student" asp-action="Index" style="text-decoration: none;">
-                                            <i class="fas fa-user-graduate"></i> Students
-                                        </a>
-                                    </li>
                                     <li>
                                         <a class="dropdown-item" asp-area="Admin" asp-controller="Doctor" asp-action="Index" style="text-decoration: none;">
                                             <i class="fas fa-user-md"></i> Doctors

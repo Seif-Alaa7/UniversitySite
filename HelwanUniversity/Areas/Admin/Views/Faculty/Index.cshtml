@@ -1,7 +1,17 @@
 ﻿@model List<Faculty>
+@using System.Security.Claims
+@using Data.Repository.IRepository
+@inject IHighBoardRepository highboardRepository
 
 @{
     ViewData["Title"] = "Faculities";
+
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var admin = highboardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    if (admin != null)
+    {
+        ViewData["Admin"] = admin;
+    }
 }
 
 <!-- Stylesheets -->
@@ -47,21 +57,23 @@
                                 <i class="fas fa-info-circle"></i>
                             </a>
                         </div>
-                        <div class="d-inline-block">
-                            <a href="@Url.Action("Edit", "Faculty", new { id = faculty.Id })" class="btn btn-warning Action">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </div>
-                        <div class="d-inline-block">
-                            <form asp-action="Delete" method="post" class="d-inline" id="delete-form">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@faculty.Id" />
-                                <button type="button" class="btn btn-outline-danger Action delete-btn" title="Delete">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </div>
-
+                        @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+                        {
+                            <div class="d-inline-block">
+                                <a href="@Url.Action("Edit", "Faculty", new { id = faculty.Id })" class="btn btn-warning Action">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                            <div class="d-inline-block">
+                                <form asp-action="Delete" method="post" class="d-inline" id="delete-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@faculty.Id" />
+                                    <button type="button" class="btn btn-outline-danger Action delete-btn" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
