@@ -6,7 +6,6 @@ async function fetchData() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log(data)
     return data
     
   } catch (error) {
@@ -173,28 +172,24 @@ const Top10data = {
 // config 
 const configTop10 = {
   type: 'bar',
-  data:Top10data,
+  data: Top10data,
   options: {
+    indexAxis: 'y', // Horizontal bar chart
     plugins: {
       legend: {
-          display: false,
-          
+        display: false,
       }
-  },
-      scales: {
-          y: {
-              beginAtZero: true,
-              ticks: {
-                  stepSize: 1, 
-                  callback: function(value) {
-                      if (Number.isInteger(value)) {
-                          return value; 
-                      }
-                      return null; 
-                  }
-              }
-          }
+    },
+    scales: {
+      x: { // Keep 'x' for scores
+        beginAtZero: true
+      },
+      y: { // Ensure student names appear
+        ticks: {
+          autoSkip: false, // Prevent skipping names
+        }
       }
+    }
   }
 };
 
@@ -227,31 +222,26 @@ const Bottom10Data = {
 // config 
 const configBottom10 = {
   type: 'bar',
-  data:Bottom10Data,
+  data: Bottom10Data,
   options: {
+    indexAxis: 'y', // Horizontal bar chart
     plugins: {
       legend: {
-          display: false,
-          
+        display: false,
       }
-  },
-      scales: {
-          y: {
-              beginAtZero: true,
-              ticks: {
-                  stepSize: 1, 
-                  callback: function(value) {
-                      if (Number.isInteger(value)) {
-                          return value; 
-                      }
-                      return null; 
-                  }
-              }
-          }
+    },
+    scales: {
+      x: { 
+        beginAtZero: true
+      },
+      y: { 
+        ticks: {
+          autoSkip: false, // Prevent skipping names
+        }
       }
+    }
   }
 };
-
 
 // render init block
 const myChartBottom10 = new Chart(
@@ -267,8 +257,6 @@ const myChartBottom10 = new Chart(
           grades2.push(gradeCount[i]); 
       }
   });
-  console.log(grades)
-  console.log(grades2)
   //barchart for the grade End
 
   //histogram Start
@@ -286,15 +274,12 @@ const myChartBottom10 = new Chart(
 data.sort((a, b) => b.degree - a.degree);
 let Top10Names = data.slice(0,10).map(student => student.studentName);
 let Top10Degrees = data.slice(0,10).map(student => student.degree);
-console.log(Top10Names)
-console.log(Top10Degrees)
+
 //Top10 Students End
 
 //bottom10 Students Start
 let Bottom10Names = data.slice(-10).map(student => student.studentName);
 let Bottom10Degrees = data.slice(-10).map(student => student.degree);
-console.log(Bottom10Names)
-console.log(Bottom10Degrees)
 
 
 
