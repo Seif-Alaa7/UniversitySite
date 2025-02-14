@@ -178,7 +178,7 @@ namespace Data.Repository
             var subjectPassRates = subjects.Select(subject => new
             {
                 Subject = subject.Name,
-                PassRate = studentRepository.StudentsBySubject(subject.Id)
+                PassRate = studentRepository.StudentsBySubject(subject.Id).ToList()
                     .Where(student => subjectRepository.ReturnDegrees(new List<Subject> { subject }, student.Id)
                     .GetValueOrDefault(subject.Id, 0) >= 60)
                     .Count() * 100.0 / studentRepository.StudentsBySubject(subject.Id).Count()

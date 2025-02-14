@@ -118,13 +118,13 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public IActionResult GetdegreesForDepartment(int DepartmentId)
         {
             var gradesData = academicRecordsRepository.GetChartData(DepartmentId);
-            return Json(gradesData);
+            return Ok(gradesData);
         }
         [HttpGet]
         public IActionResult GetSubjectPassRates(int departmentId)
         {
             var subjectPassRates = departmentRepository.GetSubjectPassRates(departmentId);
-            return Json(subjectPassRates);
+            return Ok(subjectPassRates);
         }
         public IActionResult ChartData()
         {

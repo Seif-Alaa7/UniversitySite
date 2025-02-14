@@ -10,13 +10,15 @@ namespace Data.Repository
         private readonly IDepartmentRepository departmentRepository;
         private readonly ISubjectRepository subjectRepository;
         private readonly IStudentRepository studentRepository;
+        private readonly IDoctorRepository doctorRepository;
 
         public AcademicRecordsRepository(ApplicationDbContext context,IDepartmentRepository departmentRepository
-            ,ISubjectRepository subjectRepository,IStudentRepository studentRepository)
+            ,ISubjectRepository subjectRepository,IStudentRepository studentRepository, IDoctorRepository doctorRepository)
         {
             this.context = context;
             this.departmentRepository = departmentRepository;
             this.studentRepository = studentRepository;
+            this.doctorRepository = doctorRepository;
             this.subjectRepository = subjectRepository;
         }
 
@@ -90,9 +92,9 @@ namespace Data.Repository
         }
         public List<object> GetChartData(int departmentId)
         {
-            var chartData = new List<object>(); 
+            var chartData = new List<object>();
 
-            var doctors = departmentRepository.GetDoctors(departmentId);
+            /*var doctors = departmentRepository.GetDoctors(departmentId);
 
             foreach (var doctor in doctors)
             {
@@ -111,6 +113,36 @@ namespace Data.Repository
                             .DefaultIfEmpty(0)
                             .Average()
                     }).ToArray() 
+                };*/
+            // جلب المواد المرتبطة بالقسم عبر جدول DepartmentSubjects
+            var subjects = subjectRepository.GetSubjectsbyDepartment(departmentId).ToList();
+
+            // جلب الأطباء الذين يدرّسون هذه المواد (من خلال DoctorId في جدول Subjects)
+            var doctors = subjects.Select(s => s.DoctorId)
+                                  .Distinct()
+                                  .Select(doctorId => doctorRepository.GetOne(doctorId))
+                                  .Where(d => d != null)
+                                  .ToList();
+
+            foreach (var doctor in doctors)
+            {
+                // جلب المواد التي يدرسها الطبيب
+                var doctorSubjects = subjects.Where(s => s.DoctorId == doctor.Id).ToList();
+
+                var doctorData = new
+                {
+                    Doctor = doctor.Name,
+                    Subjects = doctorSubjects.Select(subject => new
+                    {
+                        Subject = subject.Name,
+                        Average = studentRepository.StudentsBySubject(subject.Id)
+                        .ToList()
+                            .Select(student => subjectRepository.ReturnDegrees(new List<Subject> { subject }, student.Id))
+                            .Where(subjectDegrees => subjectDegrees.ContainsKey(subject.Id))
+                            .Select(subjectDegrees => subjectDegrees[subject.Id])
+                            .DefaultIfEmpty(0)
+                            .Average()
+                    }).ToArray()
                 };
 
                 chartData.Add(doctorData);
