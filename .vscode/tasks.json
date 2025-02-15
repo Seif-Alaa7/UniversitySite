@@ -2,16 +2,33 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}/HelwanUniversity.sln"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": "build",
+            "detail": "Restores NuGet packages before building."
+        },
+        {
             "label": "build",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
                 "${workspaceFolder}/HelwanUniversity.sln",
+                "--nologo",
+                "--no-restore",
+                "--verbosity:normal",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": "build",
+            "detail": "Builds the project without restoring dependencies."
         },
         {
             "label": "publish",
@@ -20,10 +37,16 @@
             "args": [
                 "publish",
                 "${workspaceFolder}/HelwanUniversity.sln",
+                "--nologo",
+                "--no-restore",
+                "--verbosity:normal",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "dependsOn": ["build"],
+            "group": "build",
+            "detail": "Publishes the project after a successful build."
         },
         {
             "label": "watch",
@@ -35,7 +58,13 @@
                 "--project",
                 "${workspaceFolder}/HelwanUniversity.sln"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "detail": "Runs the application in watch mode for hot-reloading.",
+            "options": {
+                "env": {
+                    "ASPNETCORE_ENVIRONMENT": "Development"
+                }
+            }
         }
     ]
 }

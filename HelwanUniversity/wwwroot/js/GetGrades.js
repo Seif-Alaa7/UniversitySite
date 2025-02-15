@@ -1,11 +1,12 @@
 //fetching the data
 async function fetchData() {
   try {
-    const response = await fetch('/Doctors/Subject/GetGrades?SubjectId=12'); 
+    const response = await fetch('/Doctors/Subject/GetGrades?SubjectId=14'); 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
+    console.log(data)
     return data
     
   } catch (error) {
@@ -272,14 +273,14 @@ const myChartBottom10 = new Chart(
 
 //Top10 Students Start
 data.sort((a, b) => b.degree - a.degree);
-let Top10Names = data.slice(0,10).map(student => student.studentName);
-let Top10Degrees = data.slice(0,10).map(student => student.degree);
+let Top10Names = data.slice(0,3).map(student => student.studentName);
+let Top10Degrees = data.slice(0,3).map(student => student.degree);
 
 //Top10 Students End
 
 //bottom10 Students Start
-let Bottom10Names = data.slice(-10).map(student => student.studentName);
-let Bottom10Degrees = data.slice(-10).map(student => student.degree);
+let Bottom10Names = data.slice(-3).map(student => student.studentName);
+let Bottom10Degrees = data.slice(-3).map(student => student.degree);
 
 
 
