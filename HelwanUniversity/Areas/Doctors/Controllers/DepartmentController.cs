@@ -99,7 +99,13 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
             if (entity == null)
             {
-                return Forbid();
+                return NotFound();
+            }
+            if (entity is Doctor doctor)
+            {
+                {
+                    return Forbid();
+                }
             }
             if (entity is HighBoard highboard)
             {
