@@ -1,7 +1,7 @@
 //fetching the data
 async function fetchData() {
   try {
-    const response = await fetch('/Doctors/Subject/GetGrades?SubjectId=14'); 
+    const response = await fetch('/Doctors/Subject/GetGrades?SubjectId=2'); 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -26,7 +26,6 @@ document.querySelectorAll('canvas').forEach(canvas => {
       toggleFullWidth(this);
   });
 });
-//toggle chart End
 //Charting the data 
 // setup 
 const data = {
@@ -143,7 +142,6 @@ const myChartHistogram = new Chart(
 fetchData().then(data => {
   const gradesArray = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F'];
   const scores=[] //I will push the degrees here
-  //barchart for the grades Start
   // Count occurrences of each grade
   const gradeCount = {};
   data.forEach(index => {
