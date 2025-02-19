@@ -39,11 +39,12 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var Department = departmentRepository.GetOne(id);
+            var facultyId = departmentRepository.GetFacultyIdByDepartmentId(id);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
             if (entity == null)
             {
-                return Forbid();
+                return NotFound();
             }
             if (entity is Doctor doctor)
             {
@@ -58,7 +59,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 int highboardId = highboard.Id;
                 var headDepartment = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
-                var deanFaculty = await doctorRepository.GetDepartmentForDeanAsync(highboardId, id);
+                var deanFaculty = await doctorRepository.GetDepartmentForDeanAsync(highboardId, facultyId);
 
                 if (headDepartment == null && deanFaculty == null)
                 {

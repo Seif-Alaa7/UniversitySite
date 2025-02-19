@@ -46,7 +46,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public async Task<IActionResult> DisplaySubject(int id)
         {
             var subjects = subjectRepository.SubjectsByDoctor(id).ToList();
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
             if (entity == null)
             {

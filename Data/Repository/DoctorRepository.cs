@@ -194,12 +194,12 @@ namespace Data.Repository
                 .Where(c => c.Id == courseId && c.DoctorId == doctorId) 
                 .FirstOrDefaultAsync();
         }
-        public async Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int departmentId)
+        public async Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int facultyId)
         {
             return await GetEntityForDoctorAsync<Faculty>(
                 doctorId,
-                departmentId,
-                c => c.Id == departmentId && c.DeanId == doctorId
+                facultyId,
+                c => c.Id == facultyId && c.DeanId == doctorId
             );
         }
         public async Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId)

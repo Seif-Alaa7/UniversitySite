@@ -186,5 +186,12 @@ namespace Data.Repository
 
             return subjectPassRates.Cast<dynamic>().ToList();
         }
+        public int GetFacultyIdByDepartmentId(int departmentId)
+        {
+            return context.Departments
+                .Where(d => d.Id == departmentId)
+                .Select(d => d.FacultyId)
+                .FirstOrDefault();
+        }
     }
 }
