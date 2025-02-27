@@ -38,10 +38,17 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         {
             return View();
         }
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var DoctorDatails = doctorRepository.GetOne(id);
-            return View(DoctorDatails);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+
+            if (entity is not Doctor doctor || doctor.Id != id)
+            {
+                return Forbid();
+            }
+
+            return View(doctor);
         }
         public async Task<IActionResult> DisplaySubject(int id)
         {
@@ -74,9 +81,15 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             return View(subjects);
         }
         [HttpGet]
-        public IActionResult ChangePicture(int id)
+        public async Task<IActionResult> ChangePicture(int id)
         {
-            var doctor = doctorRepository.GetOne(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+
+            if (entity is not Doctor doctor || doctor.Id != id)
+            {
+                return Forbid();
+            }
             var ModelVM = new Picture()
             {
                 Id = id,
