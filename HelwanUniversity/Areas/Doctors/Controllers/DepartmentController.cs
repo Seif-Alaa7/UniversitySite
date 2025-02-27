@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Models;
+using ViewModels;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -75,24 +76,6 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             return View(Department);
         }
-        public async Task<IActionResult> Students(int id)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
-
-            if (entity is not HighBoard highboard)
-            {
-                return Forbid();
-            }
-            var faculty = facultyRepository.GetFacultybyDean(id);
-            if(faculty == null || faculty.DeanId != highboard.Id)
-            {
-                return Forbid();
-            };
-            var Departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
-            ViewData["FacultyName"] = faculty.Name;
-            return View(Departments);
-        }
         public async Task<IActionResult> DepartmentInfo(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -101,20 +84,17 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 return NotFound();
             }
-            if (entity is Doctor doctor)
+            if (entity is not HighBoard highboard)
             {
                 {
                     return Forbid();
                 }
             }
-            if (entity is HighBoard highboard)
+            int highboardId = highboard.Id;
+            var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
+            if (course == null)
             {
-                int highboardId = highboard.Id;
-                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
-                if (course == null)
-                {
-                    return Forbid();
-                }
+                return Forbid();
             }
             ViewData["DepartmentName"] = departmentRepository.GetOne(id)?.Name;
             ViewData["FacultyId"] = facultyRepository.FacultyByDepartment(id).Id;
@@ -133,8 +113,29 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var subjectPassRates = departmentRepository.GetSubjectPassRates(departmentId);
             return Ok(subjectPassRates);
         }
-        public IActionResult ChartData()
+        public async Task<IActionResult> ChartData()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            if (entity is Doctor doctor)
+            {
+                /*{
+                    return Forbid();
+                }*/
+            }
+            if (entity is HighBoard highboard)
+            {
+                /*int highboardId = highboard.Id;
+                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
+                if (course == null)
+                {
+                    return NotFound();
+                }*/
+            }
             return View();
         }
     }
