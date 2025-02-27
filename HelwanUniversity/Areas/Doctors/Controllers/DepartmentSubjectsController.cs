@@ -3,6 +3,7 @@ using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using System.Security.Claims;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -32,8 +33,31 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult Add(int id)
+        public async Task<IActionResult> Add(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            var department = departmentRepository.GetOne(id);
+            var facultyId = departmentRepository.GetFacultyIdByDepartmentId(id);
+            if (entity is HighBoard highboard)
+            {
+                var headDepartment = await doctorRepository.GetDepartmentForHeadAsync(highboard.Id, id);
+                var deanFaculty = await doctorRepository.GetDepartmentForDeanAsync(highboard.Id, facultyId);
+
+                if (headDepartment == null && deanFaculty == null)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return Forbid();
+            }
             ViewData["DepartId"] = id;
             ViewData["Subjects"] = subjectRepository.Select();
             return View();
@@ -63,9 +87,31 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             }
             return RedirectToAction("Details", "Department", new { area = "Doctors", id = model.DepartmentId });
         }
-        public IActionResult DisplaySubjects(int Studentid)
+        public async Task<IActionResult> DisplaySubjects(int Studentid)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
 
+            if (entity is not HighBoard highboard)
+            {
+                return Forbid();
+            }
+
+            var department = departmentRepository.DepartmentByStudent(Studentid);
+            if (department == null)
+            {
+                return NotFound();
+            }
+
+            var facultyId = departmentRepository.GetFacultyIdByDepartmentId(department.Id);
+
+            var headDepartment = await doctorRepository.GetDepartmentForHeadAsync(highboard.Id, department.Id);
+            var deanFaculty = await doctorRepository.GetDepartmentForDeanAsync(highboard.Id, facultyId);
+
+            if (headDepartment == null && deanFaculty == null)
+            {
+                return Forbid();
+            }
             if (TempData["ErrorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["ErrorMessage"];
@@ -75,7 +121,6 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 ViewBag.SuccessMessage = TempData["Success"];
             }
 
-            var department = departmentRepository.DepartmentByStudent(Studentid);
             var academicRecord = academicRecordsRepository.GetAll().FirstOrDefault(x => x.StudentId == Studentid);
             if (academicRecord == null || academicRecord.Level == null || academicRecord.Semester == null)
             {
