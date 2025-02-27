@@ -1,7 +1,15 @@
 ﻿@model Models.Department
-
+@using System.Security.Claims
+@using Data.Repository.IRepository
+@inject IHighBoardRepository highboardRepository
 @{
     ViewData["Title"] = $"{Model.Name} Department";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var admin = highboardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    if (admin != null)
+    {
+        ViewData["Admin"] = admin;
+    }
 }
 
 <!-- StyleSheet -->
@@ -11,23 +19,29 @@
 <div class="container mt-4 containerStyle">
     <h1 class="text-center mb-4">@Model.Name Department</h1>
     <div class="d-flex justify-content-between mb-3">
-        <a href="@Url.Action("Add","DepartmentSubjects", new { id = Model.Id })" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
-        </a>
-        <div>
-            <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning">
-                <i class="fas fa-edit"></i>
+        @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+        {
+            <a href="@Url.Action("Add","DepartmentSubjects", new { id = Model.Id })" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
             </a>
-            <form id="deleteForm" asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display: inline;">
-                @Html.AntiForgeryToken()
-                <button type="button" class="btn btn-outline-danger" title="Delete" onclick="confirmDelete();">
-                    <i class="fas fa-trash-alt text-danger"></i>
-                </button>
-            </form>
-            <a href="@Url.Action("StudentsByDepartment", "Student", new { id = Model.Id})" class="btn btn-primary" title="Students">
-                <i class="fas fa-user"></i>
-            </a>
-        </div>
+        }
+            <div>
+            @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+            {
+                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <form id="deleteForm" asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-outline-danger" title="Delete" onclick="confirmDelete();">
+                        <i class="fas fa-trash-alt text-danger"></i>
+                    </button>
+                </form>
+            }
+                <a href="@Url.Action("StudentsByDepartment", "Student", new { id = Model.Id})" class="btn btn-primary" title="Students">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
     </div>
     @if (TempData["SuccessMessage"] != null)
     {
@@ -62,7 +76,10 @@
                 <th>@Html.DisplayNameFor(model => model.Subjects.First().Salary)</th>
                 <th>@Html.DisplayName("subject Type")</th>
                 <th>Registered Students</th>
-                <th>Actions</th>
+                @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+                {
+                    <th>Actions</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -78,17 +95,20 @@
                     <td>@subject.Subject.Salary</td>
                     <td>@subject.Subject.subjectType</td>
                     <td>@ViewBag.StudentsBySubject[subject.Subject.Id]</td>
-                    <td>
-                        <a href="@Url.Action("Edit", "Subject", new { id = @subject.Subject.Id, departmentId = Model.Id })" class="action-link edit-link" title="Edit Subject">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="@Url.Action("DeleteForever", "Subject", new { id = @subject.Subject.Id, departmentId = Model.Id })" class="action-link delete-forever-link" onclick="handleDelete(event, 'Do you want delete this Subject Forever?');" id="delete-forever" title="Delete Forever">
-                            <i class="fas fa-trash-alt text-danger"></i>
-                        </a>
-                        <a href="@Url.Action("Delete", "DepartmentSubjects", new { subjectId = subject.Subject.Id, departmentId = Model.Id })" class="action-link delete-link" onclick="handleDelete(event, 'Do you want delete this Subject From this Department?');" id="delete-from-department" title="Delete from Department">
-                            <i class="fas fa-minus-circle text-danger"></i>
-                        </a>
-                    </td>
+                    @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+                    {
+                        <td>
+                            <a href="@Url.Action("Edit", "Subject", new { id = @subject.Subject.Id, departmentId = Model.Id })" class="action-link edit-link" title="Edit Subject">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="@Url.Action("DeleteForever", "Subject", new { id = @subject.Subject.Id, departmentId = Model.Id })" class="action-link delete-forever-link" onclick="handleDelete(event, 'Do you want delete this Subject Forever?');" id="delete-forever" title="Delete Forever">
+                                <i class="fas fa-trash-alt text-danger"></i>
+                            </a>
+                            <a href="@Url.Action("Delete", "DepartmentSubjects", new { subjectId = subject.Subject.Id, departmentId = Model.Id })" class="action-link delete-link" onclick="handleDelete(event, 'Do you want delete this Subject From this Department?');" id="delete-from-department" title="Delete from Department">
+                                <i class="fas fa-minus-circle text-danger"></i>
+                            </a>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

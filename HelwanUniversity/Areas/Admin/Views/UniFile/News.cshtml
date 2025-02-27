@@ -1,7 +1,16 @@
 ﻿@model IEnumerable<Models.UniFile>
-
+@using System.Security.Claims
+@using Data.Repository.IRepository
+@inject IHighBoardRepository highboardRepository
 @{
     ViewData["Title"] = "News";
+
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var admin = highboardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+    if (admin != null)
+    {
+        ViewData["Admin"] = admin;
+    }
 }
 
 <!-- Stylesheet -->
@@ -10,32 +19,38 @@
 <h1>News</h1>
 
 <div class="container" style="padding-bottom: 170PX;">
-    <div class="add-image-button">
-        <span class="add-text">Add New</span>
-        <a asp-action="AddVideo">
-            <img src="https://img.icons8.com/dotty/80/1A1A1A/add.png" alt="add" />
-        </a>
-    </div>
+    @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+    {
+        <div class="add-image-button">
+            <span class="add-text">Add New</span>
+            <a asp-action="AddVideo">
+                <img src="https://img.icons8.com/dotty/80/1A1A1A/add.png" alt="add" />
+            </a>
+        </div>
+    }
     <div class="row video-list">
         @foreach (var item in Model)
         {
             <div class="col-md-4">
                 <div class="card video-card">
                     <iframe src="@item.File" allowfullscreen></iframe>
-                    <div class="action-bar">
-                        <a asp-action="UpdateVideo" asp-route-id="@item.Id">
-                            <img src="https://img.icons8.com/ios/50/1A1A1A/available-updates.png" alt="edit" />
-                        </a>
+                    @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+                    {
+                        <div class="action-bar">
+                            <a asp-action="UpdateVideo" asp-route-id="@item.Id">
+                                <img src="https://img.icons8.com/ios/50/1A1A1A/available-updates.png" alt="edit" />
+                            </a>
 
-                        <!-- Form -->
-                        <form asp-action="Delete" method="post" class="d-inline" id="delete-form">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@item.Id" />
-                            <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;" class="delete-btn" title="Delete">
-                                <img src="https://img.icons8.com/dotty/80/1A1A1A/delete-forever.png" alt="delete" />
-                            </button>
-                        </form>
-                    </div>
+                            <!-- Form -->
+                            <form asp-action="Delete" method="post" class="d-inline" id="delete-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;" class="delete-btn" title="Delete">
+                                    <img src="https://img.icons8.com/dotty/80/1A1A1A/delete-forever.png" alt="delete" />
+                                </button>
+                            </form>
+                        </div>
+                    }
                 </div>
             </div>
         }
