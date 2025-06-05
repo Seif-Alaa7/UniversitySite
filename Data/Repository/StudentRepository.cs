@@ -113,5 +113,13 @@ namespace Data.Repository
             }
             return studentGrade;
         }
+        public IEnumerable<StudentSubjects> GetStudentSubjects(int studentId)
+        {
+            return context.StudentSubjects
+                          .Where(ss => ss.StudentId == studentId)
+                          .Include(ss => ss.Subject)
+                          .ToList();
+        }
+
     }
 }

@@ -101,7 +101,9 @@ namespace Data.Repository
         public async Task<object?> GetEntityByUserIdAsync(string userId)
         {
             return await context.HighBoards
-                .FirstOrDefaultAsync(h => h.ApplicationUserId == userId);
+            .Include(hb => hb.Faculty)
+            .Include(hb => hb.Department)
+            .FirstOrDefaultAsync(h => h.ApplicationUserId == userId);
         }
     }
 }
