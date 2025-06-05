@@ -1,5 +1,6 @@
 ﻿using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Enums;
 
@@ -97,5 +98,10 @@ namespace Data.Repository
             return Deans;
         }
 
+        public async Task<object?> GetEntityByUserIdAsync(string userId)
+        {
+            return await context.HighBoards
+                .FirstOrDefaultAsync(h => h.ApplicationUserId == userId);
+        }
     }
 }
