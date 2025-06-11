@@ -36,7 +36,9 @@ namespace Data.Repository
         public Student GetOne(int Id)
         {
             var student = context.Students
-                .Find(Id);
+                .Include(s => s.Department)
+                .ThenInclude(d => d.Faculty)
+                .FirstOrDefault(s => s.Id == Id);
             return student;
         }
         public string GetStudentName(int studentId)
