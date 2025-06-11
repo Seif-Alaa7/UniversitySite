@@ -105,5 +105,12 @@ namespace Data.Repository
             .Include(hb => hb.Department)
             .FirstOrDefaultAsync(h => h.ApplicationUserId == userId);
         }
+        public HighBoard GetByUserId(string userId)
+        {
+            return context.HighBoards
+                .Include(h => h.Faculty)
+                .Include(h => h.Department)
+                .FirstOrDefault(h => h.ApplicationUserId == userId);
+        }
     }
 }

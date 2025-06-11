@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using ViewModels;
+using System.Security.Claims;
+using Models.Enums;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -17,10 +19,11 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
         private readonly IFacultyRepository facultyRepository;
         private readonly IStudentRepository studentRepository;
+        private readonly IHighBoardRepository highBoardRepository;
 
         public SubjectController(ISubjectRepository subjectRepository,IDoctorRepository doctorRepository,
             IDepartmentRepository departmentRepository, IDepartmentSubjectsRepository departmentSubjectsRepository,
-            IFacultyRepository facultyRepository,IStudentRepository studentRepository)
+            IFacultyRepository facultyRepository,IStudentRepository studentRepository, IHighBoardRepository highBoardRepository)
         {
             this.subjectRepository = subjectRepository;
             this.doctorRepository = doctorRepository;
@@ -28,6 +31,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.facultyRepository = facultyRepository;
             this.studentRepository = studentRepository;
+            this.highBoardRepository = highBoardRepository;
         }
         public IActionResult Index()
         {
@@ -46,7 +50,36 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         [HttpGet]
         public IActionResult Edit(int id, int departmentId)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var highBoard = highBoardRepository.GetByUserId(userId);
+            if (highBoard == null) 
+                return Forbid();
+
             var subject = subjectRepository.GetOne(id);
+            if (subject == null) 
+                return NotFound();
+
+            var subjectDepartmentIds = departmentSubjectsRepository.SubjectDepartments(id)
+                .Select(ds => ds.DepartmentId)
+                .ToList();
+
+            if (highBoard.JobTitle == JobTitle.HeadOfDepartment)
+            {
+                if (!subjectDepartmentIds.Contains(highBoard.Department.Id))
+                    return Forbid();
+            }
+            else if (highBoard.JobTitle == JobTitle.DeanOfFaculty)
+            {
+                var allowedDepartments = departmentRepository.GetDepartmentsByCollegeId(highBoard.Faculty.Id)
+                    .Select(d => d.Id)
+                    .ToList();
+                if (!subjectDepartmentIds.Any(did => allowedDepartments.Contains(did)))
+                    return Forbid();
+            }
+            else
+            {
+                return Forbid();
+            }
             var subjectVM = new SubjectVM()
             {
                 Id = id,
@@ -78,7 +111,48 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         [HttpPost]
         public IActionResult SaveEdit(SubjectVM model)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var highBoard = highBoardRepository.GetByUserId(userId);
+            if (highBoard == null)
+                return Forbid();
+
             var subject = subjectRepository.GetOne(model.Id);
+            if (subject == null) 
+                return NotFound();
+
+            var subjectDepartmentIds = departmentSubjectsRepository
+                .SubjectDepartments(subject.Id)
+                .Select(ds => ds.DepartmentId)
+                .ToList();
+
+            bool isAuthorized = false;
+
+            if (highBoard.JobTitle == JobTitle.HeadOfDepartment)
+            {
+                isAuthorized = subjectDepartmentIds.Contains(highBoard.Department.Id);
+            }
+            else if (highBoard.JobTitle == JobTitle.DeanOfFaculty)
+            {
+                var allowedDepartments = departmentRepository
+                    .GetDepartmentsByCollegeId(highBoard.Faculty.Id)
+                    .Select(d => d.Id)
+                    .ToList();
+                isAuthorized = subjectDepartmentIds.Any(did => allowedDepartments.Contains(did));
+            }
+
+            if (!isAuthorized)
+                return Forbid();
+
+            if (model.Name != subject.Name)
+            {
+                var exist = subjectRepository.ExistSubject(model.Name);
+                if (exist)
+                {
+                    ModelState.AddModelError("Name", "This Name is Already Exist");
+                    return View("Edit", model);
+                }
+            }
+
             if (model.Name != subject.Name)
             {
                 var exist = subjectRepository.ExistSubject(model.Name);

@@ -21,5 +21,6 @@ namespace Data.Repository.IRepository
         IQueryable<HighBoard> GetDeans();
         void DeleteUser(string id);
         Task<object?> GetEntityByUserIdAsync(string userId);
+        HighBoard GetByUserId(string userId);
     }
 }
