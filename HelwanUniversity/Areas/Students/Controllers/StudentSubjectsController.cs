@@ -6,6 +6,7 @@ using Models;
 using Models.Enums;
 using Newtonsoft.Json;
 using Stripe.Checkout;
+using System.Security.Claims;
 
 namespace HelwanUniversity.Areas.Students.Controllers
 {
@@ -19,10 +20,13 @@ namespace HelwanUniversity.Areas.Students.Controllers
         private readonly IDoctorRepository doctorRepository;
         private readonly IDepartmentRepository departmentRepository;
         private readonly IUniFileRepository uniFileRepository;
+        private readonly IStudentRepository studentRepository;
         public StudentSubjectsController(IStudentSubjectsRepository studentSubjectsRepository, IAcademicRecordsRepository academicRecordsRepository,
             ISubjectRepository subjectRepository,
             IDoctorRepository doctorRepository,
-            IDepartmentRepository departmentRepository, IUniFileRepository uniFileRepository)
+            IDepartmentRepository departmentRepository,
+            IUniFileRepository uniFileRepository,
+            IStudentRepository studentRepository)
         {
             this.studentSubjectsRepository = studentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
@@ -30,6 +34,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
             this.doctorRepository = doctorRepository;
             this.departmentRepository = departmentRepository;
             this.uniFileRepository = uniFileRepository;
+            this.studentRepository = studentRepository;
         }
         public IActionResult Index()
         {
@@ -92,6 +97,11 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult SubjectRegsitered(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentStudent = studentRepository.GetByUserId(userId);
+
+            if (currentStudent == null || currentStudent.Id != id)
+                return Forbid();
             var Images = uniFileRepository.GetAllImages();
             var Subjects = subjectRepository.GetSubjects(id);
             ViewData["LogoTitle"] = Images[0].File;
@@ -150,6 +160,12 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult DisplayDegrees(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentStudent = studentRepository.GetByUserId(userId);
+
+            if (currentStudent == null || currentStudent.Id != id)
+                return Forbid();
+
             var studentSubjects = studentSubjectsRepository.FindStudent(id);
             var Images = uniFileRepository.GetAllImages();
             var Subjects = subjectRepository.GetSubjects(id);

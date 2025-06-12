@@ -1,6 +1,8 @@
-﻿using Data.Repository.IRepository;
+﻿using Data.Repository;
+using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HelwanUniversity.Areas.Students.Controllers
 {
@@ -13,17 +15,19 @@ namespace HelwanUniversity.Areas.Students.Controllers
         private readonly IHighBoardRepository highBoardRepository;
         private readonly IUniFileRepository uniFileRepository;
         private readonly IDoctorRepository doctorRepository;
+        private readonly IStudentRepository studentRepository;
         public DepartmentController(IDepartmentRepository departmentRepository, 
             IDepartmentSubjectsRepository departmentSubjectsRepository,
             IHighBoardRepository highBoardRepository,
             IDoctorRepository doctorRepository,
-            IUniFileRepository uniFileRepository)
+            IUniFileRepository uniFileRepository, IStudentRepository studentRepository)
         {
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.highBoardRepository = highBoardRepository;
             this.doctorRepository = doctorRepository;
             this.uniFileRepository = uniFileRepository;
+            this.studentRepository = studentRepository;
         }
         public IActionResult Index()
         {
@@ -31,7 +35,15 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult Details(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var isAllowed = studentRepository.IsStudentInDepartment(userId, id);
+            if (!isAllowed)
+                return Forbid();
+
             var Department = departmentRepository.GetOne(id);
+            if (Department == null)
+                return NotFound();
             var Images = uniFileRepository.GetAllImages();
 
             ViewData["Head"] = highBoardRepository.GetOne(Department.HeadId);

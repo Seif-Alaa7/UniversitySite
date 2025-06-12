@@ -122,6 +122,23 @@ namespace Data.Repository
                           .Include(ss => ss.Subject)
                           .ToList();
         }
+        public Student GetByUserId(string userId)
+        {
+            return context.Students.FirstOrDefault(s => s.ApplicationUserId == userId);
+        }
+        public Student GetAuthorizedStudent(string userId, int studentId)
+        {
+            var student = context.Students.FirstOrDefault(s => s.Id == studentId);
 
+            if (student == null || student.ApplicationUserId != userId)
+                return null;
+
+            return student;
+        }
+        public bool IsStudentInDepartment(string userId, int departmentId)
+        {
+            return context.Students
+                .Any(s => s.ApplicationUserId == userId && s.DepartmentId == departmentId);
+        }
     }
 }

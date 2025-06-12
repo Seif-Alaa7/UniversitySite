@@ -37,8 +37,15 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult Details(int id)
         {
-            var studentDatails = studentRepository.GetOne(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentStudent = studentRepository.GetByUserId(userId);
 
+            if (currentStudent == null || currentStudent.Id != id)
+                return Forbid();
+
+            var studentDatails = studentRepository.GetOne(id);
+            if (studentDatails == null)
+                return NotFound();
             var Images = uniFileRepository.GetAllImages();
             ViewData["LogoTitle"] = Images[0].File;
             return View(studentDatails);
@@ -46,11 +53,15 @@ namespace HelwanUniversity.Areas.Students.Controllers
         [HttpGet]
         public IActionResult ChangePicture(int id)
         {
-            var student = studentRepository.GetOne(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentStudent = studentRepository.GetByUserId(userId);
+
+            if (currentStudent == null || currentStudent.Id != id)
+                return Forbid();
             var ModelVM = new Picture()
             {
                 Id = id,
-                MainPicture = student.Picture
+                MainPicture = currentStudent.Picture
             };
 
             return View(ModelVM);
@@ -58,21 +69,25 @@ namespace HelwanUniversity.Areas.Students.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveChange(Picture ModelVM)
         {
-            var student = studentRepository.GetOne(ModelVM.Id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentStudent = studentRepository.GetByUserId(userId);
+
+            if (currentStudent == null || currentStudent.Id != ModelVM.Id)
+                return Forbid();
             try
             {
-                ModelVM.MainPicture = await cloudinaryService.UploadFile(ModelVM.MainPictureFile, student.Picture, "An error occurred while uploading the Picture. Please try again.");
+                ModelVM.MainPicture = await cloudinaryService.UploadFile(ModelVM.MainPictureFile, currentStudent.Picture, "An error occurred while uploading the Picture. Please try again.");
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View("ChangePicture", ModelVM);
             }
-            student.Picture = ModelVM.MainPicture;
-            studentRepository.Update(student);
+            currentStudent.Picture = ModelVM.MainPicture;
+            studentRepository.Update(currentStudent);
             studentRepository.Save();
 
-            return RedirectToAction("Details", new { id = student.Id });
+            return RedirectToAction("Details", new { id = currentStudent.Id });
         }
     }
 }

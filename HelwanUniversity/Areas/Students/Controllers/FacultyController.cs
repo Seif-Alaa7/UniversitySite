@@ -26,21 +26,6 @@ namespace HelwanUniversity.Areas.Students.Controllers
             var faculties =facultyRepository.GetAll().ToList();
             return View(faculties);
         }
-        public IActionResult Details(int id)
-        {
-
-            var faculty = facultyRepository.GetOne(id);
-            if (faculty == null)
-            {
-                return NotFound();
-            }
-            faculty.ViewCount++;
-            facultyRepository.Save();
-
-            ViewData["Dean"] = highBoardRepository.GetOne(faculty.DeanId)?.Name;
-
-            return View(faculty);
-        }
         public IActionResult DetailsStudent(int id)
         {
             var Images = uniFileRepository.GetAllImages();

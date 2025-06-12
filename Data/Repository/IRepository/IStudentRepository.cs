@@ -20,5 +20,8 @@ namespace Data.Repository.IRepository
         Dictionary<int, int> ReturnDegrees(IQueryable<Student> students, int Subjectid);
         Dictionary<int, Models.Enums.Grade> ReturnGrades(IQueryable<Student> students, int Subjectid);
         IEnumerable<StudentSubjects> GetStudentSubjects(int studentId);
+        Student GetByUserId(string userId);
+        Student GetAuthorizedStudent(string userId, int studentId);
+        bool IsStudentInDepartment(string userId, int departmentId);
     }
 }

@@ -20,19 +20,22 @@ namespace HelwanUniversity.Areas.Students.Controllers
        {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var Student = studentRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
-            if (Student != null)
-            {
-                Student.PaymentFees = true;
-                Student.PaymentFeesDate = DateTime.Now;
+            var student = studentRepository.GetByUserId(userId);
+            if (student == null)
+                return Forbid();
 
-                studentRepository.Update(Student);
-                studentRepository.Save();
-            };
+            student.PaymentFees = true;
+            student.PaymentFeesDate = DateTime.Now;
+
+            studentRepository.Update(student);
+            studentRepository.Save();
+
             return View();
-       }
+        }
        public IActionResult cancel()
        {
+            if (!User.Identity.IsAuthenticated)
+                return Forbid();
             return View();
        }
     }

@@ -2,6 +2,7 @@
 using Data.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Models;
 using ViewModels;
 
@@ -16,15 +17,16 @@ namespace HelwanUniversity.Areas.Students.Controllers
         private readonly IAcademicRecordsRepository academicRecordsRepository;
         private readonly IUniFileRepository uniFileRepository;
         private readonly ISubjectRepository subjectRepository;
-        private readonly IDoctorRepository doctorRepository;    
-
+        private readonly IDoctorRepository doctorRepository;
+        private readonly IStudentRepository studentRepository;
 
         public DepartmentSubjectsController(IDepartmentRepository departmentRepository,
             IDepartmentSubjectsRepository departmentSubjectsRepository
             , IAcademicRecordsRepository academicRecordsRepository,
               IUniFileRepository uniFileRepository,
               ISubjectRepository subjectRepository,
-              IDoctorRepository doctorRepository)
+              IDoctorRepository doctorRepository,
+              IStudentRepository studentRepository)
         {
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
@@ -32,6 +34,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
             this.uniFileRepository = uniFileRepository;
             this.subjectRepository = subjectRepository;
             this.doctorRepository = doctorRepository;
+            this.studentRepository = studentRepository;
         }
         public IActionResult Index()
         {
@@ -39,6 +42,12 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult DisplaySubjects(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentStudent = studentRepository.GetByUserId(userId);
+
+            if (currentStudent == null || currentStudent.Id != id)
+                return Forbid();
+
             if (TempData["ErrorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["ErrorMessage"];
