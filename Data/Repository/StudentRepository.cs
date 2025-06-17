@@ -36,7 +36,9 @@ namespace Data.Repository
         public Student GetOne(int Id)
         {
             var student = context.Students
-                .Find(Id);
+                .Include(s => s.Department)
+                .ThenInclude(d => d.Faculty)
+                .FirstOrDefault(s => s.Id == Id);
             return student;
         }
         public string GetStudentName(int studentId)
@@ -112,6 +114,31 @@ namespace Data.Repository
                 }
             }
             return studentGrade;
+        }
+        public IEnumerable<StudentSubjects> GetStudentSubjects(int studentId)
+        {
+            return context.StudentSubjects
+                          .Where(ss => ss.StudentId == studentId)
+                          .Include(ss => ss.Subject)
+                          .ToList();
+        }
+        public Student GetByUserId(string userId)
+        {
+            return context.Students.FirstOrDefault(s => s.ApplicationUserId == userId);
+        }
+        public Student GetAuthorizedStudent(string userId, int studentId)
+        {
+            var student = context.Students.FirstOrDefault(s => s.Id == studentId);
+
+            if (student == null || student.ApplicationUserId != userId)
+                return null;
+
+            return student;
+        }
+        public bool IsStudentInDepartment(string userId, int departmentId)
+        {
+            return context.Students
+                .Any(s => s.ApplicationUserId == userId && s.DepartmentId == departmentId);
         }
     }
 }

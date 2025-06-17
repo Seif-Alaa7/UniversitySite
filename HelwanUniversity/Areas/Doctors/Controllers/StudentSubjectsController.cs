@@ -5,6 +5,7 @@ using Models;
 using ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Data.Repository;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -18,10 +19,11 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IStudentRepository studentRepository;
         private readonly IDoctorRepository doctorRepository;
         private readonly IDepartmentRepository departmentRepository;
+        private readonly IHighBoardRepository highBoardRepository;
 
         public StudentSubjectsController(IStudentSubjectsRepository studentSubjectsRepository,
             IAcademicRecordsRepository academicRecordsRepository, ISubjectRepository subjectRepository, IStudentRepository studentRepository,
-            IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository)
+            IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository, IHighBoardRepository highBoardRepository)
         {
             this.studentSubjectsRepository = studentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
@@ -29,6 +31,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.studentRepository = studentRepository;
             this.doctorRepository = doctorRepository;
             this.departmentRepository = departmentRepository;
+            this.highBoardRepository = highBoardRepository;
         }
         public IActionResult Index()
         {
@@ -97,8 +100,39 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewBag.DoctorNames = doctorRepository.GetName(Subjects);
             return View(Subjects);
         }
-        public IActionResult DisplayDegrees(int id)
+        public async Task<IActionResult> DisplayDegrees(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await highBoardRepository.GetEntityByUserIdAsync(userId);
+            if (entity is not HighBoard highBoard)
+            {
+                return Forbid();
+            }
+            var student = studentRepository.GetOne(id);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            if (highBoard.JobTitle == JobTitle.HeadOfDepartment)
+            {
+                if (student.DepartmentId != highBoard.Department.Id)
+                {
+                    return Forbid();
+                }
+            }
+            else if (highBoard.JobTitle == JobTitle.DeanOfFaculty)
+            {
+                if (student.Department.Faculty.Id != highBoard.Faculty.Id)
+                {
+                    return Forbid();
+                }
+            }
+            else
+            {
+                return Forbid();
+            }
             var studentSubjects = studentSubjectsRepository.FindStudent(id);
 
             var Subjects = subjectRepository.GetSubjects(id);
@@ -164,8 +198,22 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             }
             return RedirectToAction("DisplaySubject", "Doctor", new { id = @Doctor.Id });
         }
-        public IActionResult StudentSubjectRegistered(int id)
+        public async Task<IActionResult> StudentSubjectRegistered(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var doctor = await doctorRepository.GetEntityByUserIdAsync(userId) as Doctor;
+
+            if (doctor == null)
+            {
+                return Forbid();
+            }
+
+            var subject = subjectRepository.GetOne(id);
+            if (subject == null || subject.DoctorId != doctor.Id)
+            {
+                return Forbid();
+            }
+
             ViewData["SubjectName"] = subjectRepository.GetName(id);
             ViewData["Level"] = subjectRepository.GetLevel(id);
             ViewData["Semester"] = subjectRepository.GetSemester(id);

@@ -5,6 +5,7 @@ using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using NuGet.Protocol.Plugins;
 using System.Security.Claims;
 using ViewModels.FacultyVMs;
 
@@ -46,15 +47,28 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             return View(faculty);
         }
-        public IActionResult FacultyInfo(int id)
+        public async Task<IActionResult> FacultyInfo(int id)
         {
-            var Faculty = facultyRepository.GetFacultybyDean(id);
-            if (Faculty == null)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+
+            if (entity is not HighBoard highboard)
+            {
+                return Forbid();
+            }
+
+            var faculty = facultyRepository.GetFacultybyDean(id);
+            if (faculty == null)
             {
                 return NotFound();
             };
-            ViewData["FacultyName"] = Faculty.Name;
-            ViewData["FacultyId"] = Faculty.Id;
+
+            if (faculty.DeanId != highboard.Id)
+            {
+                return Forbid();
+            }
+            ViewData["FacultyName"] = faculty.Name;
+            ViewData["FacultyId"] = faculty.Id;
             ViewBag.ID = id;
             return View();
         }
