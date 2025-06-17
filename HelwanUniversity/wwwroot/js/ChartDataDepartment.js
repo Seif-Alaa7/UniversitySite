@@ -1,5 +1,4 @@
 const DepId = 7;
-
 // Function to fetch data
 async function fetchData(url) {
     try {
@@ -20,6 +19,9 @@ async function fetchAllData() {
         fetchData(`/Doctors/Department/GetdegreesForDepartment?DepartmentId=${DepId}`),
         fetchData(`/Doctors/Department/GetSubjectPassRates?DepartmentId=${DepId}`)
     ]);
+    // Log the data to console
+    console.log('Doctor Data:', doctorData);
+    console.log('Pass Rate Data:', passRateData);
 
     return { 
         doctorData: doctorData || [], 
