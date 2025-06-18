@@ -37,4 +37,12 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Doctors\Views\Faculty\ChartDataFaculty.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Areas\Doctors\Views\Faculty\ChartDataFaculty.cshtml" />
+  </ItemGroup>
+
 </Project>

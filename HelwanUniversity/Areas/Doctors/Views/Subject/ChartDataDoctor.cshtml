@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -26,12 +26,14 @@
             <canvas id="Top10"></canvas>
         </div>
         <div class="chartBox4">
-            <p>Bottom10 Students</p>
+            <p>Bottom 10 Students</p>
             <canvas id="Bottom10"></canvas>
         </div>
         <div class="full-width"></div>
     </div>
-          
+    <script>
+        window.subjectId = @ViewBag.SubjectId;
+    </script>
     <script src="/js/ChartDataDoctor.js"></script>
 </body>
 </html>

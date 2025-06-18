@@ -1,4 +1,4 @@
-const DepId = 7;
+﻿const DepId = window.departmentId;
 // Function to fetch data
 async function fetchData(url) {
     try {

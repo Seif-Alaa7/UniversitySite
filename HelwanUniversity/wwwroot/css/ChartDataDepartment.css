@@ -31,7 +31,7 @@ canvas {
     grid-column: span 2;
 }
 
-p {
+.maincontainer p {
     font-size: 1.5rem;
     justify-self: center;
     font-family: "Outfit", serif;
@@ -39,3 +39,4 @@ p {
     font-weight: 500;
     font-style: normal;
 }
+

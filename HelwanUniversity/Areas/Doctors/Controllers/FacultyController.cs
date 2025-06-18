@@ -90,5 +90,31 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewData["FacultyName"] = faculty.Name;
             return View(Departments);
         }
+        public async Task<IActionResult> ChartDataFaculty(int facultyId)
+        {
+            ViewBag.facultyId = facultyId;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            if (entity is Doctor doctor)
+            {
+                /*{
+                    return Forbid();
+                }*/
+            }
+            if (entity is HighBoard highboard)
+            {
+                /*int highboardId = highboard.Id;
+                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
+                if (course == null)
+                {
+                    return NotFound();
+                }*/
+            }
+            return View();
+        }
     }
 }

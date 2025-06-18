@@ -1,7 +1,6 @@
 ﻿@{
-    ViewData["Title"] = "ChartData";
+    ViewData["Title"] = "Chart Data";
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +29,9 @@
             el.classList.toggle('full-width');
         }
     </script>
-
-    <script src="/js/ChartDataDepartment.js"></script>
+    <script>
+        window.FacultyId = @ViewBag.facultyId;
+    </script>
+    <script src="/js/ChartDataFaculty.js"></script>
 </body>
 </html>
