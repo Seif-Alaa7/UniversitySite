@@ -173,7 +173,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
 
             var AcademicRecords = academicRecordsRepository.GetStudent(id);
-
+            ViewBag.StudentId = id;
             ViewData["AcademicRecords"] = AcademicRecords;
             ViewData["LogoTitle"] = Images[0].File;
 
