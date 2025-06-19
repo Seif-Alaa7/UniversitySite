@@ -59,6 +59,7 @@ namespace HelwanUniversity
             );
             var cloudinary = new Cloudinary(cloudinaryAccount);
             builder.Services.AddSingleton(cloudinary);
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
