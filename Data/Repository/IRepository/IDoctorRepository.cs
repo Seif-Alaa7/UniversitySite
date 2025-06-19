@@ -8,6 +8,7 @@ namespace Data.Repository.IRepository
     {
         List<Doctor> GetAll();
         Doctor GetOne(int Id);
+        Task<Doctor> GetByIdAsync(int id);
         void Delete(int id);
         void Update(Doctor doctor);
         List<SelectListItem> Select();

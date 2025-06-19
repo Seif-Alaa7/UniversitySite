@@ -7,6 +7,7 @@ namespace Data.Repository.IRepository
     public interface ISubjectRepository
     {
         Subject GetOne(int Id);
+        Task<Subject> GetByIdAsync(int id);
         void Delete(Subject subject);
         void Update(Subject subject);
         void Add(Subject subject);
