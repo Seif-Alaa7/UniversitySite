@@ -13,6 +13,7 @@ namespace Data.Repository.IRepository
         void DeleteByStudent(int studentId);
         AcademicRecords GetStudent(int id);
         Dictionary<int, (Level Level, Semester Semester)> GetLevelANDSemester(List<Student> students);
-        public List<object> GetChartData(int departmentId);
+        List<object> GetChartData(int departmentId);
+        decimal FindAvgGPAByDepartmentAndFilters(int departmentId, Level level, Gender gender);
     }
 }

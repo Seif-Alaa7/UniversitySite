@@ -5,6 +5,7 @@ using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Enums;
 using NuGet.Protocol.Plugins;
 using System.Security.Claims;
 using ViewModels.FacultyVMs;
@@ -19,14 +20,17 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IHighBoardRepository highBoardRepository;
         private readonly IDoctorRepository doctorRepository;
         private readonly IDepartmentRepository departmentRepository;
+        private readonly IAcademicRecordsRepository academicRecordsRepository;
 
         public FacultyController(IFacultyRepository facultyRepository,
-            IHighBoardRepository highBoardRepository , IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository)
+            IHighBoardRepository highBoardRepository , IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository
+            , IAcademicRecordsRepository academicRecordsRepository)
         {
             this.facultyRepository = facultyRepository;
             this.highBoardRepository = highBoardRepository;
             this.doctorRepository = doctorRepository;
             this.departmentRepository = departmentRepository;
+            this.academicRecordsRepository = academicRecordsRepository;
         }
         public IActionResult Index()
         {
@@ -89,6 +93,37 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var Departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
             ViewData["FacultyName"] = faculty.Name;
             return View(Departments);
+        }
+        public IActionResult getAvgGpa(int facultyId)
+        {
+            var levels = Enum.GetValues(typeof(Level)).Cast<Level>();
+            var genders = Enum.GetValues(typeof(Gender)).Cast<Gender>();
+            var departments = departmentRepository.GetDepsWithStudents(facultyId);
+            var result = new List<object>();
+
+            foreach (var department in departments)
+            {
+                var groups = new List<object>();
+                foreach (var level in levels)
+                {
+                    foreach (var gender in genders)
+                    {
+                        var avgGpa = academicRecordsRepository.FindAvgGPAByDepartmentAndFilters(department.Id, level, gender);
+                        groups.Add(new
+                        {
+                            level = level.ToString(),
+                            gender = gender.ToString(),
+                            avgGpa
+                        });
+                    }
+                }
+                result.Add(new
+                {
+                    departmentName = department.Name,
+                    groups
+                });
+            }
+            return Ok(result);
         }
         public async Task<IActionResult> ChartDataFaculty(int facultyId)
         {

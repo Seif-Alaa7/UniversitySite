@@ -1,4 +1,5 @@
 ﻿using Data.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Enums;
 
@@ -94,30 +95,8 @@ namespace Data.Repository
         {
             var chartData = new List<object>();
 
-            /*var doctors = departmentRepository.GetDoctors(departmentId);
-
-            foreach (var doctor in doctors)
-            {
-                var subjects = subjectRepository.SubjectsByDoctor(doctor.Id).ToList();
-
-                var doctorData = new
-                {
-                    Doctor = doctor.Name, 
-                    Subjects = subjects.Select(subject => new
-                    {
-                        Subject = subject.Name, 
-                        Average = studentRepository.StudentsBySubject(subject.Id)
-                            .Select(student => subjectRepository.ReturnDegrees(new List<Subject> { subject }, student.Id))
-                            .Where(subjectDegrees => subjectDegrees.ContainsKey(subject.Id))
-                            .Select(subjectDegrees => subjectDegrees[subject.Id])
-                            .DefaultIfEmpty(0)
-                            .Average()
-                    }).ToArray() 
-                };*/
-            // جلب المواد المرتبطة بالقسم عبر جدول DepartmentSubjects
             var subjects = subjectRepository.GetSubjectsbyDepartment(departmentId).ToList();
 
-            // جلب الأطباء الذين يدرّسون هذه المواد (من خلال DoctorId في جدول Subjects)
             var doctors = subjects.Select(s => s.DoctorId)
                                   .Distinct()
                                   .Select(doctorId => doctorRepository.GetOne(doctorId))
@@ -126,7 +105,6 @@ namespace Data.Repository
 
             foreach (var doctor in doctors)
             {
-                // جلب المواد التي يدرسها الطبيب
                 var doctorSubjects = subjects.Where(s => s.DoctorId == doctor.Id).ToList();
 
                 var doctorData = new
@@ -149,6 +127,30 @@ namespace Data.Repository
             }
 
             return chartData; 
+        }
+        public decimal FindAvgGPAByDepartmentAndFilters(int departmentId, Level level, Gender gender)
+        {
+            var studentIds = context.Students
+             .Where(s => s.DepartmentId == departmentId && s.Gender == gender)
+             .Select(s => s.Id)
+             .ToList();
+
+            var records = context.academicRecords
+                .Where(ar => studentIds.Contains(ar.StudentId) && ar.Level == level)
+                .ToList();
+
+            var groupedGpas = records
+                .GroupBy(ar => ar.StudentId)
+                .Select(g =>
+                {
+                    var totalPoints = g.Sum(ar => ar.TotalPoints);
+                    var totalHours = g.Sum(ar => ar.TotalHours);
+                    return totalHours > 0 ? (totalPoints / totalHours) : 0;
+                })
+                .Where(gpa => gpa > 0)
+                .ToList();
+
+            return groupedGpas.Any() ? groupedGpas.Average() : 0;
         }
     }
 }

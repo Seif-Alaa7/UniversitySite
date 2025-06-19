@@ -103,6 +103,13 @@ namespace Data.Repository
         {
             return context.Departments.Where(d => d.FacultyId == collegeId).ToList();
         }
+        public IEnumerable<Department> GetDepsWithStudents(int collegeId)
+        {
+            return context.Departments
+         .Where(d => d.FacultyId == collegeId)
+         .Include(d => d.Students) 
+         .ToList();
+        }
         public Department? DepartmentByStudent(int StudentId)
         {
             var student = context.Students
