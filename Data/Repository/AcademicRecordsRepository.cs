@@ -128,16 +128,28 @@ namespace Data.Repository
 
             return chartData; 
         }
-        public decimal FindAvgGPAByDepartmentAndFilters(int departmentId, Level level, Gender gender)
+        public decimal FindAvgGPAByDepartmentAndFilters(int departmentId, Level? level, Gender? gender)
         {
-            var studentIds = context.Students
-             .Where(s => s.DepartmentId == departmentId && s.Gender == gender)
-             .Select(s => s.Id)
-             .ToList();
+            var studentQuery = context.Students.AsQueryable();
 
-            var records = context.academicRecords
-                .Where(ar => studentIds.Contains(ar.StudentId) && ar.Level == level)
-                .ToList();
+            studentQuery = studentQuery.Where(s => s.DepartmentId == departmentId);
+
+            if (gender.HasValue)
+            {
+                studentQuery = studentQuery.Where(s => s.Gender == gender.Value);
+            }
+
+            var studentIds = studentQuery.Select(s => s.Id).ToList();
+
+            var recordsQuery = context.academicRecords.AsQueryable()
+                .Where(ar => studentIds.Contains(ar.StudentId));
+
+            if (level.HasValue)
+            {
+                recordsQuery = recordsQuery.Where(ar => ar.Level == level.Value);
+            }
+
+            var records = recordsQuery.ToList();
 
             var groupedGpas = records
                 .GroupBy(ar => ar.StudentId)
@@ -151,6 +163,19 @@ namespace Data.Repository
                 .ToList();
 
             return groupedGpas.Any() ? groupedGpas.Average() : 0;
+        }
+
+        public decimal FindAvgGPAByDepartment(int departmentId)
+        {
+            return FindAvgGPAByDepartmentAndFilters(departmentId, null, null);
+        }
+        public decimal FindAvgGPAByDepartmentAndLevel(int departmentId, Level level)
+        {
+            return FindAvgGPAByDepartmentAndFilters(departmentId, level, null);
+        }
+        public decimal FindAvgGPAByDepartmentLevelGender(int departmentId, Level level, Gender gender)
+        {
+            return FindAvgGPAByDepartmentAndFilters(departmentId, level, gender);
         }
     }
 }

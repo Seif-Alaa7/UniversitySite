@@ -94,37 +94,49 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewData["FacultyName"] = faculty.Name;
             return View(Departments);
         }
-        public IActionResult getAvgGpa(int facultyId)
+        [HttpGet]
+        public IActionResult GetDepartments(int facultyId)
         {
-            var levels = Enum.GetValues(typeof(Level)).Cast<Level>();
-            var genders = Enum.GetValues(typeof(Gender)).Cast<Gender>();
-            var departments = departmentRepository.GetDepsWithStudents(facultyId);
-            var result = new List<object>();
+            var departments = departmentRepository.GetDepartmentsByCollegeId(facultyId)
+                .Select(d => new { d.Id, d.Name });
+            return Ok(departments);
+        }
+        [HttpGet]
+        public IActionResult GetAvgGpaByDepartment(int facultyId)
+        {
+            var departments = departmentRepository.GetDepartmentsByCollegeId(facultyId);
 
-            foreach (var department in departments)
-            {
-                var groups = new List<object>();
-                foreach (var level in levels)
-                {
-                    foreach (var gender in genders)
-                    {
-                        var avgGpa = academicRecordsRepository.FindAvgGPAByDepartmentAndFilters(department.Id, level, gender);
-                        groups.Add(new
-                        {
-                            level = level.ToString(),
-                            gender = gender.ToString(),
-                            avgGpa
-                        });
-                    }
-                }
-                result.Add(new
-                {
-                    departmentName = department.Name,
-                    groups
-                });
-            }
+            var result = departments.Select(dep => new {
+                departmentId = dep.Id,
+                departmentName = dep.Name,
+                avgGpa = academicRecordsRepository.FindAvgGPAByDepartment(dep.Id)
+            });
+
             return Ok(result);
         }
+        [HttpGet]
+        public IActionResult GetAvgGpaByLevel(int departmentId)
+        {
+            var levels = Enum.GetValues(typeof(Level)).Cast<Level>();
+            var result = levels.Select(level => new {
+                level = level.ToString(),
+                avgGpa = academicRecordsRepository.FindAvgGPAByDepartmentAndLevel(departmentId, level)
+            });
+
+            return Ok(result);
+        }
+        [HttpGet]
+        public IActionResult GetAvgGpaByGender(int departmentId, Level level)
+        {
+            var genders = Enum.GetValues(typeof(Gender)).Cast<Gender>();
+            var result = genders.Select(gender => new {
+                gender = gender.ToString(),
+                avgGpa = academicRecordsRepository.FindAvgGPAByDepartmentLevelGender(departmentId, level, gender)
+            });
+
+            return Ok(result);
+        }
+
         public async Task<IActionResult> ChartDataFaculty(int facultyId)
         {
             ViewBag.facultyId = facultyId;

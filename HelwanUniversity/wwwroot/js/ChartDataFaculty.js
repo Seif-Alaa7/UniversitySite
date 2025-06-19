@@ -1,4 +1,10 @@
-﻿const FacId = window.FacultyId;
+﻿let currentState = {
+    facultyId: window.FacultyId,
+    departmentId: null,
+    level: null
+};
+
+let departmentMap = {};
 
 async function fetchData(url) {
     try {
@@ -7,81 +13,138 @@ async function fetchData(url) {
         return await res.json();
     } catch (err) {
         console.error('❌ Error fetching data:', err);
-        return null;
+        return [];
     }
 }
 
-function getColor(index) {
-    const palette = [
-        '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
-        '#59a14f', '#edc948', '#b07aa1', '#ff9da7',
-        '#9c755f', '#bab0ab'
-    ];
-    return palette[index % palette.length];
-}
-
-async function initCharts() {
-    const data = await fetchData(`/Doctors/Faculty/getAvgGpa?facultyId=${FacId}`);
-    if (!data) return;
-
-    const departmentLabels = [];
-    const datasetMap = {};
-    const allGroupLabels = new Set();
-
-    for (const dep of data) {
-        departmentLabels.push(dep.departmentName);
-
-        dep.groups.forEach(group => {
-            const label = `${group.level} - ${group.gender}`;
-            allGroupLabels.add(label);
-
-            if (!datasetMap[label]) datasetMap[label] = [];
-            datasetMap[label].push(group.avgGpa);
-        });
-    }
-
-    allGroupLabels.forEach(label => {
-        while (datasetMap[label].length < departmentLabels.length) {
-            datasetMap[label].push(null);
-        }
+async function loadDepartments() {
+    const data = await fetchData(`/Doctors/Faculty/GetDepartments?facultyId=${currentState.facultyId}`);
+    data.forEach(dep => {
+        departmentMap[dep.name] = dep.id;
     });
+}
 
-    const datasets = [...allGroupLabels].map((label, index) => ({
-        label,
-        data: datasetMap[label],
-        backgroundColor: getColor(index),
-        borderWidth: 1
-    }));
+function findDepartmentIdByName(name) {
+    return departmentMap[name] || null;
+}
 
-    new Chart(document.getElementById('GpaPerDepartment').getContext('2d'), {
+async function initChart() {
+    if (!currentState.departmentId) {
+        const data = await fetchData(`/Doctors/Faculty/GetAvgGpaByDepartment?facultyId=${currentState.facultyId}`);
+        renderChart(data, 'departmentName', 'avgGpa', 'Departments', onDepartmentClick);
+    } else if (!currentState.level) {
+        const data = await fetchData(`/Doctors/Faculty/GetAvgGpaByLevel?departmentId=${currentState.departmentId}`);
+        renderChart(data, 'level', 'avgGpa', 'Levels', onLevelClick);
+    } else {
+        const data = await fetchData(`/Doctors/Faculty/GetAvgGpaByGender?departmentId=${currentState.departmentId}&level=${currentState.level}`);
+        renderChart(data, 'gender', 'avgGpa', 'Genders', null);
+    }
+}
+
+function renderChart(data, labelKey, valueKey, title, clickHandler) {
+    const labels = data.map(d => d[labelKey]);
+    const values = data.map(d => d[valueKey]);
+
+    let backgroundColors;
+
+    if (title === "Genders") {
+        backgroundColors = labels.map(label => {
+            if (label === "Male") {
+                return 'rgba(74, 144, 226, 0.6)'; // Blue
+            } else if (label === "Female") {
+                return 'rgba(255, 105, 180, 0.6)'; // Pink
+            }
+            return 'rgba(180, 180, 180, 0.6)'; // Gray fallback
+        });
+    } else {
+        backgroundColors = labels.map(() => 'rgba(54, 162, 235, 0.6)');
+    }
+
+    const ctx = document.getElementById('GpaPerDepartment').getContext('2d');
+    if (window.chartInstance) window.chartInstance.destroy();
+
+    window.chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: departmentLabels,
-            datasets
+            labels,
+            datasets: [{
+                label: title,
+                data: values,
+                backgroundColor: backgroundColors
+            }]
         },
         options: {
-            responsive: true,
+            onClick: (evt, elements) => {
+                if (!elements.length || !clickHandler) return;
+                const index = elements[0].index;
+                clickHandler(labels[index]);
+            },
             plugins: {
                 title: {
                     display: true,
-                    text: 'Average GPA per Department (Grouped by Level & Gender)'
+                    text: `Average GPA - ${title}`
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 4,
-                    title: {
-                        display: true,
-                        text: 'GPA'
-                    }
+                    max: 4
                 }
             }
         }
     });
+
+    renderBackButton();
 }
 
-document.addEventListener('DOMContentLoaded', initCharts);
+
+
+function onDepartmentClick(departmentName) {
+    currentState.departmentId = findDepartmentIdByName(departmentName);
+    initChart();
+}
+
+function onLevelClick(level) {
+    currentState.level = level;
+    initChart();
+}
+
+function renderBackButton() {
+    const btn = document.getElementById('backBtn');
+    if (!btn) return;
+
+    btn.style.display = currentState.departmentId ? 'block' : 'none';
+
+    btn.onclick = () => {
+        if (currentState.level) {
+            currentState.level = null;
+        } else if (currentState.departmentId) {
+            currentState.departmentId = null;
+        }
+        initChart();
+    };
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadDepartments();
+    initChart();
+});
+
+function toggleFullWidthChart() {
+    const box = document.querySelector('.chartBox4');
+    box.classList.toggle('full-width');
+}
+
+function goBack() {
+    if (currentState.level) {
+        currentState.level = null;
+    } else if (currentState.departmentId) {
+        currentState.departmentId = null;
+    }
+    initChart();
+}
+
+
 
 
 

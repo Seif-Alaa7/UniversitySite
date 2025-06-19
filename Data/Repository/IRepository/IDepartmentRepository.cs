@@ -25,7 +25,5 @@ namespace Data.Repository.IRepository
         List<Doctor> GetDoctors(int departmentId);
         List<dynamic> GetSubjectPassRates(int departmentId);
         int GetFacultyIdByDepartmentId(int departmentId);
-        IEnumerable<Department> GetDepsWithStudents(int collegeId);
-
     }
 }

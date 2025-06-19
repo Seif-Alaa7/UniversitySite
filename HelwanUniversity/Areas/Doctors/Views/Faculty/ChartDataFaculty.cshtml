@@ -22,8 +22,12 @@
         <div class="chartBox3" onclick="toggleFullWidth(this)">
             <canvas id="PercentOfSuccessPerSubject"></canvas>
         </div>
-        <!-- New GPA Chart -->
-        <div class="chartBox4" onclick="toggleFullWidth(this)">
+        <!-- GPA Chart Section -->
+        <div class="chartBox4">
+            <div class="chart-controls">
+                <button id="backBtn" style="display: none;" onclick="goBack()">🔙 Back</button>
+                <button onclick="toggleFullWidthChart()">🖥️ Expand/Collapse</button>
+            </div>
             <canvas id="GpaPerDepartment"></canvas>
         </div>
     </div>
