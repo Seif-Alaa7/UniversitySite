@@ -1,7 +1,9 @@
+const SubId = window.subjectId;
+
 //fetching the data
 async function fetchData() {
   try {
-    const response = await fetch('/Doctors/Subject/GetGrades?SubjectId=2'); 
+    const response = await fetch(`/Doctors/Subject/GetGrades?SubjectId=${SubId}`); 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

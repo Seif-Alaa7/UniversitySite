@@ -19,10 +19,10 @@ namespace HelwanUniversity.Areas.Students.Controllers
         private readonly ICloudinaryService cloudinaryService;
         private readonly IUniFileRepository uniFileRepository;
 
-        
+
         public StudentController(IStudentRepository studentRepository
-            ,IFacultyRepository faculty, IUniversityRepository universityRepository 
-            , ICloudinaryService cloudinaryService,IUniFileRepository uniFileRepository)
+            , IFacultyRepository faculty, IUniversityRepository universityRepository
+            , ICloudinaryService cloudinaryService, IUniFileRepository uniFileRepository)
         {
             this.studentRepository = studentRepository;
             this.faculty = faculty;

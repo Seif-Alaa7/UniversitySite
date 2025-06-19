@@ -144,7 +144,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.Students = students;    
             ViewBag.Records = academicRecordsRepository.GetLevelANDSemester(students);
             ViewData["DepartmentName"] = departmentRepository.GetOne(id)?.Name;
             ViewData["FacultyName"] = facultyRepository.FacultyByDepartment(id).Name;

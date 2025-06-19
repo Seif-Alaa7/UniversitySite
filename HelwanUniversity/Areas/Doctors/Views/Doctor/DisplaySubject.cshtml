@@ -22,6 +22,7 @@ else
             <tr>
                 <th>Subject</th>
                 <th>Departments</th>
+                <th>Student Results Statistics</th>
                 <th>Register Results</th>
             </tr>
         </thead>
@@ -49,6 +50,11 @@ else
                         {
                             <p>There are No Departments for this Subject</p>
                         }
+                    </td>
+                    <td>
+                        <a href="@Url.Action("ChartDataDoctor", "Subject", new { subjectId = subject.Id })" class="ml-2" title="Student Results Statistics">
+                            <i class="fas fa-chart-bar fa-lg"></i>
+                        </a>
                     </td>
                     <td>
                         <a href="@Url.Action("StudentSubjectRegistered", "StudentSubjects", new { id = subject.Id })" class="ml-2" title="Register Results">

@@ -6,6 +6,7 @@ using Models;
 using ViewModels;
 using System.Security.Claims;
 using Models.Enums;
+using System.Security.Cryptography.Pkcs;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -224,9 +225,31 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             return Json(gradesViewModel);
         }
-        public IActionResult ChartData()
+        public async Task<IActionResult> ChartDataDoctor(int subjectId)
         {
-             return View();
+            ViewBag.SubjectId = subjectId;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            if (entity is Doctor doctor)
+            {
+                /*{
+                    return Forbid();
+                }*/
+            }
+            if (entity is HighBoard highboard)
+            {
+                /*int highboardId = highboard.Id;
+                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
+                if (course == null)
+                {
+                    return NotFound();
+                }*/
+            }
+            return View();
         }
     }
 }

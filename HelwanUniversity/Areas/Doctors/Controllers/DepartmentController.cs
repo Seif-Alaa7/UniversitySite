@@ -113,8 +113,9 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var subjectPassRates = departmentRepository.GetSubjectPassRates(departmentId);
             return Ok(subjectPassRates);
         }
-        public async Task<IActionResult> ChartData()
+        public async Task<IActionResult> ChartDataDepartment(int  departmentId)
         {
+            ViewBag.Department = departmentId;    
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
             if (entity == null)

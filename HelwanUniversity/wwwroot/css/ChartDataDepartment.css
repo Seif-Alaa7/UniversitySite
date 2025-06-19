@@ -17,7 +17,8 @@
     padding: 10px;
     border-radius: 5px;
     background: #f9f9f9;
-    cursor: pointer; 
+    cursor: pointer;
+    transition: width 2s ease;
 }
 
 canvas {
@@ -25,19 +26,11 @@ canvas {
     height: auto !important;
 }
 
-.chartBox1, .chartBox2, .chartBox3, .chartBox4 {
-    width: 100%;
-    border: 2px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    background: #f9f9f9;
-    transition: width 2s ease; 
+.chartBox1.full-width, .chartBox2.full-width, .chartBox3.full-width, .chartBox4.full-width {
+    width: 100% !important;
+    grid-column: span 2;
 }
 
-.chartBox1.full-width, .chartBox2.full-width, .chartBox3.full-width, .chartBox4.full-width {
-    width: 100% !important; 
-    grid-column: span 2; 
-}
 .maincontainer p {
     font-size: 1.5rem;
     justify-self: center;
@@ -46,3 +39,4 @@ canvas {
     font-weight: 500;
     font-style: normal;
 }
+
