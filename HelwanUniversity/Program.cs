@@ -48,6 +48,9 @@ namespace HelwanUniversity
             builder.Services.AddScoped<IStudentSubjectsRepository, StudentSubjectsRepository>();
             builder.Services.AddScoped<IDepartmentSubjectsRepository, DepartmentSubjectsRepository>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+            builder.Services.AddScoped<IAttendanceRecordRepository, AttendanceRecordRepository>();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var cloudinaryAccount = new CloudinaryDotNet.Account(
                 builder.Configuration["Cloudinary:CloudName"],
@@ -60,11 +63,18 @@ namespace HelwanUniversity
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger(); 
+                app.UseSwaggerUI(); 
+                app.UseDeveloperExceptionPage(); 
+            }
+            else 
             {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
             app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
@@ -79,6 +89,7 @@ namespace HelwanUniversity
                 name: "default",
                 pattern: "{area=User}/{controller=University}/{action=Index}/{id?}");
 
+            app.MapControllers();
             app.MapRazorPages();
 
             app.Run();

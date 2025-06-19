@@ -23,6 +23,7 @@ namespace Data
         public DbSet<University> University { get; set; }
         public DbSet<AcademicRecords> academicRecords { get; set; }
         public DbSet<UniFile> UniFiles { get; set; }
+        public DbSet<AttendanceRecord> attendanceRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

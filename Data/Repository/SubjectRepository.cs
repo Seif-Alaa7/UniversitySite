@@ -39,6 +39,10 @@ namespace Data.Repository
                 .Find(Id);
             return subject;
         }
+        public async Task<Subject> GetByIdAsync(int id)
+        {
+            return await context.Subjects.FirstOrDefaultAsync(ar => ar.Id == id);
+        }
         public List<SelectListItem> Select()
         {
             var list = context.Subjects.Select(a => new SelectListItem

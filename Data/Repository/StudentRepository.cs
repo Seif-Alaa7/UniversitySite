@@ -41,6 +41,10 @@ namespace Data.Repository
                 .FirstOrDefault(s => s.Id == Id);
             return student;
         }
+        public async Task<Student> GetByIdAsync(int id)
+        {
+            return await context.Students.FirstOrDefaultAsync(ar => ar.Id == id);
+        }
         public string GetStudentName(int studentId)
         {
             return context.Students
