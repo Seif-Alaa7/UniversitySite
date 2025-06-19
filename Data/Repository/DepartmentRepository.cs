@@ -193,5 +193,17 @@ namespace Data.Repository
                 .Select(d => d.FacultyId)
                 .FirstOrDefault();
         }
+        public Dictionary<string, List<string>> GetDepartmentsByFaculty()
+        {
+            return context.Departments
+                .Include(d => d.Faculty)
+                .Where(d => d.Faculty != null)
+                .ToList()
+                .GroupBy(d => d.Faculty.Name.ToLower())
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(d => d.Name).ToList()
+                );
+        }
     }
 }

@@ -1,4 +1,9 @@
 ﻿@using Models.Enums;
+@using Newtonsoft.Json
+@{
+    var deptDict = ViewData["DepartmentNames"] as Dictionary<int, string>;
+    var allDepartments = deptDict?.Values.Distinct().ToList() ?? new List<string>();
+}
 @{
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var records = ViewBag.Records as Dictionary<int, (Level Level, Semester Semester)>;
@@ -38,9 +43,15 @@
     </select>
     <select id="facultyFilter" class="filter-select">
         <option value="">Select Faculty</option>
-        @foreach (var faculty in ViewBag.FacultyNames)
+        @{
+            var uniqueFaculties = ((Dictionary<int, string>)ViewBag.FacultyNames)
+            .Select(f => f.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        }
+        @foreach (var facultyName in uniqueFaculties)
         {
-            <option value="@faculty.Value.ToLower()">@faculty.Value</option>
+            <option value="@facultyName.ToLower()">@facultyName</option>
         }
     </select>
     <select id="departmentFilter" class="filter-select">
@@ -139,17 +150,36 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        var seen = {};  
-        $('#facultyFilter option').each(function () {
-            var facultyName = $(this).text().toLowerCase();  
-            if (seen[facultyName]) {
-                $(this).hide();
+        var departmentsByFaculty = @Html.Raw(JsonConvert.SerializeObject(ViewBag.FacultyDepartments));
+        var allDepartments = @Html.Raw(JsonConvert.SerializeObject(allDepartments));
+
+        $('#facultyFilter').on('change', function () {
+            var selectedFaculty = $(this).val(); 
+            var departmentSelect = $('#departmentFilter'); 
+
+            departmentSelect.empty();
+            departmentSelect.append($('<option>', { value: '', text: 'Select Department' }));
+
+            if (selectedFaculty && departmentsByFaculty[selectedFaculty]) {
+                departmentsByFaculty[selectedFaculty].forEach(function (dept) {
+                    departmentSelect.append($('<option>', {
+                        value: dept.toLowerCase(),
+                        text: dept
+                    }));
+                });
             } else {
-                seen[facultyName] = true; 
+                allDepartments.forEach(function (dept) {
+                    departmentSelect.append($('<option>', {
+                        value: dept.toLowerCase(),
+                        text: dept
+                    }));
+                });
             }
         });
     });
 </script>
+
+
 
 
 

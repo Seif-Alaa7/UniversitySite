@@ -97,6 +97,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             ViewBag.SubjectNames = subjectRepository.GetName(Subjects);
             ViewData["AcademicRecords"] = AcademicRecords;
+            ViewBag.StudentId = id; 
 
             return View(studentSubjects);
         }

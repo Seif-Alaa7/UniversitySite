@@ -4,8 +4,11 @@
     ViewData["Title"] = "Students";
     var records = ViewBag.Records as Dictionary<int, (Level Level, Semester Semester)>;
 }
-
-
+<div id="main-content">
+    <button class="btn btn-danger mb-3" onclick="generatePDF()" data-students="@ViewBag.Students">
+        <i class="fas fa-file-pdf"></i> Download PDF
+    </button>
+</div>
 <h1 class="my-4 text-center">@ViewData["Title"]</h1>
 
 <h3 class="my-4 text-center">
@@ -70,5 +73,7 @@
         </tbody>
     </table>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="~/js/StudentsDepartmentPrint.js"></script>
 

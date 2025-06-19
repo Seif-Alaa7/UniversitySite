@@ -45,8 +45,10 @@ namespace Data.Repository
         }
         public List<SelectListItem> Select()
         {
-            var list = context.Subjects.Select(a => new SelectListItem
-            {
+            var list = context.Subjects
+           .OrderBy(a => a.Name) 
+           .Select(a => new SelectListItem
+           {
                 Value = a.Id.ToString(),
                 Text = a.Name
             }).ToList();

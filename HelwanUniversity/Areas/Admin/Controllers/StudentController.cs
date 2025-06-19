@@ -4,6 +4,7 @@ using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Models;
 using ViewModels;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
@@ -37,6 +38,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             ViewBag.FacultyNames = facultyRepository.GetNames(Students);
             ViewData["Records"] = academicRecordsRepository.GetLevelANDSemester(Students);
+
+            ViewBag.FacultyDepartments = departmentRepository.GetDepartmentsByFaculty();
 
             return View(Students);
         }
@@ -160,7 +163,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             ViewBag.Records = academicRecordsRepository.GetLevelANDSemester(students);
             ViewData["DepartmentName"] = departmentRepository.GetOne(id)?.Name;
-
+            ViewBag.Students = students;    
             return View(students);
         }
     }
