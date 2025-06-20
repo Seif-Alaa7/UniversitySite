@@ -1,6 +1,8 @@
 ﻿using Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Models;
+using Models.Enums;
 
 namespace HelwanUniversity.Services
 {
@@ -14,7 +16,7 @@ namespace HelwanUniversity.Services
             _context = context;
             _httpContextAccessor = httpContextAccessor;
         }
-        public void Log(string actionType, string tableName, int? recordId, string description, int? userId, string userName)
+        public void Log(string actionType, string tableName, int? recordId, string description, int? userId, string userName,UserRole userRole)
         {
             var ip = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
             var agent = _httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString();
@@ -28,6 +30,7 @@ namespace HelwanUniversity.Services
                 UserId = userId,
                 UserName = userName,
                 ActionDate = DateTime.Now,
+                UserRole = userRole,
                 IPAddress = ip,
                 UserAgent = agent   
             };

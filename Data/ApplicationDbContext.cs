@@ -30,6 +30,10 @@ namespace Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ActivityLog>()
+               .Property(a => a.UserRole)
+               .HasConversion<string>();
+
             modelBuilder.Entity<Faculty>()
                 .HasOne(f => f.HighBoard)
                 .WithOne(hb => hb.Faculty)
