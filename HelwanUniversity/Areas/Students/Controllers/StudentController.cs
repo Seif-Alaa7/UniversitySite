@@ -3,6 +3,9 @@ using Data.Repository.IRepository;
 using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Models.Enums;
+using NuGet.Protocol.Plugins;
 using Stripe.Checkout;
 using System.Security.Claims;
 using ViewModels;
@@ -18,17 +21,21 @@ namespace HelwanUniversity.Areas.Students.Controllers
         private readonly IUniversityRepository universityRepository;
         private readonly ICloudinaryService cloudinaryService;
         private readonly IUniFileRepository uniFileRepository;
+        private readonly IActivityLogger _logger;
 
 
         public StudentController(IStudentRepository studentRepository
             , IFacultyRepository faculty, IUniversityRepository universityRepository
-            , ICloudinaryService cloudinaryService, IUniFileRepository uniFileRepository)
+            , ICloudinaryService cloudinaryService, IUniFileRepository uniFileRepository,
+             IActivityLogger logger)
         {
             this.studentRepository = studentRepository;
             this.faculty = faculty;
             this.universityRepository = universityRepository;
             this.cloudinaryService = cloudinaryService;
             this.uniFileRepository = uniFileRepository;
+            this._logger = logger;
+
         }
 
         public IActionResult Index()
@@ -81,11 +88,32 @@ namespace HelwanUniversity.Areas.Students.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
+
+                _logger.Log(
+                    actionType: "Update",
+                    tableName: "Students",
+                    recordId: currentStudent.Id,
+                    description: "Profile picture updated successfully.",
+                    userId: currentStudent.Id,
+                    userName: currentStudent.Name,
+                    userRole: UserRole.Student
+                 );
                 return View("ChangePicture", ModelVM);
+
             }
             currentStudent.Picture = ModelVM.MainPicture;
             studentRepository.Update(currentStudent);
             studentRepository.Save();
+
+            _logger.Log(
+                   actionType: "Update",
+                   tableName: "Students",
+                   recordId: currentStudent.Id,
+                   description: "Failed to update profile picture due to Cloudinary error.",
+                   userId: currentStudent.Id,
+                   userName: currentStudent.Name,
+                   userRole: UserRole.Student
+                );
 
             return RedirectToAction("Details", new { id = currentStudent.Id });
         }

@@ -6,7 +6,7 @@ using Models.Enums;
 
 namespace HelwanUniversity.Services
 {
-    public class ActivityLogger
+    public class ActivityLogger : IActivityLogger
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;

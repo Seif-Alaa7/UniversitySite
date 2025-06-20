@@ -1,5 +1,6 @@
 ﻿using Data.Repository;
 using Data.Repository.IRepository;
+using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -7,6 +8,7 @@ using Models.Enums;
 using Newtonsoft.Json;
 using Stripe.Checkout;
 using System.Security.Claims;
+using ViewModels;
 
 namespace HelwanUniversity.Areas.Students.Controllers
 {
@@ -21,12 +23,15 @@ namespace HelwanUniversity.Areas.Students.Controllers
         private readonly IDepartmentRepository departmentRepository;
         private readonly IUniFileRepository uniFileRepository;
         private readonly IStudentRepository studentRepository;
+        private readonly IActivityLogger _logger;
+
         public StudentSubjectsController(IStudentSubjectsRepository studentSubjectsRepository, IAcademicRecordsRepository academicRecordsRepository,
             ISubjectRepository subjectRepository,
             IDoctorRepository doctorRepository,
             IDepartmentRepository departmentRepository,
             IUniFileRepository uniFileRepository,
-            IStudentRepository studentRepository)
+            IStudentRepository studentRepository,
+            IActivityLogger logger)
         {
             this.studentSubjectsRepository = studentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
@@ -35,6 +40,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
             this.departmentRepository = departmentRepository;
             this.uniFileRepository = uniFileRepository;
             this.studentRepository = studentRepository;
+            this._logger = logger;
         }
         public IActionResult Index()
         {
@@ -42,10 +48,23 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult AddSubject(int studentId, int subjectId)
         {
+            var subjectName = subjectRepository.GetName(subjectId);
+            var departmentName = departmentRepository.DepartmentByStudent(studentId)?.Name;
             var exists = studentSubjectsRepository.Exist(studentId, subjectId);
             if (exists)
             {
                 TempData["ErrorMessage"] = "This subject is already registered.";
+
+                _logger.Log(
+                   actionType: "Enroll Subject",
+                   tableName: "StudentSubjects",
+                   recordId: subjectId,
+                   description: $"Attempted to enroll in subject '{subjectName}' in Department of '{departmentName}', but it is already registered.",
+                   userId: studentId,
+                   userName: studentRepository.GetStudentName(studentId),
+                   userRole: UserRole.Student
+                );
+
                 return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
             }
 
@@ -65,14 +84,39 @@ namespace HelwanUniversity.Areas.Students.Controllers
             UpdateAcademicRecords(studentId);
 
             TempData["Success"] = "Subject has been successfully added.";
+
+            _logger.Log(
+               actionType: "Enroll Subject",
+               tableName: "StudentSubjects",
+               recordId: subjectId,
+               description: $"Enrolled in subject '{subjectName}' in Department of '{departmentName}' successfully.",
+               userId: studentId,
+               userName: studentRepository.GetStudentName(studentId),
+               userRole: UserRole.Student
+            );
+
             return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
         }
         public IActionResult DeleteSubject(int studentId, int subjectId)
         {
+            var subjectName = subjectRepository.GetName(subjectId);
+            var departmentName = departmentRepository.DepartmentByStudent(studentId)?.Name;
+
             var links = studentSubjectsRepository.FindStudent(studentId);
             if (links.Count() == 1)
             {
                 TempData["ErrorMessage"] = "You cannot delete this subject as it's the only one registered. Removing it will delete the student record.";
+
+                _logger.Log(
+                  actionType:"Cancel Enrolling in Subject",
+                  tableName: "StudentSubjects",
+                  recordId: subjectId,
+                  description: $"Attempted to delete subject '{subjectName}' in Department of '{departmentName}', but it is the only registered subject and cannot be removed.",
+                  userId: studentId,
+                  userName: studentRepository.GetStudentName(studentId),
+                  userRole: UserRole.Student
+               );
+
                 return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
             }
             else
@@ -81,6 +125,17 @@ namespace HelwanUniversity.Areas.Students.Controllers
                 if (link == null)
                 {
                     TempData["ErrorMessage"] = "you Can't Delete Subject because you Did not Add";
+
+                    _logger.Log(
+                        actionType: "Cancel Enrolling in Subject",
+                        tableName: "StudentSubjects",
+                        recordId: subjectId,
+                        description: $"Attempted to delete subject '{subjectName}' in Department of '{departmentName}', but it was never registered.",
+                        userId: studentId,
+                        userName: studentRepository.GetStudentName(studentId),
+                        userRole: UserRole.Student
+                    );
+
                     return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
                 }
                 else
@@ -90,9 +145,20 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                     // Update Academic Records
                     UpdateAcademicRecords(studentId);
+
+                    TempData["Success"] = "Subject has been successfully Deleted.";
+
+                    _logger.Log(
+                        actionType: "Cancel Enrolling in Subject",
+                        tableName: "StudentSubjects",
+                        recordId: subjectId,
+                        description: $"Successfully deleted subject '{subjectName}' in Department of '{departmentName}'.",
+                        userId: studentId,
+                        userName: studentRepository.GetStudentName(studentId),
+                        userRole: UserRole.Student
+                    );
                 }
             }
-            TempData["Success"] = "Subject has been successfully Deleted.";
             return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { id = studentId });
         }
         public IActionResult SubjectRegsitered(int id)
@@ -117,6 +183,9 @@ namespace HelwanUniversity.Areas.Students.Controllers
         }
         public IActionResult Pay()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentStudent = studentRepository.GetByUserId(userId);
+
             var subjectsJson = TempData["CartItems"] as string;
             if (string.IsNullOrEmpty(subjectsJson))
             {
@@ -124,8 +193,10 @@ namespace HelwanUniversity.Areas.Students.Controllers
             }
 
             var subjects = JsonConvert.DeserializeObject<List<Subject>>(subjectsJson);
-
-
+            if (subjects == null || !subjects.Any())
+            {
+                return NotFound("Subjects list is empty.");
+            }
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
@@ -135,8 +206,13 @@ namespace HelwanUniversity.Areas.Students.Controllers
                 CancelUrl = $"{Request.Scheme}://{Request.Host}/Students/checkout/cancel",
             };
 
+            long totalAmount = 0;
+
             foreach (var model in subjects)
             {
+                var amount = (long)model.Salary * 100;
+                totalAmount += amount;
+
                 var line = new SessionLineItemOptions
                 {
                     PriceData = new SessionLineItemPriceDataOptions
@@ -156,6 +232,17 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
             var service = new SessionService();
             var session = service.Create(options);
+
+            _logger.Log(
+                   actionType: "Start Payment",
+                   tableName: "Students",
+                   recordId: null, 
+                   description: $"Initiated payment for {subjects.Count} subjects. Total: {totalAmount / 100.0:F2} USD.",
+                   userId: currentStudent.Id,
+                   userName: currentStudent.Name,
+                   userRole: UserRole.Student
+            );
+
             return Redirect(session.Url);   
         }
         public IActionResult DisplayDegrees(int id)

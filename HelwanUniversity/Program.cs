@@ -48,6 +48,8 @@ namespace HelwanUniversity
             builder.Services.AddScoped<IStudentSubjectsRepository, StudentSubjectsRepository>();
             builder.Services.AddScoped<IDepartmentSubjectsRepository, DepartmentSubjectsRepository>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+            builder.Services.AddScoped<IActivityLogger, ActivityLogger>();
+
             builder.Services.AddScoped<IAttendanceRecordRepository, AttendanceRecordRepository>();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
