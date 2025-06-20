@@ -148,6 +148,15 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             ViewData["LogoTitle"] = Images[0].File;
 
             var university = universityRepository.Get();
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var admin = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+            if (admin != null)
+            {
+                ViewBag.Admin = admin;
+            };
+
             return View(university);
         }
     }

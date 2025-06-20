@@ -285,9 +285,12 @@
                 <div class="col-md-8 mr-auto ml-auto">
                     <h3 class="arabic-text">
                         Photo Gallery
-                        <a href="@Url.Action("DispalyImages", "UniFile")">
-                            <i class="fa fa-info-circle"></i>
-                        </a>
+                        @if (ViewBag.Admin.JobTitle != Models.Enums.JobTitle.VP_For_AcademicAffairs)
+                        {
+                            <a href="@Url.Action("DispalyImages", "UniFile")">
+                                <i class="fa fa-info-circle"></i>
+                            </a>
+                        }
                     </h3>
                     <br />
                     <br />
