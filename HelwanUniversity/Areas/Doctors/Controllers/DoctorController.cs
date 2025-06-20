@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Enums;
 using System;
 using System.Security.Claims;
 using ViewModels;
@@ -22,10 +23,11 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
         private readonly ICloudinaryService cloudinaryService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IActivityLogger _logger;
 
         public DoctorController(IDoctorRepository doctorRepository,
             ISubjectRepository subjectRepository, IDepartmentRepository departmentRepository, IHttpContextAccessor httpContextAccessor,
-            IDepartmentSubjectsRepository departmentSubjectsRepository, ICloudinaryService cloudinaryService)
+            IDepartmentSubjectsRepository departmentSubjectsRepository, ICloudinaryService cloudinaryService, IActivityLogger logger)
         {
             this.doctorRepository = doctorRepository;
             this.subjectRepository = subjectRepository;
@@ -33,6 +35,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.cloudinaryService = cloudinaryService;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
         public IActionResult Index()
         {
@@ -102,21 +105,66 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public async Task<IActionResult> SaveChange(Picture ModelVM)
         {
             var doctor = doctorRepository.GetOne(ModelVM.Id);
+
             try
             {
-                ModelVM.MainPicture = await cloudinaryService.UploadFile(ModelVM.MainPictureFile , doctor.Picture, "An error occurred while uploading the Picture. Please try again.");
+                ModelVM.MainPicture = await cloudinaryService.UploadFile(
+                    ModelVM.MainPictureFile,
+                    doctor.Picture,
+                    "An error occurred while uploading the Picture. Please try again."
+                );
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
+
+                _logger.Log(
+                    actionType: "Update",
+                    tableName: "Doctors",
+                    recordId: doctor.Id,
+                    description: "Failed to update profile picture due to Cloudinary error.",
+                    userId: doctor.Id,
+                    userName: doctor.Name,
+                    userRole: UserRole.Doctor
+                );
+
                 return View("ChangePicture", ModelVM);
             }
-            doctor.Picture = ModelVM.MainPicture;
-            doctorRepository.Update(doctor);
-            doctorRepository.Save();
 
-            return RedirectToAction("Details", new {id = doctor.Id});
+            if (!string.IsNullOrEmpty(ModelVM.MainPicture))
+            {
+                doctor.Picture = ModelVM.MainPicture;
+                doctorRepository.Update(doctor);
+                doctorRepository.Save();
+
+                _logger.Log(
+                    actionType: "Update",
+                    tableName: "Doctors",
+                    recordId: doctor.Id,
+                    description: "Doctor updated their profile picture successfully.",
+                    userId: doctor.Id,
+                    userName: doctor.Name,
+                    userRole: UserRole.Doctor
+                );
+
+                return RedirectToAction("Details", new { id = doctor.Id });
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Picture upload failed unexpectedly.");
+
+                _logger.Log(
+                    actionType: "Update",
+                    tableName: "Doctors",
+                    recordId: doctor.Id,
+                    description: "Upload returned empty picture URL despite no exception. Possibly a silent failure.",
+                    userId: doctor.Id,
+                    userName: doctor.Name,
+                    userRole: UserRole.Doctor
+                );
+
+                return View("ChangePicture", ModelVM);
+            }
         }
-        
     }
 }
