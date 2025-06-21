@@ -82,4 +82,27 @@ public class AttendanceApiController : ControllerBase
 
         return Ok("Attendance records processed successfully.");
     }
+    [HttpGet("StudentDetails/{studentId}")]
+    public async Task<IActionResult> GetStudentDetails(int studentId)
+    {
+        if (studentId <= 0)
+        {
+            return BadRequest("Student ID must be a positive integer.");
+        }
+
+        var student = await _studentRepository.GetByIdAsync(studentId);
+
+        if (student == null)
+        {
+            return NotFound($"Student with ID {studentId} not found in the database.");
+        }
+
+        var studentDetails = new Student
+        {
+            Id = student.Id,
+            Name = student.Name
+        };
+
+        return Ok(studentDetails);
+    }
 }
