@@ -207,5 +207,41 @@ namespace Data.Repository
 
             return result;
         }
+        public List<(string SubjectName, double Rate)> GetSubjectRateByDepartment(int departmentId, int top, bool isSuccessRate)
+        {
+            var subjects = subjectRepository.GetSubjectsbyDepartment(departmentId);
+            var subjectRates = new List<(string SubjectName, double Rate)>();
+
+            foreach (var subject in subjects)
+            {
+                var studentsInSubject = context.StudentSubjects
+                    .Where(ss => ss.SubjectId == subject.Id)
+                    .ToList();
+
+                if (studentsInSubject.Count == 0)
+                {
+                    subjectRates.Add((subject.Name, 0));
+                    continue;
+                }
+
+                int count = 0;
+
+                foreach (var ss in studentsInSubject)
+                {
+                    if (isSuccessRate && ss.Degree >= 60)
+                        count++;
+                    else if (!isSuccessRate && ss.Degree < 60)
+                        count++;
+                }
+
+                double rate = ((double)count / studentsInSubject.Count) * 100;
+                subjectRates.Add((subject.Name, Math.Round(rate, 2)));
+            }
+
+            return subjectRates
+                .OrderByDescending(x => x.Rate)
+                .Take(top)
+                .ToList();
+        }
     }
 }

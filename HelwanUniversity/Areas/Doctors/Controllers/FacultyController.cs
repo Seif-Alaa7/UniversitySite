@@ -176,5 +176,14 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             var result = academicRecordsRepository.GetLowestAvgGpaSubjectsByDepartment(departmentId,top);
             return Ok(result);
         }
+        [HttpGet]
+        public IActionResult GetSubjectRates(int departmentId, int top = 5, bool isSuccess = true)
+        {
+            var data = academicRecordsRepository.GetSubjectRateByDepartment(departmentId, top, isSuccess);
+            return Ok(data.Select(d => new {
+                subjectName = d.SubjectName,
+                rate = d.Rate
+            }));
+        }
     }
 }
