@@ -18,5 +18,6 @@ namespace Data.Repository.IRepository
         decimal FindAvgGPAByDepartment(int departmentId);
         decimal FindAvgGPAByDepartmentAndLevel(int departmentId, Level level);
         decimal FindAvgGPAByDepartmentLevelGender(int departmentId, Level level, Gender gender);
+        public List<(string SubjectName, double AvgGpa)> GetLowestAvgGpaSubjectsByDepartment(int departmentId, int top);
     }
 }

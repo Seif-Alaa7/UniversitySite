@@ -1,4 +1,5 @@
 ﻿using Data.Repository.IRepository;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Enums;
@@ -76,6 +77,7 @@ namespace Data.Repository
             var Student = context.academicRecords.FirstOrDefault(x => x.StudentId == id);
             return Student;
         }
+
         public Dictionary<int, (Level Level, Semester Semester)> GetLevelANDSemester(List<Student> students)
         {
             var StudentsDictionary = context.academicRecords.ToList()
@@ -176,6 +178,34 @@ namespace Data.Repository
         public decimal FindAvgGPAByDepartmentLevelGender(int departmentId, Level level, Gender gender)
         {
             return FindAvgGPAByDepartmentAndFilters(departmentId, level, gender);
+        }
+        public List<(string SubjectName, double AvgGpa)> GetLowestAvgGpaSubjectsByDepartment(int departmentId, int top)
+        {
+            var students = studentRepository.GetStudents(departmentId).ToList();
+
+            var studentIds = students.Select(s => s.Id).ToList();
+
+            var studentSubjects = context.StudentSubjects
+                .Where(ss => studentIds.Contains(ss.StudentId))
+                .ToList();
+
+            var subjects = subjectRepository.GetAll();
+
+            var grouped = studentSubjects
+                .GroupBy(ss => ss.SubjectId)
+                .OrderBy(g => g.Average(x => x.DegreePoints))
+                .Take(top);
+
+            var result = new List<(string SubjectName, double AvgGpa)>();
+            foreach (var group in grouped)
+            {
+                var subject = subjects.FirstOrDefault(s => s.Id == group.Key);
+                string name = subject?.Name ?? "Unknown";
+                double avg = (double)group.Average(x => x.DegreePoints);
+                result.Add((name, avg));
+            }
+
+            return result;
         }
     }
 }

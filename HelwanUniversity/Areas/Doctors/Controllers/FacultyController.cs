@@ -21,16 +21,19 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDoctorRepository doctorRepository;
         private readonly IDepartmentRepository departmentRepository;
         private readonly IAcademicRecordsRepository academicRecordsRepository;
+        private readonly ISubjectRepository subjectRepository;
 
         public FacultyController(IFacultyRepository facultyRepository,
-            IHighBoardRepository highBoardRepository , IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository
-            , IAcademicRecordsRepository academicRecordsRepository)
+            IHighBoardRepository highBoardRepository, IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository
+            , IAcademicRecordsRepository academicRecordsRepository
+            , ISubjectRepository subjectRepository)
         {
             this.facultyRepository = facultyRepository;
             this.highBoardRepository = highBoardRepository;
             this.doctorRepository = doctorRepository;
             this.departmentRepository = departmentRepository;
             this.academicRecordsRepository = academicRecordsRepository;
+            this.subjectRepository = subjectRepository;
         }
         public IActionResult Index()
         {
@@ -106,7 +109,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         {
             var departments = departmentRepository.GetDepartmentsByCollegeId(facultyId);
 
-            var result = departments.Select(dep => new {
+            var result = departments.Select(dep => new
+            {
                 departmentId = dep.Id,
                 departmentName = dep.Name,
                 avgGpa = academicRecordsRepository.FindAvgGPAByDepartment(dep.Id)
@@ -118,7 +122,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public IActionResult GetAvgGpaByLevel(int departmentId)
         {
             var levels = Enum.GetValues(typeof(Level)).Cast<Level>();
-            var result = levels.Select(level => new {
+            var result = levels.Select(level => new
+            {
                 level = level.ToString(),
                 avgGpa = academicRecordsRepository.FindAvgGPAByDepartmentAndLevel(departmentId, level)
             });
@@ -129,7 +134,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public IActionResult GetAvgGpaByGender(int departmentId, Level level)
         {
             var genders = Enum.GetValues(typeof(Gender)).Cast<Gender>();
-            var result = genders.Select(gender => new {
+            var result = genders.Select(gender => new
+            {
                 gender = gender.ToString(),
                 avgGpa = academicRecordsRepository.FindAvgGPAByDepartmentLevelGender(departmentId, level, gender)
             });
@@ -161,7 +167,14 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                     return NotFound();
                 }*/
             }
+            ViewBag.departments = departmentRepository.GetDepartmentsByCollegeId(facultyId);
             return View();
+        }
+        [HttpGet]
+        public IActionResult GetSubjectGpaStats(int departmentId, int top = 5)
+        {
+            var result = academicRecordsRepository.GetLowestAvgGpaSubjectsByDepartment(departmentId,top);
+            return Ok(result);
         }
     }
 }
