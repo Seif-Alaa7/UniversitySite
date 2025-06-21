@@ -81,9 +81,14 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
             if (currentStudent == null || currentStudent.Id != ModelVM.Id)
                 return Forbid();
+
             try
             {
-                ModelVM.MainPicture = await cloudinaryService.UploadFile(ModelVM.MainPictureFile, currentStudent.Picture, "An error occurred while uploading the Picture. Please try again.");
+                ModelVM.MainPicture = await cloudinaryService.UploadFile(
+                    ModelVM.MainPictureFile,
+                    currentStudent.Picture,
+                    "An error occurred while uploading the Picture. Please try again."
+                );
             }
             catch (Exception ex)
             {
@@ -93,29 +98,49 @@ namespace HelwanUniversity.Areas.Students.Controllers
                     actionType: "Update",
                     tableName: "Students",
                     recordId: currentStudent.Id,
-                    description: "Profile picture updated successfully.",
+                    description: "Failed to update profile picture due to Cloudinary error.",
                     userId: currentStudent.Id,
                     userName: currentStudent.Name,
                     userRole: UserRole.Student
-                 );
-                return View("ChangePicture", ModelVM);
-
-            }
-            currentStudent.Picture = ModelVM.MainPicture;
-            studentRepository.Update(currentStudent);
-            studentRepository.Save();
-
-            _logger.Log(
-                   actionType: "Update",
-                   tableName: "Students",
-                   recordId: currentStudent.Id,
-                   description: "Failed to update profile picture due to Cloudinary error.",
-                   userId: currentStudent.Id,
-                   userName: currentStudent.Name,
-                   userRole: UserRole.Student
                 );
 
-            return RedirectToAction("Details", new { id = currentStudent.Id });
+                return View("ChangePicture", ModelVM);
+            }
+
+            if (!string.IsNullOrEmpty(ModelVM.MainPicture))
+            {
+                currentStudent.Picture = ModelVM.MainPicture;
+                studentRepository.Update(currentStudent);
+                studentRepository.Save();
+
+                _logger.Log(
+                    actionType: "Update",
+                    tableName: "Students",
+                    recordId: currentStudent.Id,
+                    description: "Student updated their profile picture successfully.",
+                    userId: currentStudent.Id,
+                    userName: currentStudent.Name,
+                    userRole: UserRole.Student
+                );
+
+                return RedirectToAction("Details", new { id = currentStudent.Id });
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Picture upload failed unexpectedly.");
+
+                _logger.Log(
+                    actionType: "Update",
+                    tableName: "Students",
+                    recordId: currentStudent.Id,
+                    description: "Upload returned empty picture URL despite no exception. Possibly a silent failure.",
+                    userId: currentStudent.Id,
+                    userName: currentStudent.Name,
+                    userRole: UserRole.Student
+                );
+
+                return View("ChangePicture", ModelVM);
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ using ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Data.Repository;
+using HelwanUniversity.Services;
+using System.Numerics;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
 {
@@ -20,10 +22,14 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDoctorRepository doctorRepository;
         private readonly IDepartmentRepository departmentRepository;
         private readonly IHighBoardRepository highBoardRepository;
+        private readonly IActivityLogger _logger;
+        private readonly IFacultyRepository facultyRepository;  
+
 
         public StudentSubjectsController(IStudentSubjectsRepository studentSubjectsRepository,
             IAcademicRecordsRepository academicRecordsRepository, ISubjectRepository subjectRepository, IStudentRepository studentRepository,
-            IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository, IHighBoardRepository highBoardRepository)
+            IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository, IHighBoardRepository highBoardRepository,
+            IActivityLogger logger,IFacultyRepository facultyRepository)
         {
             this.studentSubjectsRepository = studentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
@@ -32,6 +38,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.doctorRepository = doctorRepository;
             this.departmentRepository = departmentRepository;
             this.highBoardRepository = highBoardRepository;
+            this._logger = logger;  
+            this.facultyRepository = facultyRepository; 
         }
         public IActionResult Index()
         {
@@ -39,10 +47,38 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         }
         public IActionResult AddSubject(int studentId, int subjectId)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var HB = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+            var studentName = studentRepository.GetStudentName(studentId);
+            var subjectName = subjectRepository.GetName(subjectId); 
+            var departmentName = departmentRepository.DepartmentByStudent(studentId)?.Name;
+
+            if (HB == null) return Forbid();
+
+
+            string positionDetails = HB.JobTitle switch
+            {
+                JobTitle.HeadOfDepartment => $" of {departmentRepository.GetDepartbyHead(HB.Id)?.Name}",
+                JobTitle.DeanOfFaculty => $" of {facultyRepository.GetFacultybyDean(HB.Id)?.Name}",
+                _ => ""
+            };
+
             var exists = studentSubjectsRepository.Exist(studentId, subjectId);
             if (exists)
             {
                 TempData["ErrorMessage"] = "This subject is already registered.";
+
+                _logger.Log(
+                   actionType: "Enroll Subject",
+                   tableName: "StudentSubjects",
+                   recordId: subjectId,
+                   description: $"{HB.JobTitle}{positionDetails} Attempted to enroll for Student '{studentName}' in subject '{subjectName}' in Department of '{departmentName}', but it is already registered.",
+                   userId: HB.Id,
+                   userName: HB.Name,
+                   userRole: UserRole.HighBoard
+                );
+
+
                 return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
             }
 
@@ -62,14 +98,51 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             UpdateAcademicRecords(studentId);
 
             TempData["Success"] = "Subject has been successfully added.";
+
+            _logger.Log(
+                 actionType: "Enroll Subject",
+                 tableName: "StudentSubjects",
+                 recordId: subjectId,
+                 description: $"{HB.JobTitle}{positionDetails} Enrolled for student '{studentName}' in subject '{subjectName}' in Department of '{departmentName}' successfully.",
+                 userId: HB.Id,
+                 userName: HB.Name,
+                 userRole: UserRole.HighBoard
+            );
+
+
             return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
         public IActionResult DeleteSubject(int studentId, int subjectId)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var HB = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+            var subjectName = subjectRepository.GetName(subjectId);
+            var departmentName = departmentRepository.DepartmentByStudent(studentId)?.Name;
+            var studentName = studentRepository.GetStudentName(studentId);
+
+            if (HB == null) return Forbid();
+
+            string positionDetails = HB?.JobTitle switch
+            {
+                JobTitle.HeadOfDepartment => $" of {departmentRepository.GetDepartbyHead(HB.Id)?.Name}",
+                JobTitle.DeanOfFaculty => $" of {facultyRepository.GetFacultybyDean(HB.Id)?.Name}",
+                _ => ""
+            };
             var links = studentSubjectsRepository.FindStudent(studentId);
             if (links.Count() == 1)
             {
                 TempData["ErrorMessage"] = "You cannot delete this subject as it's the only one registered. Removing it will delete the student record.";
+
+                _logger.Log(
+                 actionType: "Cancel Enrolling in Subject",
+                 tableName: "StudentSubjects",
+                 recordId: subjectId,
+                 description: $"{HB.JobTitle}{positionDetails} Attempted to delete subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}', but it is the only registered subject and cannot be removed.",
+                 userId: HB.Id,
+                 userName: HB.Name,
+                 userRole: UserRole.HighBoard
+              );
+
                 return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
             }
             else
@@ -78,6 +151,17 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 if (link == null)
                 {
                     TempData["ErrorMessage"] = "you Can't Delete Subject because you Did not Add";
+
+                    _logger.Log(
+                        actionType: "Cancel Enrolling in Subject",
+                        tableName: "StudentSubjects",
+                        recordId: subjectId,
+                        description: $"{HB.JobTitle}{positionDetails} Attempted to delete subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}', but it was never registered.",
+                        userId: HB.Id,
+                        userName: HB.Name,
+                        userRole: UserRole.HighBoard
+                    );
+
                     return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
                 }
                 else
@@ -90,6 +174,18 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 }
             }
             TempData["Success"] = "Subject has been successfully Deleted.";
+
+
+            _logger.Log(
+                    actionType: "Cancel Enrolling in Subject",
+                    tableName: "StudentSubjects",
+                    recordId: subjectId,
+                    description: $"{HB.JobTitle}{positionDetails} Successfully deleted subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}'.",
+                    userId: HB.Id,
+                    userName: HB.Name,
+                    userRole: UserRole.HighBoard
+                );
+
             return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
         public IActionResult SubjectRegsitered(int id)
@@ -142,6 +238,23 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             ViewData["AcademicRecords"] = AcademicRecords;
 
+            string positionDetails = highBoard.JobTitle switch
+            {
+                JobTitle.HeadOfDepartment => $" of {departmentRepository.GetDepartbyHead(highBoard.Id)?.Name}",
+                JobTitle.DeanOfFaculty => $" of {facultyRepository.GetFacultybyDean(highBoard.Id)?.Name}",
+                _ => ""
+            };
+
+            _logger.Log(
+                     actionType: "Show Student Degrees",
+                     tableName: "Students",
+                     recordId: student.Id,
+                     description: $"{highBoard.JobTitle}{positionDetails} viewed the degrees of student '{student.Name}'.",
+                     userId: highBoard.Id,
+                     userName: highBoard.Name,
+                     userRole: UserRole.HighBoard
+            );
+
             return View(studentSubjects);
         }
 
@@ -150,19 +263,20 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var Doctor = doctorRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+            var subjectName = subjectRepository.GetName(subjectId);
 
             foreach (var studentDegree in Degrees)
             {
                 var studentId = studentDegree.Key;
                 var degree = studentDegree.Value;
 
-
-                // Fetch academic records for the student
-                var academicRecords = academicRecordsRepository.GetStudent(studentId);
-                var currentLevel = academicRecordsRepository.GetStudent(studentId)?.Level;
-
-                // Fetch student subject entry and update it
                 var studentSubject = studentSubjectsRepository.GetOne(studentId, subjectId);
+
+                // ✅ Check if degree didn't change
+                if (studentSubject.Degree == degree)
+                    continue;
+
+                // Update degree and grade
                 studentSubject.Degree = degree;
                 studentSubject.Grade = studentSubjectsRepository.CalculateGrade(degree);
 
@@ -170,6 +284,9 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 studentSubjectsRepository.Save();
 
                 // Update Academic Records
+                var academicRecords = academicRecordsRepository.GetStudent(studentId);
+                var currentLevel = academicRecords?.Level;
+
                 UpdateAcademicRecords(studentId);
 
                 var creditHours = studentSubjectsRepository.CalculateCreditHours(studentId);
@@ -177,13 +294,14 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 var gpaSemester = academicRecordsRepository.CalculateGpaSemester(studentId, semester);
                 var gpaTotal = academicRecordsRepository.CalculateGPATotal(studentId);
-                // Update GPA information
+
                 if (academicRecords != null)
                 {
                     academicRecords.GPASemester = gpaSemester;
                     academicRecords.GPATotal = gpaTotal;
                     academicRecordsRepository.Update(academicRecords);
                     academicRecordsRepository.Save();
+
                     if (academicRecords.Level != currentLevel)
                     {
                         var student = studentRepository.GetOne(studentId);
@@ -195,8 +313,19 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                         }
                     }
                 }
+
+                _logger.Log(
+                    actionType: "Update Degree",
+                    tableName: "StudentSubjects",
+                    recordId: studentSubject.StudentId,
+                    description: $"Doctor Updated degree for student '{studentRepository.GetStudentName(studentId)}' in subject '{subjectName}' to {degree}.",
+                    userId: Doctor.Id,
+                    userName: Doctor.Name,
+                    userRole: UserRole.Doctor
+                );
             }
-            return RedirectToAction("DisplaySubject", "Doctor", new { id = @Doctor.Id });
+
+            return RedirectToAction("DisplaySubject", "Doctor", new { id = Doctor.Id });
         }
         public async Task<IActionResult> StudentSubjectRegistered(int id)
         {
@@ -225,6 +354,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             ViewData["StudentDegree"] = studentDegree;
             ViewData["StudentGrade"] = studentGrade;
+
             return View(students);
         }
         private void UpdateAcademicRecords(int studentId)

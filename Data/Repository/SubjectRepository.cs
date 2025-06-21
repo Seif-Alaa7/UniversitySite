@@ -39,6 +39,10 @@ namespace Data.Repository
                 .Find(Id);
             return subject;
         }
+        public List<Subject> GetAll()
+        {
+            return context.Subjects.ToList();
+        }
         public async Task<Subject> GetByIdAsync(int id)
         {
             return await context.Subjects.FirstOrDefaultAsync(ar => ar.Id == id);
