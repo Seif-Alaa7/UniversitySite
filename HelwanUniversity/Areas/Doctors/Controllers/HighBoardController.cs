@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Models;
+using Models.Enums;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Numerics;
 using System.Security.Claims;
 using ViewModels;
 
@@ -18,13 +20,18 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
     {
         private readonly IHighBoardRepository highBoardRepository;
         private readonly ICloudinaryService cloudinaryService;
+        private readonly IActivityLogger _logger;
+        private readonly IDepartmentRepository departmentRepository;
+        private readonly IFacultyRepository facultyRepository;  
 
-        public IDoctorRepository DoctorRepository { get; }
-
-        public HighBoardController(IHighBoardRepository highBoardRepository, ICloudinaryService cloudinaryService)
+        public HighBoardController(IHighBoardRepository highBoardRepository, ICloudinaryService cloudinaryService, IActivityLogger logger
+            ,IDepartmentRepository departmentRepository,IFacultyRepository facultyRepository)
         {
             this.highBoardRepository = highBoardRepository;
             this.cloudinaryService = cloudinaryService;
+            this._logger = logger;
+            this.departmentRepository = departmentRepository;
+            this.facultyRepository = facultyRepository;
         }
         public async Task<IActionResult> Details(int id)
         {
@@ -68,6 +75,14 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 return Forbid();
             }
             var HB = highBoardRepository.GetOne(ModelVM.Id);
+
+            string positionDetails = HB.JobTitle switch
+            {
+                JobTitle.HeadOfDepartment => $" of {departmentRepository.GetDepartbyHead(HB.Id)?.Name}",
+                JobTitle.DeanOfFaculty => $" of {facultyRepository.GetFacultybyDean(HB.Id)?.Name}",
+                _ => ""
+            };
+
             try
             {
                 ModelVM.MainPicture = await cloudinaryService.UploadFile(
@@ -78,14 +93,53 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
+
+                _logger.Log(
+                    actionType: "Update",
+                    tableName: "HighBoards",
+                    recordId: HB.Id,
+                    description: $"{HB.JobTitle}{positionDetails} failed to update profile picture due to Cloudinary error.",
+                    userId: HB.Id,
+                    userName: HB.Name,
+                    userRole: UserRole.HighBoard
+                );
+
                 return View("ChangePicture", ModelVM);
             }
+            if (!string.IsNullOrEmpty(ModelVM.MainPicture))
+            {
+                HB.Picture = ModelVM.MainPicture;
+                highBoardRepository.Update(HB);
+                highBoardRepository.Save();
 
-            HB.Picture = ModelVM.MainPicture;
-            highBoardRepository.Update(HB);
-            highBoardRepository.Save();
+                _logger.Log(
+                      actionType: "Update",
+                      tableName:  "HighBoards",
+                      recordId: HB.Id,
+                      description: $"{HB.JobTitle}{positionDetails} updated their profile picture successfully.",
+                      userId: HB.Id,
+                      userName: HB.Name,
+                      userRole: UserRole.HighBoard
+                );
 
-            return RedirectToAction("Details", new { id = HB.Id });
+                return RedirectToAction("Details", new { id = HB.Id });
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Picture upload failed unexpectedly.");
+
+                _logger.Log(
+                   actionType: "Update",
+                   tableName: "HighBoards",
+                   recordId: HB.Id,
+                   description: $"{HB.JobTitle}{positionDetails} upload returned empty picture URL despite no exception. Possibly a silent failure.",
+                   userId: HB.Id,
+                   userName: HB.Name,
+                   userRole: UserRole.HighBoard
+                );
+
+                return View("ChangePicture", ModelVM);
+            }
         }
     }
 }

@@ -75,7 +75,6 @@
             <th>@Html.DisplayName("Department")</th>
             <th>@Html.DisplayNameFor(model => model.First().PaymentFees)</th>
             <th>@Html.DisplayNameFor(model => model.First().PaymentFeesDate)</th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -134,11 +133,6 @@
                     {
                         <p class="card-text"><i class="fas fa-calendar-alt mr-2"></i><strong>Payment Date:</strong> @item.PaymentFeesDate?.ToString("d")</p>
                     }
-                </td>
-                <td>
-                    <a href="@Url.Action("Details", "Student", new { id = item.Id })" title="Details Student">
-                        <i class="fas fa-info"></i>
-                    </a>
                 </td>
             </tr>
         }

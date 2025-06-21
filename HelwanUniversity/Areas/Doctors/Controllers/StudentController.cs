@@ -24,11 +24,13 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDoctorRepository doctorRepository;
         private readonly IHighBoardRepository highBoardRepository;
         private readonly ISubjectRepository subjectRepository;
-        public StudentController(IStudentRepository studentRepository , IDepartmentRepository departmentRepository,IFacultyRepository faculty,
-            ICloudinaryService cloudinaryService,IUniversityRepository universityRepository,
+        private readonly IActivityLogger _logger;
+
+        public StudentController(IStudentRepository studentRepository , IDepartmentRepository departmentRepository, IFacultyRepository faculty,
+            ICloudinaryService cloudinaryService, IUniversityRepository universityRepository,
             IAcademicRecordsRepository academicRecordsRepository,
-            IFacultyRepository facultyRepository,IHighBoardRepository highBoardRepository,IDoctorRepository doctorRepository, 
-            ISubjectRepository subjectRepository)
+            IFacultyRepository facultyRepository, IHighBoardRepository highBoardRepository, IDoctorRepository doctorRepository,
+            ISubjectRepository subjectRepository, IActivityLogger logger)
         {
             this.studentRepository = studentRepository;
             this.departmentRepository = departmentRepository;
@@ -39,6 +41,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.highBoardRepository = highBoardRepository;
             this.doctorRepository = doctorRepository;
             this.subjectRepository = subjectRepository;
+            this._logger = logger;
         }
         public IActionResult Index()
         {
@@ -57,8 +60,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 return NotFound();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+
             if (entity is Doctor doctor)
             {
                 var studentSubjects = studentRepository.GetStudentSubjects(id);
@@ -98,6 +101,37 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 return NotFound();
             }
 
+            if(entity is HighBoard HB)
+            {
+                string positionDetails = HB.JobTitle switch
+                {
+                    JobTitle.HeadOfDepartment => $" of {departmentRepository.GetDepartbyHead(HB.Id)?.Name}",
+                    JobTitle.DeanOfFaculty => $" of {facultyRepository.GetFacultybyDean(HB.Id)?.Name}",
+                    _ => ""
+                };
+
+                _logger.Log(
+                         actionType:"Show Student Details",
+                         tableName: "Students",
+                         recordId: studentDatails.Id,
+                         description: $"{HB.JobTitle}{positionDetails} viewed the profile of student '{studentDatails.Name}'.",
+                         userId: HB.Id,
+                         userName: HB.Name,
+                         userRole: UserRole.HighBoard
+                );
+            }
+            else if(entity is Doctor DOC)
+            {
+                _logger.Log(
+                         actionType: "Show Student Details",
+                         tableName: "Students",
+                         recordId: studentDatails.Id,
+                         description: $"Doctor viewed student '{studentDatails.Name}' details.",
+                         userId: DOC.Id,
+                         userName: DOC.Name,
+                         userRole: UserRole.Doctor
+                );
+            }
             return View(studentDatails);
         }
         public async Task<IActionResult> StudentsByDepartment(int id)
@@ -169,6 +203,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewData["Records"] = academicRecordsRepository.GetLevelANDSemester(students);
 
             ViewBag.TotalCount = students.Count();
+
             return View(students);
         }
         public IActionResult FeesPaid()
@@ -194,7 +229,27 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewData["Records"] = academicRecordsRepository.GetLevelANDSemester(students);
 
             ViewBag.TotalCount = students.Count();
+
             return View("FeesStatus", students);
+        }
+        [HttpPost]
+        public IActionResult LogExportExcel()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var highBoard = highBoardRepository.GetByUserId(userId);
+            if (highBoard == null)
+                return Forbid();
+
+            _logger.Log(
+                actionType:"Export Excel",
+                tableName: "Students",
+                recordId: 0,
+                description: $"{highBoard.JobTitle} exported a report showing students’ tuition fee status",
+                userId: highBoard.Id,
+                userName: highBoard.Name,
+                userRole: UserRole.HighBoard 
+            );
+            return Ok();
         }
     }
 }
