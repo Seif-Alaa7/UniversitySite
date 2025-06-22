@@ -17,47 +17,13 @@
         <div class="chartBox1" onclick="toggleFullWidth(this)">
             <canvas id="PercentOfSuccessPerDoctor"></canvas>
         </div>
-        <!-- chartBox2 -->
         <div class="chartBox2" onclick="toggleFullWidth(this)">
-            <div class="chart-controls">
-                <label>Department:</label>
-                <select id="departmentSelectRate">
-                    <option value="">Select Department</option>
-                    @foreach (var dep in ViewBag.Departments)
-                    {
-                        <option value="@dep.Id">@dep.Name</option>
-                    }
-                </select>
-
-                <label>Top N:</label>
-                <input type="number" id="topInputRate" value="5" min="1" />
-
-                <label><input type="checkbox" id="successRateCheckbox" checked /> Show Success Rate</label>
-                <label><input type="checkbox" id="failureRateCheckbox" /> Show Failure Rate</label>
-
-                <button onclick="loadSubjectRateChart()">🔍 Show Rates</button>
-
-                <div id="rateOutput" style="margin-top: 15px; background: #f8f8f8; padding: 10px; font-family: monospace;"></div>
-            </div>
+            <canvas id="PercentOfSuccessPerDoctor"></canvas>
         </div>
 
         <!-- chartBox3 -->
-        <div class="chartBox3">
-            <div class="chart-controls">
-                <label>Department:</label>
-                <select id="departmentSelectGpa">
-                    <option value="">Select Department</option>
-                    @foreach (var dep in ViewBag.Departments)
-                    {
-                        <option value="@dep.Id">@dep.Name</option>
-                    }
-                </select>
-                <label>Top N:</label>
-                <input type="number" id="topInputGpa" value="5" min="1" />
-
-                <button onclick="loadSubjectGpaChart()">🔍 Filter</button>
-            </div>
-            <canvas id="LowGpaSubjectsChart"></canvas>
+        <div class="chartBox3" onclick="toggleFullWidth(this)">
+            <canvas id="FullStatsChart"></canvas>
         </div>
 
         <!-- GPA Chart Section -->
@@ -79,98 +45,5 @@
         window.FacultyId = @ViewBag.facultyId;
     </script>
     <script src="/js/ChartDataFaculty.js"></script>
-
-    <!-- checkbox3-->
-    <script>
-        window.loadSubjectGpaChart = async function () {
-            const departmentId = document.getElementById("departmentSelect").value;
-            const top = document.getElementById("topInput").value;
-
-            if (!departmentId) {
-                console.warn("⚠️ Please select a department first.");
-                return;
-            }
-
-            const url = `/Doctors/Faculty/GetSubjectGpaStats?departmentId=${departmentId}&top=${top}`;
-
-            try {
-                const data = await fetch(url).then(res => res.json());
-                console.log("📊 Subject GPA Data (Checkbox 3):", data);
-            } catch (error) {
-                console.error("❌ Failed to fetch GPA data:", error);
-            }
-        }
-    </script>
-    <script>
-        async function loadSubjectRateChart() {
-            const departmentId = document.getElementById("departmentSelectRate").value;
-            const top = document.getElementById("topInputRate").value;
-            const showSuccess = document.getElementById("successRateCheckbox").checked;
-            const showFailure = document.getElementById("failureRateCheckbox").checked;
-            const outputDiv = document.getElementById("rateOutput");
-            outputDiv.innerHTML = ""; // Clear previous results
-
-            if (!departmentId) {
-                outputDiv.innerText = "⚠️ Please select a department.";
-                return;
-            }
-
-            if (!showSuccess && !showFailure) {
-                outputDiv.innerText = "⚠️ Please select at least one rate type.";
-                return;
-            }
-
-            if (showSuccess) {
-                const url = `/Doctors/Faculty/GetSubjectRates?departmentId=${departmentId}&top=${top}&isSuccess=true`;
-                try {
-                    const data = await fetch(url).then(res => res.json());
-                    outputDiv.innerHTML += "<strong>✅ Success Rates:</strong><br>";
-                    data.forEach(d => {
-                        outputDiv.innerHTML += `📘 ${d.subjectName}: ${d.rate}%<br>`;
-                    });
-                    outputDiv.innerHTML += "<hr>";
-                } catch (err) {
-                    outputDiv.innerHTML += "❌ Error loading success data.<br>";
-                    console.error(err);
-                }
-            }
-
-            if (showFailure) {
-                const url = `/Doctors/Faculty/GetSubjectRates?departmentId=${departmentId}&top=${top}&isSuccess=false`;
-                try {
-                    const data = await fetch(url).then(res => res.json());
-                    outputDiv.innerHTML += "<strong>❌ Failure Rates:</strong><br>";
-                    data.forEach(d => {
-                        outputDiv.innerHTML += `📘 ${d.subjectName}: ${d.rate}%<br>`;
-                    });
-                } catch (err) {
-                    outputDiv.innerHTML += "❌ Error loading failure data.<br>";
-                    console.error(err);
-                }
-            }
-        }
-
-        window.loadSubjectGpaChart = async function () {
-            const departmentId = document.getElementById("departmentSelectGpa").value;
-            const top = document.getElementById("topInputGpa").value;
-
-            if (!departmentId) {
-                console.warn("⚠️ Please select a department first.");
-                return;
-            }
-
-            const url = `/Doctors/Faculty/GetSubjectGpaStats?departmentId=${departmentId}&top=${top}`;
-
-            try {
-                const data = await fetch(url).then(res => res.json());
-                console.log("📊 Subject GPA Data (Checkbox 3):", data);
-            } catch (error) {
-                console.error("❌ Failed to fetch GPA data:", error);
-            }
-        }
-
-    </script>
-
-
 </body>
 </html>

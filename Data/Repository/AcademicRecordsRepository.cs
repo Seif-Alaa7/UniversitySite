@@ -179,10 +179,9 @@ namespace Data.Repository
         {
             return FindAvgGPAByDepartmentAndFilters(departmentId, level, gender);
         }
-        public List<(string SubjectName, double AvgGpa)> GetLowestAvgGpaSubjectsByDepartment(int departmentId, int top)
+        public List<(int SubjectId, string SubjectName, double AvgGpa)> GetLowestAvgGpaSubjectsByDepartment(int departmentId, int top)
         {
             var students = studentRepository.GetStudents(departmentId).ToList();
-
             var studentIds = students.Select(s => s.Id).ToList();
 
             var studentSubjects = context.StudentSubjects
@@ -196,21 +195,23 @@ namespace Data.Repository
                 .OrderBy(g => g.Average(x => x.DegreePoints))
                 .Take(top);
 
-            var result = new List<(string SubjectName, double AvgGpa)>();
+            var result = new List<(int SubjectId, string SubjectName, double AvgGpa)>();
             foreach (var group in grouped)
             {
                 var subject = subjects.FirstOrDefault(s => s.Id == group.Key);
                 string name = subject?.Name ?? "Unknown";
                 double avg = (double)group.Average(x => x.DegreePoints);
-                result.Add((name, avg));
+                result.Add((group.Key, name, avg));
             }
 
             return result;
         }
-        public List<(string SubjectName, double Rate)> GetSubjectRateByDepartment(int departmentId, int top, bool isSuccessRate)
+
+
+        public List<(int SubjectId, string SubjectName, double Rate)> GetSubjectRateByDepartment(int departmentId, int top, bool isSuccessRate)
         {
             var subjects = subjectRepository.GetSubjectsbyDepartment(departmentId);
-            var subjectRates = new List<(string SubjectName, double Rate)>();
+            var subjectRates = new List<(int SubjectId, string SubjectName, double Rate)>();
 
             foreach (var subject in subjects)
             {
@@ -220,12 +221,11 @@ namespace Data.Repository
 
                 if (studentsInSubject.Count == 0)
                 {
-                    subjectRates.Add((subject.Name, 0));
+                    subjectRates.Add((subject.Id, subject.Name, 0));
                     continue;
                 }
 
                 int count = 0;
-
                 foreach (var ss in studentsInSubject)
                 {
                     if (isSuccessRate && ss.Degree >= 60)
@@ -235,7 +235,7 @@ namespace Data.Repository
                 }
 
                 double rate = ((double)count / studentsInSubject.Count) * 100;
-                subjectRates.Add((subject.Name, Math.Round(rate, 2)));
+                subjectRates.Add((subject.Id, subject.Name, Math.Round(rate, 2)));
             }
 
             return subjectRates

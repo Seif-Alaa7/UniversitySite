@@ -171,19 +171,41 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult GetSubjectGpaStats(int departmentId, int top = 5)
+        public IActionResult GetSubjectFullStatsByFaculty(int facultyId)
         {
-            var result = academicRecordsRepository.GetLowestAvgGpaSubjectsByDepartment(departmentId,top);
-            return Ok(result);
-        }
-        [HttpGet]
-        public IActionResult GetSubjectRates(int departmentId, int top = 5, bool isSuccess = true)
-        {
-            var data = academicRecordsRepository.GetSubjectRateByDepartment(departmentId, top, isSuccess);
-            return Ok(data.Select(d => new {
-                subjectName = d.SubjectName,
-                rate = d.Rate
-            }));
+            var departments = departmentRepository.GetDepartmentsByCollegeId(facultyId);
+            var allStats = new List<object>();
+
+            foreach (var dept in departments)
+            {
+                var gpaList = academicRecordsRepository.GetLowestAvgGpaSubjectsByDepartment(dept.Id, int.MaxValue);
+                var rateList = academicRecordsRepository.GetSubjectRateByDepartment(dept.Id, int.MaxValue, true);
+
+                var deptStats = gpaList.Select(g =>
+                {
+                    double? rateValue = rateList
+                      .Where(r => r.SubjectId == g.SubjectId)
+                      .Select(r => (double?)r.Rate)
+                      .FirstOrDefault();
+
+                    double passRate = (rateValue ?? 0) / 100.0;
+                    double failRate = 1 - passRate;
+
+                    return new
+                    {
+                        subjectId = g.SubjectId,
+                        subjectName = g.SubjectName,
+                        avgGpa = Math.Round(g.AvgGpa, 2),
+                        passRate = Math.Round(passRate, 2),
+                        failRate = Math.Round(failRate, 2),
+                        departmentName = dept.Name
+                    };
+                });
+
+                allStats.AddRange(deptStats);
+            }
+
+            return Ok(allStats);
         }
     }
 }
