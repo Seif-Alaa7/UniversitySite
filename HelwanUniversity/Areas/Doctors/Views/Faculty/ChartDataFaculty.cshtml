@@ -9,30 +9,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <link rel="stylesheet" href="/css/ChartDataDepartment.css">
+    <link rel="stylesheet" href="/css/ChartDataFaculty.css">
     <title>Chart Data</title>
 </head>
 <body>
+    <div class="controls-container">
+    <div class="rate-toggle">
+        <label>
+            <input type="radio" name="rateType" value="passRate" checked>
+            Pass Rate
+        </label>
+        <label>
+            <input type="radio" name="rateType" value="failRate">
+            Fail Rate
+        </label>
+    </div>
+
+    <div class="filter-options">
+        <label for="departmentSelector">Department:</label>
+        <select id="departmentSelector">
+            <option value="All">All Departments</option>
+        </select>
+
+        <label for="topNInput">N Subjects:</label>
+        <input type="number" id="topNInput" min="1" value="5" style="width: 50px;" />
+
+        <label for="topOrBottomSelect">Order:</label>
+        <select id="topOrBottomSelect">
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+        </select>
+    </div>
+</div>
+
     <div class="maincontainer">
         <div class="chartBox1" onclick="toggleFullWidth(this)">
-            <canvas id="PercentOfSuccessPerDoctor"></canvas>
+            <canvas id="avgGpaChart"></canvas>
         </div>
         <div class="chartBox2" onclick="toggleFullWidth(this)">
-            <canvas id="PercentOfSuccessPerDoctor"></canvas>
-        </div>
-
-        <!-- chartBox3 -->
-        <div class="chartBox3" onclick="toggleFullWidth(this)">
-            <canvas id="FullStatsChart"></canvas>
-        </div>
-
-        <!-- GPA Chart Section -->
-        <div class="chartBox4">
-            <div class="chart-controls">
-                <button id="backBtn" style="display: none;" onclick="goBack()">🔙 Back</button>
-                <button onclick="toggleFullWidthChart()">🖥️ Expand/Collapse</button>
-            </div>
-            <canvas id="GpaPerDepartment"></canvas>
+            <canvas id="rateChart"></canvas>
         </div>
     </div>
 
@@ -41,6 +56,7 @@
             el.classList.toggle('full-width');
         }
     </script>
+
     <script>
         window.FacultyId = @ViewBag.facultyId;
     </script>

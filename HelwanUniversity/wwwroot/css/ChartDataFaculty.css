@@ -1,0 +1,41 @@
+.maincontainer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .maincontainer {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chartBox1, .chartBox2{
+    width: 100%;
+    border: 2px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: width 2s ease;
+}
+
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.chartBox1.full-width, .chartBox2.full-width{
+    width: 100% !important;
+    grid-column: span 2;
+}
+
+.maincontainer p {
+    font-size: 1.5rem;
+    justify-self: center;
+    font-family: "Outfit", serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
