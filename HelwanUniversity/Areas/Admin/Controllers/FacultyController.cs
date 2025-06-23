@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Build.Framework;
 using Models;
+using Models.Enums;
+using System;
+using System.Security.Claims;
 using ViewModels.FacultyVMs;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
@@ -17,15 +20,17 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly IHighBoardRepository highBoardRepository;
         private readonly IUniFileRepository uniFileRepository;
         private readonly IDepartmentRepository departmentRepository;
+        private readonly IActivityLogger _logger;
 
         public FacultyController(IFacultyRepository facultyRepository,ICloudinaryService cloudinaryService,
-            IHighBoardRepository highBoardRepository, IUniFileRepository uniFileRepository,IDepartmentRepository departmentRepository)
+            IHighBoardRepository highBoardRepository, IUniFileRepository uniFileRepository,IDepartmentRepository departmentRepository,IActivityLogger logger)
         {
             this.facultyRepository = facultyRepository;
             this.cloudinaryService = cloudinaryService;
             this.highBoardRepository = highBoardRepository;
             this.departmentRepository = departmentRepository;
             this.uniFileRepository = uniFileRepository;
+            this._logger = logger;
         }
         public IActionResult Index()
         {
@@ -69,62 +74,142 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveEdit(FacultyVm facultyvm)
         {
-            var Faculty = facultyRepository.GetOne(facultyvm.Id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
 
-            if(facultyvm.Name != Faculty.Name)
-            {
-                var Faculities = facultyRepository.GetAll();
-                var NameExists = Faculities.Any(a=>a.Name == facultyvm.Name);
-                if(NameExists)
-                {
-                    ModelState.AddModelError("Name", "The faculty name already exists.");
-                    return View("Edit", facultyvm);
+            var faculty = facultyRepository.GetOne(facultyvm.Id);
 
-                }
-            }
-            if(facultyvm.DeanId != Faculty.DeanId)
+            if (facultyvm.Name != faculty.Name && facultyRepository.GetAll().Any(f => f.Name == facultyvm.Name))
             {
-                if (facultyRepository.ExistDeanInFaculty(facultyvm.DeanId))
-                {
-                    ModelState.AddModelError("DeanId", "This person is already a Dean of a registered Faculty.");
-                    return View("Edit", facultyvm);
-                }
+                ModelState.AddModelError("Name", "The faculty name already exists.");
+
+                _logger.Log(
+                    actionType: "Update Faculty Name",
+                    tableName: "Faculty",
+                    recordId: faculty.Id,
+                    description: $"{admin.JobTitle} failed to update the name of faculty '{faculty.Name}' to '{facultyvm.Name}' as the name already exists.",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+
+                return View("Edit", facultyvm);
             }
+
+            if (facultyvm.DeanId != faculty.DeanId && facultyRepository.ExistDeanInFaculty(facultyvm.DeanId))
+            {
+                ModelState.AddModelError("DeanId", "This person is already assigned as Dean of another faculty.");
+
+                _logger.Log(
+                    actionType: "Update Faculty Dean",
+                    tableName: "Faculty",
+                    recordId: faculty.Id,
+                    description: $"{admin.JobTitle} failed to change the Dean of faculty '{faculty.Name}' as the selected person is already Dean elsewhere.",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+
+                return View("Edit", facultyvm);
+            }
+
             try
             {
-                facultyvm.Logo = await cloudinaryService.UploadFile(facultyvm.LogoFile,Faculty.Logo, "An error occurred while uploading the logo. Please try again.");
-
+                facultyvm.Logo = await cloudinaryService.UploadFile(facultyvm.LogoFile, faculty.Logo, "An error occurred while uploading the logo. Please try again.");
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
+
+                _logger.Log(
+                    actionType: "Update Faculty Logo",
+                    tableName: "Faculty",
+                    recordId: faculty.Id,
+                    description: $"{admin.JobTitle} failed to update the logo for faculty '{faculty.Name}'. Error: {ex.Message}",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+
                 return View("Edit", facultyvm);
             }
+
             try
             {
-                facultyvm.Picture = await cloudinaryService.UploadFile(facultyvm.PictureFile, Faculty.Picture, "An error occurred while uploading the logo. Please try again.");
-
+                facultyvm.Picture = await cloudinaryService.UploadFile(facultyvm.PictureFile, faculty.Picture, "An error occurred while uploading the picture. Please try again.");
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
+
+                _logger.Log(
+                    actionType: "Update Faculty Picture",
+                    tableName: "Faculty",
+                    recordId: faculty.Id,
+                    description: $"{admin.JobTitle} failed to update the picture for faculty '{faculty.Name}'. Error: {ex.Message}",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+
                 return View("Edit", facultyvm);
             }
-            Faculty.Description = facultyvm.Description;
-            Faculty.DeanId = facultyvm.DeanId;
-            Faculty.Logo = facultyvm.Logo;
-            Faculty.Name = facultyvm.Name;
-            Faculty.Picture = facultyvm.Picture;
-            Faculty.ViewCount = facultyvm.ViewCount;
 
-            facultyRepository.Update(Faculty);
+            List<string> changes = new();
+
+            if (faculty.Name != facultyvm.Name)
+                changes.Add($"Name changed to '{facultyvm.Name}'");
+
+            if (faculty.DeanId != facultyvm.DeanId)
+            {
+                var oldDeanName = highBoardRepository.GetDeanByFaculty(faculty.Id)?.Name ?? "N/A";
+                var newDeanName = highBoardRepository.GetDeanByFaculty(facultyvm.DeanId)?.Name ?? "N/A";
+                changes.Add($"Dean changed from '{oldDeanName}' to '{newDeanName}'");
+            }
+
+            if (faculty.Logo != facultyvm.Logo)
+                changes.Add("Logo updated");
+
+            if (faculty.Picture != facultyvm.Picture)
+                changes.Add("Picture updated");
+
+            faculty.Name = facultyvm.Name;
+            faculty.DeanId = facultyvm.DeanId;
+            faculty.Description = facultyvm.Description;
+            faculty.Logo = facultyvm.Logo;
+            faculty.Picture = facultyvm.Picture;
+            faculty.ViewCount = facultyvm.ViewCount;
+
+            facultyRepository.Update(faculty);
             facultyRepository.Save();
-            return RedirectToAction("Details", "Faculty", new {id = Faculty.Id});
+
+            if (changes.Count > 0)
+            {
+                _logger.Log(
+                    actionType: "Update Faculty Details",
+                    tableName: "Faculty",
+                    recordId: faculty.Id,
+                    description: $"{admin.JobTitle} updated faculty '{faculty.Name}' details: {string.Join(", ", changes)}.",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+            }
+
+            return RedirectToAction("Details", "Faculty", new { id = faculty.Id });
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(Faculty faculty)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
+
             var departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
             if (!departments.Any())
             {
@@ -132,10 +217,31 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                 facultyRepository.Save();
 
                 TempData["SuccessMessage"] = "The Faculty has been successfully deleted.";
+
+                _logger.Log(
+                         actionType: "Delete Faculty",
+                         tableName: "Faculty",
+                         recordId: faculty.Id,
+                         description: $"{admin.JobTitle} successfully deleted faculty of '{faculty.Name}'.",
+                         userId: admin.Id,
+                         userName: admin.Name,
+                         userRole: UserRole.Admin
+                );
             }
             else
             {
                 TempData["ErrorMessage"] = "Deletion is not allowed as the faculty is still associated with departments.";
+
+                var Departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
+                _logger.Log(
+                       actionType: "Delete Faculty",
+                       tableName: "Faculty",
+                       recordId: faculty.Id,
+                       description: $"{admin.JobTitle} failed to delete faculty of '{faculty.Name}' as it is still associated with the following departments: {string.Join(", ", departments.Select(d => d.Name))}",
+                       userId: admin.Id,
+                       userName: admin.Name,
+                       userRole: UserRole.Admin
+                );
             }
             return RedirectToAction("Index");
         }

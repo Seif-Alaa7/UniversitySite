@@ -9,10 +9,12 @@ namespace Data.Repository
     public class HighBoardRepository : IHighBoardRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IFacultyRepository facultyRepository;
 
-        public HighBoardRepository(ApplicationDbContext context)
+        public HighBoardRepository(ApplicationDbContext context,IFacultyRepository facultyRepository)
         {
             this.context = context;
+            this.facultyRepository = facultyRepository; 
         }
         public void Update(HighBoard highBoard)
         {
@@ -111,6 +113,10 @@ namespace Data.Repository
                 .Include(h => h.Faculty)
                 .Include(h => h.Department)
                 .FirstOrDefault(h => h.ApplicationUserId == userId);
+        }
+        public HighBoard GetDeanByFaculty(int facultyid)
+        {
+            return facultyRepository.GetOne(facultyid).HighBoard;
         }
     }
 }

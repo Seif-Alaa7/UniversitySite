@@ -64,6 +64,3 @@ document.getElementById('dropZone').addEventListener('drop', function (event) {
         reader.readAsDataURL(file);
     }
 });
-function cancelForm() {
-    window.location.href = 'DispalyImages';
-}

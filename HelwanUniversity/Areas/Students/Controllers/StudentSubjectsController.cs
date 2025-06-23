@@ -57,7 +57,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                 _logger.Log(
                    actionType: "Enroll Subject",
-                   tableName: "StudentSubjects",
+                   tableName: "StudentSubject",
                    recordId: subjectId,
                    description: $"Attempted to enroll in subject '{subjectName}' in Department of '{departmentName}', but it is already registered.",
                    userId: studentId,
@@ -87,7 +87,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
             _logger.Log(
                actionType: "Enroll Subject",
-               tableName: "StudentSubjects",
+               tableName: "StudentSubject",
                recordId: subjectId,
                description: $"Enrolled in subject '{subjectName}' in Department of '{departmentName}' successfully.",
                userId: studentId,
@@ -109,7 +109,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                 _logger.Log(
                   actionType:"Cancel Enrolling in Subject",
-                  tableName: "StudentSubjects",
+                  tableName: "StudentSubject",
                   recordId: subjectId,
                   description: $"Attempted to delete subject '{subjectName}' in Department of '{departmentName}', but it is the only registered subject and cannot be removed.",
                   userId: studentId,
@@ -128,7 +128,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                     _logger.Log(
                         actionType: "Cancel Enrolling in Subject",
-                        tableName: "StudentSubjects",
+                        tableName: "StudentSubject",
                         recordId: subjectId,
                         description: $"Attempted to delete subject '{subjectName}' in Department of '{departmentName}', but it was never registered.",
                         userId: studentId,
@@ -150,7 +150,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                     _logger.Log(
                         actionType: "Cancel Enrolling in Subject",
-                        tableName: "StudentSubjects",
+                        tableName: "StudentSubject",
                         recordId: subjectId,
                         description: $"Successfully deleted subject '{subjectName}' in Department of '{departmentName}'.",
                         userId: studentId,
@@ -235,7 +235,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
             _logger.Log(
                    actionType: "Start Payment",
-                   tableName: "Students",
+                   tableName: "Student",
                    recordId: null, 
                    description: $"Initiated payment for {subjects.Count} subjects. Total: {totalAmount / 100.0:F2} USD.",
                    userId: currentStudent.Id,

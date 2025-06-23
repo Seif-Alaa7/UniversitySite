@@ -96,7 +96,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                 _logger.Log(
                     actionType: "Update",
-                    tableName: "Students",
+                    tableName: "Student",
                     recordId: currentStudent.Id,
                     description: "Failed to update profile picture due to Cloudinary error.",
                     userId: currentStudent.Id,
@@ -115,7 +115,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                 _logger.Log(
                     actionType: "Update",
-                    tableName: "Students",
+                    tableName: "Student",
                     recordId: currentStudent.Id,
                     description: "Student updated their profile picture successfully.",
                     userId: currentStudent.Id,
@@ -131,7 +131,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
                 _logger.Log(
                     actionType: "Update",
-                    tableName: "Students",
+                    tableName: "Student",
                     recordId: currentStudent.Id,
                     description: "Upload returned empty picture URL despite no exception. Possibly a silent failure.",
                     userId: currentStudent.Id,
