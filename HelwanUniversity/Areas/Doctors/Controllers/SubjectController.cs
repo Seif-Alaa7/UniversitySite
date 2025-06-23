@@ -292,6 +292,9 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             if (subject == null)
                 return NotFound();
 
+            var subjectId = subject.Id;
+            var subjectName = subject.Name;
+
             var departments = departmentSubjectsRepository.SubjectDepartments(id).ToList();
             var deletedDepartmentNames = departments
                 .Select(d => departmentRepository.GetOne(d.DepartmentId)?.Name ?? "Unknown")
@@ -304,21 +307,24 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 departmentSubjectsRepository.Delete(department);
             }
+            departmentSubjectsRepository.Save();
 
             subjectRepository.Delete(subject);
-            departmentSubjectsRepository.Save();
+            subjectRepository.Save();
 
             string departmentList = string.Join(", ", deletedDepartmentNames);
 
             _logger.Log(
                 actionType: "Delete Subject",
                 tableName: "Subject",
-                recordId: subject.Id,
-                description: $"{highBoard.JobTitle}{positionDetails} permanently deleted subject '{subject.Name}' from {departmentsCount} {departmentLabel}: {departmentList}",
+                recordId: subjectId,
+                description: $"{highBoard.JobTitle}{positionDetails} permanently deleted subject '{subjectName}' from {departmentsCount} {departmentLabel}: {departmentList}",
                 userId: highBoard.Id,
                 userName: highBoard.Name,
                 userRole: UserRole.HighBoard
             );
+
+            TempData["SuccessMessage"] = "The Subject has been successfully deleted Forever.";
 
             return RedirectToAction("Details", "Department", new { id = Departmentid });
         }

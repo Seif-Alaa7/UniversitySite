@@ -10,11 +10,14 @@ namespace Data.Repository
     {
         private readonly ApplicationDbContext context;
         private readonly IFacultyRepository facultyRepository;
+        private readonly IDepartmentRepository departmentRepository;
 
-        public HighBoardRepository(ApplicationDbContext context,IFacultyRepository facultyRepository)
+        public HighBoardRepository(ApplicationDbContext context,IFacultyRepository facultyRepository,
+            IDepartmentRepository departmentRepository)
         {
             this.context = context;
             this.facultyRepository = facultyRepository; 
+            this.departmentRepository = departmentRepository;   
         }
         public void Update(HighBoard highBoard)
         {
@@ -117,6 +120,10 @@ namespace Data.Repository
         public HighBoard GetDeanByFaculty(int facultyid)
         {
             return facultyRepository.GetOne(facultyid).HighBoard;
+        }
+        public HighBoard? GetHeadByDepartment(int departmentid)
+        {
+            return departmentRepository.GetOne(departmentid).HighBoard;
         }
     }
 }

@@ -12,10 +12,12 @@ namespace Data.Repository
     public class DoctorRepository :IDoctorRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly ISubjectRepository subjectRepository;  
 
-        public DoctorRepository(ApplicationDbContext context)
+        public DoctorRepository(ApplicationDbContext context, ISubjectRepository subjectRepository)
         {
             this.context = context;
+            this.subjectRepository = subjectRepository;
         }
 
         public void Update(Doctor doctor)
@@ -213,6 +215,10 @@ namespace Data.Repository
                 departmentId,
                 c => c.Id == departmentId && c.HeadId == doctorId
             );
+        }
+        public Doctor GetDoctorOfSubject(int DoctorId)
+        {
+            return subjectRepository.GetOne(DoctorId).Doctor;
         }
     }
 }

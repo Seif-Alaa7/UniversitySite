@@ -23,5 +23,6 @@ namespace Data.Repository.IRepository
         Task<object?> GetEntityByUserIdAsync(string userId);
         HighBoard GetByUserId(string userId);
         HighBoard GetDeanByFaculty(int facultyid);
+        HighBoard? GetHeadByDepartment(int departmentid);
     }
 }

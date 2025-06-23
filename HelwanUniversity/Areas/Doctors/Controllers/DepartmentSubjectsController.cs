@@ -233,6 +233,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                      userRole: UserRole.HighBoard
             );
 
+            TempData["SuccessMessage"] = "The Subject has been successfully deleted From this department.";
             return RedirectToAction("Details", "Department", new { area = "Doctors", id = departmentId });
         }
     }

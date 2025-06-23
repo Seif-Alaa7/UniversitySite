@@ -203,14 +203,19 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(Faculty faculty)
+        public IActionResult Delete(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var admin = highBoardRepository.GetByUserId(userId);
             if (admin == null)
                 return Forbid();
 
-            var departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
+            var faculty = facultyRepository.GetOne(id);
+            if (faculty == null)
+                return NotFound();
+
+            var departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id).ToList();
+
             if (!departments.Any())
             {
                 facultyRepository.Delete(faculty);
@@ -219,30 +224,30 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                 TempData["SuccessMessage"] = "The Faculty has been successfully deleted.";
 
                 _logger.Log(
-                         actionType: "Delete Faculty",
-                         tableName: "Faculty",
-                         recordId: faculty.Id,
-                         description: $"{admin.JobTitle} successfully deleted faculty of '{faculty.Name}'.",
-                         userId: admin.Id,
-                         userName: admin.Name,
-                         userRole: UserRole.Admin
+                    actionType: "Delete Faculty",
+                    tableName: "Faculty",
+                    recordId: faculty.Id,
+                    description: $"{admin.JobTitle} successfully deleted faculty '{faculty.Name}'.",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
                 );
             }
             else
             {
                 TempData["ErrorMessage"] = "Deletion is not allowed as the faculty is still associated with departments.";
 
-                var Departments = departmentRepository.GetDepartmentsByCollegeId(faculty.Id);
                 _logger.Log(
-                       actionType: "Delete Faculty",
-                       tableName: "Faculty",
-                       recordId: faculty.Id,
-                       description: $"{admin.JobTitle} failed to delete faculty of '{faculty.Name}' as it is still associated with the following departments: {string.Join(", ", departments.Select(d => d.Name))}",
-                       userId: admin.Id,
-                       userName: admin.Name,
-                       userRole: UserRole.Admin
+                    actionType: "Delete Faculty",
+                    tableName: "Faculty",
+                    recordId: faculty.Id,
+                    description: $"{admin.JobTitle} failed to delete faculty '{faculty.Name}' as it is still associated with the following departments: {string.Join(", ", departments.Select(d => d.Name))}",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
                 );
             }
+
             return RedirectToAction("Index");
         }
         public IActionResult AllFaculities()
