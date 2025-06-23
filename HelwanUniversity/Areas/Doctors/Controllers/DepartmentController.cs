@@ -117,25 +117,19 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         {
             ViewBag.Department = departmentId;    
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
+            var entity = await highBoardRepository.GetEntityByUserIdAsync(userId);
             if (entity == null)
             {
                 return NotFound();
             }
-            if (entity is Doctor doctor)
+            if (entity is not HighBoard highboard)
             {
-                /*{
-                    return Forbid();
-                }*/
+                return Forbid();
             }
-            if (entity is HighBoard highboard)
+            var department = await highBoardRepository.GetDepartmentForHeadAsync(highboard.Id, departmentId);
+            if (department == null)
             {
-                /*int highboardId = highboard.Id;
-                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
-                if (course == null)
-                {
-                    return NotFound();
-                }*/
+                return Forbid();
             }
             return View();
         }

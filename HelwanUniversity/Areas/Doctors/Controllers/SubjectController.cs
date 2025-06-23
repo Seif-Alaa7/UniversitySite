@@ -348,20 +348,20 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 return NotFound();
             }
-            if (entity is Doctor doctor)
-            {
-                /*{
-                    return Forbid();
-                }*/
-            }
             if (entity is HighBoard highboard)
             {
-                /*int highboardId = highboard.Id;
-                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
+                {
+                    return Forbid();
+                }
+            }
+            if (entity is Doctor doctor)
+            {
+                int DoctorId = doctor.Id;
+                var course = await doctorRepository.GetCourseForDoctorAsync(DoctorId, subjectId);
                 if (course == null)
                 {
                     return NotFound();
-                }*/
+                }
             }
             return View();
         }
