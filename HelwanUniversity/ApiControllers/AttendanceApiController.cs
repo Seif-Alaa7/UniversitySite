@@ -42,17 +42,12 @@ public class AttendanceApiController : ControllerBase
         {
             return NotFound($"Subject with ID {request.SubjectId} not found.");
         }
+        int? doctorIdToUse = request.DoctorId;
 
-        Doctor doctor = null;
-        if (request.DoctorId.HasValue)
+        if (!request.DoctorId.HasValue)
         {
-            doctor = await _doctorRepository.GetByIdAsync(request.DoctorId.Value);
-            if (doctor == null)
-            {
-                return NotFound($"Doctor with ID {request.DoctorId.Value} not found.");
-            }
+            doctorIdToUse = subject.DoctorId;
         }
-
         foreach (var attendee in request.Attendees)
         {
             var student = await _studentRepository.GetByIdAsync(attendee.StudentId);
@@ -71,7 +66,7 @@ public class AttendanceApiController : ControllerBase
                     StudentId = attendee.StudentId,
                     SubjectId = request.SubjectId,
                     AttendanceDate = request.AttendanceDate.Date,
-                    DoctorId = request.DoctorId, // يمكن أن يكون null
+                    DoctorId = doctorIdToUse,
                     AiSessionId = request.AiSessionId
                 };
                 await _attendanceRepository.AddAsync(attendanceRecord);
