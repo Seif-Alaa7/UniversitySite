@@ -70,7 +70,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                    actionType: "Enroll Subject",
-                   tableName: "StudentSubjects",
+                   tableName: "StudentSubject",
                    recordId: subjectId,
                    description: $"{HB.JobTitle}{positionDetails} Attempted to enroll for Student '{studentName}' in subject '{subjectName}' in Department of '{departmentName}', but it is already registered.",
                    userId: HB.Id,
@@ -101,7 +101,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                  actionType: "Enroll Subject",
-                 tableName: "StudentSubjects",
+                 tableName: "StudentSubject",
                  recordId: subjectId,
                  description: $"{HB.JobTitle}{positionDetails} Enrolled for student '{studentName}' in subject '{subjectName}' in Department of '{departmentName}' successfully.",
                  userId: HB.Id,
@@ -135,7 +135,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                  actionType: "Cancel Enrolling in Subject",
-                 tableName: "StudentSubjects",
+                 tableName: "StudentSubject",
                  recordId: subjectId,
                  description: $"{HB.JobTitle}{positionDetails} Attempted to delete subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}', but it is the only registered subject and cannot be removed.",
                  userId: HB.Id,
@@ -154,7 +154,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                     _logger.Log(
                         actionType: "Cancel Enrolling in Subject",
-                        tableName: "StudentSubjects",
+                        tableName: "StudentSubject",
                         recordId: subjectId,
                         description: $"{HB.JobTitle}{positionDetails} Attempted to delete subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}', but it was never registered.",
                         userId: HB.Id,
@@ -178,7 +178,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                     actionType: "Cancel Enrolling in Subject",
-                    tableName: "StudentSubjects",
+                    tableName: "StudentSubject",
                     recordId: subjectId,
                     description: $"{HB.JobTitle}{positionDetails} Successfully deleted subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}'.",
                     userId: HB.Id,
@@ -247,7 +247,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                      actionType: "Show Student Degrees",
-                     tableName: "Students",
+                     tableName: "Student",
                      recordId: student.Id,
                      description: $"{highBoard.JobTitle}{positionDetails} viewed the degrees of student '{student.Name}'.",
                      userId: highBoard.Id,
@@ -316,7 +316,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                     actionType: "Update Degree",
-                    tableName: "StudentSubjects",
+                    tableName: "StudentSubject",
                     recordId: studentSubject.StudentId,
                     description: $"Doctor Updated degree for student '{studentRepository.GetStudentName(studentId)}' in subject '{subjectName}' to {degree}.",
                     userId: Doctor.Id,

@@ -97,7 +97,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                              actionType:"Add Subject From Department",
-                             tableName: "DepartmentSubjects",
+                             tableName: "DepartmentSubject",
                              recordId: model.DepartmentId,
                              description: $"{highBoard.JobTitle}{positionDetails} attempted to add subject '{subjectName}' to department '{departmentName}', but it already exists",
                              userId: highBoard.Id,
@@ -121,7 +121,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                            actionType: "Add Subject From Department",
-                           tableName: "DepartmentSubjects",
+                           tableName: "DepartmentSubject",
                            recordId: model.DepartmentId,
                            description: $"{highBoard.JobTitle}{positionDetails} successfully added subject '{subjectName}' to department '{departmentName}'",
                            userId: highBoard.Id,
@@ -210,7 +210,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                                 actionType: "Delete Subject From Department",
-                                tableName: "DepartmentSubjects",
+                                tableName: "DepartmentSubject",
                                 recordId: departmentId,
                                 description: $"{highBoard.JobTitle}{positionDetails} attempted to delete subject '{subjectName}' from department '{departmentName}', but no such relation was found",
                                 userId: highBoard.Id,
@@ -225,7 +225,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                      actionType: "Delete Subject From Department",
-                     tableName: "DepartmentSubjects",
+                     tableName: "DepartmentSubject",
                      recordId: departmentId,
                      description: $"{highBoard.JobTitle}{positionDetails} successfully deleted subject '{subjectName}' from department '{departmentName}'",
                      userId: highBoard.Id,

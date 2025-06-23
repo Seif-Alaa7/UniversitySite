@@ -165,8 +165,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                     ModelState.AddModelError("Name", "This Name is Already Exist");
 
                     _logger.Log(
-                        actionType: "Edit Subject",
-                        tableName: "Subjects",
+                        actionType: "Update Subject",
+                        tableName: "Subject",
                         recordId: subject.Id,
                         description: $"{highBoard.JobTitle}{positionDetails} failed to update subject '{subject.Name}' to '{model.Name}' due to duplicate name",
                         userId: highBoard.Id,
@@ -231,8 +231,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             if (department.Id == departmentOld.Id)
             {
                 _logger.Log(
-                    actionType: "Edit Subject",
-                    tableName: "Subjects",
+                    actionType: "Update Subject",
+                    tableName: "Subject",
                     recordId: subject.Id,
                     description: $"{highBoard.JobTitle}{positionDetails} updated subject '{subject.Name}'{changeSummary} without changing department '{department.Name}'",
                     userId: highBoard.Id,
@@ -246,8 +246,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             if (exists)
             {
                 _logger.Log(
-                    actionType: "Edit Subject",
-                    tableName: "Subjects",
+                    actionType: "Update Subject",
+                    tableName: "Subject",
                     recordId: subject.Id,
                     description: $"{highBoard.JobTitle}{positionDetails} updated subject '{subject.Name}'{changeSummary} and attempted to change department from '{departmentOld.Name}' to '{department.Name}' but link already existed",
                     userId: highBoard.Id,
@@ -263,8 +263,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             departmentRepository.Save();
 
             _logger.Log(
-                actionType: "Edit Subject",
-                tableName: "Subjects",
+                actionType: "Update Subject",
+                tableName: "Subject",
                 recordId: subject.Id,
                 description: $"{highBoard.JobTitle}{positionDetails} updated subject '{subject.Name}'{changeSummary} and successfully transferred it from department '{departmentOld.Name}' to department '{department.Name}'",
                 userId: highBoard.Id,
@@ -312,7 +312,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                 actionType: "Delete Subject",
-                tableName: "Subjects",
+                tableName: "Subject",
                 recordId: subject.Id,
                 description: $"{highBoard.JobTitle}{positionDetails} permanently deleted subject '{subject.Name}' from {departmentsCount} {departmentLabel}: {departmentList}",
                 userId: highBoard.Id,

@@ -74,7 +74,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
                 _logger.Log(
                     actionType: "Add Video",
-                    tableName: "UniFiles",
+                    tableName: "UniFile",
                     recordId: file.Id,
                     description: $"{admin.JobTitle} has successfully added a new Video to the News.",
                     userId: admin.Id,
@@ -91,7 +91,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             _logger.Log(
                 actionType: "Add Video",
-                tableName: "UniFiles",
+                tableName: "UniFile",
                 recordId: 0,
                 description: $"{admin.JobTitle} failed to add a new video to the News due to invalid form data. Errors: {string.Join(" | ", errors)}",
                 userId: admin.Id,
@@ -135,7 +135,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
                 _logger.Log(
                     actionType: "Add Image",
-                    tableName: "UniFiles",
+                    tableName: "UniFile",
                     recordId: file.Id,
                     description: $"{admin.JobTitle} has successfully added a new image to the slide images.",
                     userId: admin.Id,
@@ -149,7 +149,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             {
                 _logger.Log(
                     actionType: "Add Image",
-                    tableName: "UniFiles",
+                    tableName: "UniFile",
                     recordId: 0,
                     description: $"{admin.JobTitle} failed to add a new image to the slide images. Error: {ex.Message}",
                     userId: admin.Id,
@@ -199,7 +199,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
                 _logger.Log(
                     actionType: "Update Video",
-                    tableName: "UniFiles",
+                    tableName: "UniFile",
                     recordId: video.Id,
                     description: $"{admin.JobTitle} failed to update the video file due to invalid Facebook link.",
                     userId: admin.Id,
@@ -219,7 +219,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
                     _logger.Log(
                           actionType: "Update Video",
-                          tableName: "UniFiles",
+                          tableName: "UniFile",
                           recordId: video.Id,
                           description: $"{admin.JobTitle} failed to update the video file. The same video file is already registered.",
                           userId: admin.Id,
@@ -238,7 +238,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             _logger.Log(
                      actionType: "Update Video",
-                     tableName: "UniFiles",
+                     tableName: "UniFile",
                      recordId: video.Id,
                      description: $"{admin.JobTitle} successfully updated the Facebook video link.",
                      userId: admin.Id,
@@ -305,7 +305,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
                 _logger.Log(
                       actionType: $"Update Image",
-                      tableName: "UniFiles",
+                      tableName: "UniFile",
                       recordId: IMG.Id,
                       description: $"{admin.JobTitle} has updated the Image file{imgRole} successfully.",
                       userId: admin.Id,
@@ -321,7 +321,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
                 _logger.Log(
                    actionType: "Update Image",
-                   tableName: "UniFiles",
+                   tableName: "UniFile",
                    recordId: IMG.Id,
                    description: $"{admin.JobTitle} Failed to Update Image{imgRole}. Error: {ex.Message}",
                    userId: admin.Id,
@@ -378,7 +378,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             _logger.Log(
                 actionType: $"Delete{fileTypeText}",
-                tableName: "UniFiles",
+                tableName: "UniFile",
                 recordId: file.Id,
                 description: $"{admin.JobTitle} has deleted {article}{fileTypeText} file{imgRole} successfully.",
                 userId: admin.Id,

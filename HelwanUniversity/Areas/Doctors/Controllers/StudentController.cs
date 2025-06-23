@@ -112,7 +112,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                          actionType:"Show Student Details",
-                         tableName: "Students",
+                         tableName: "Student",
                          recordId: studentDatails.Id,
                          description: $"{HB.JobTitle}{positionDetails} viewed the profile of student '{studentDatails.Name}'.",
                          userId: HB.Id,
@@ -124,7 +124,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 _logger.Log(
                          actionType: "Show Student Details",
-                         tableName: "Students",
+                         tableName: "Student",
                          recordId: studentDatails.Id,
                          description: $"Doctor viewed student '{studentDatails.Name}' details.",
                          userId: DOC.Id,
@@ -242,7 +242,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                 actionType:"Export Excel",
-                tableName: "Students",
+                tableName: "Student",
                 recordId: 0,
                 description: $"{highBoard.JobTitle} exported a report showing students’ tuition fee status",
                 userId: highBoard.Id,
