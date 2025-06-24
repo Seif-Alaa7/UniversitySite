@@ -164,7 +164,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             }
             else
             {
-                ViewBag.SuccessMessage = TempData["Success"];
+                ViewBag.SuccessMessage = TempData["SuccessMessage"];
             }
 
             var academicRecord = academicRecordsRepository.GetAll().FirstOrDefault(x => x.StudentId == Studentid);

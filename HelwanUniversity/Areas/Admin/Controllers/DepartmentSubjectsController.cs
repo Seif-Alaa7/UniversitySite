@@ -157,7 +157,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             }
             else
             {
-                ViewBag.SuccessMessage = TempData["Success"];
+                ViewBag.SuccessMessage = TempData["SuccessMessage"];
             }
 
             var department = departmentRepository.DepartmentByStudent(Studentid);

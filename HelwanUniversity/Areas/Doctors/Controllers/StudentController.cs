@@ -49,16 +49,15 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         }
         public async Task<IActionResult> Details(int id)
         {
-            var studentDatails = studentRepository.GetOne(id);
-            if (studentDatails == null)
-            {
+            var student = studentRepository.GetOne(id);
+            if (student == null)
                 return NotFound();
-            }
-            var department = departmentRepository.DepartmentByStudent(id);
 
+            var department = departmentRepository.DepartmentByStudent(id);
             if (department == null)
                 return NotFound();
 
+            var faculty = facultyRepository.FacultyByDepartment(department.Id);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var entity = await doctorRepository.GetEntityByUserIdAsync(userId);
 
@@ -66,42 +65,43 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 var studentSubjects = studentRepository.GetStudentSubjects(id);
                 var doctorSubjects = subjectRepository.SubjectsByDoctor(doctor.Id);
-                var isTeachingStudent = studentSubjects.Any(s => doctorSubjects.Any(d => d.Id == s.SubjectId));
+                bool isTeachingStudent = studentSubjects.Any(s => doctorSubjects.Any(d => d.Id == s.SubjectId));
                 if (!isTeachingStudent)
                     return Forbid();
             }
-            else if (entity is HighBoard head && head.JobTitle == JobTitle.HeadOfDepartment)
+            else if (entity is HighBoard highBoard)
             {
-                var doctorDepartment = departmentRepository.GetDepartbyHead(head.Id);
-                if (doctorDepartment == null || doctorDepartment.Id != department.Id)
+                if (highBoard.JobTitle == JobTitle.HeadOfDepartment)
+                {
+                    var dept = departmentRepository.GetDepartbyHead(highBoard.Id);
+                    if (dept == null || dept.Id != department.Id)
+                        return Forbid();
+                }
+                else if (highBoard.JobTitle == JobTitle.DeanOfFaculty)
+                {
+                    var deanFaculty = facultyRepository.GetFacultybyDean(highBoard.Id);
+                    if (deanFaculty == null || faculty == null || deanFaculty.Id != faculty.Id)
+                        return Forbid();
+                }
+                else
+                {
                     return Forbid();
-            }
-            else if (entity is HighBoard dean && dean.JobTitle == JobTitle.DeanOfFaculty)
-            {
-                var faculty = facultyRepository.GetFacultybyDean(dean.Id);
-                var facultyOfStudent = facultyRepository.FacultyByDepartment(department.Id);
-
-                if (faculty == null || facultyOfStudent == null || faculty.Id != facultyOfStudent.Id)
-                    return Forbid();
+                }
             }
             else
             {
                 return Forbid();
             }
-            var facultyData = facultyRepository.FacultyByDepartment(department.Id);
-            ViewData["Faculty"] = facultyData;
 
-            var googleForm = universityRepository.Get().GoogleForm;
-            if (googleForm != null)
-            {
-                ViewData["FormBifurcation"] = googleForm;
-            }
-            else
-            {
-                return NotFound();
-            }
+            ViewData["Faculty"] = faculty;
+            ViewData["Department"] = department;
+            ViewData["FormBifurcation"] = universityRepository.Get()?.GoogleForm;
 
-            if(entity is HighBoard HB)
+            string departmentName = department.Name;
+            string facultyName = faculty?.Name ?? "Unknown Faculty";
+            string extraDetails = $" from Department '{departmentName}' and Faculty '{facultyName}'";
+
+            if (entity is HighBoard HB)
             {
                 string positionDetails = HB.JobTitle switch
                 {
@@ -111,28 +111,29 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 };
 
                 _logger.Log(
-                         actionType:"Show Student Details",
-                         tableName: "Student",
-                         recordId: studentDatails.Id,
-                         description: $"{HB.JobTitle}{positionDetails} viewed the profile of student '{studentDatails.Name}'.",
-                         userId: HB.Id,
-                         userName: HB.Name,
-                         userRole: UserRole.HighBoard
+                    actionType: "Show Student Details",
+                    tableName: "Student",
+                    recordId: student.Id,
+                    description: $"{HB.JobTitle}{positionDetails} viewed the profile of student '{student.Name}'{extraDetails}.",
+                    userId: HB.Id,
+                    userName: HB.Name,
+                    userRole: UserRole.HighBoard
                 );
             }
-            else if(entity is Doctor DOC)
+            else if (entity is Doctor doc)
             {
                 _logger.Log(
-                         actionType: "Show Student Details",
-                         tableName: "Student",
-                         recordId: studentDatails.Id,
-                         description: $"Doctor viewed student '{studentDatails.Name}' details.",
-                         userId: DOC.Id,
-                         userName: DOC.Name,
-                         userRole: UserRole.Doctor
+                    actionType: "Show Student Details",
+                    tableName: "Student",
+                    recordId: student.Id,
+                    description: $"Doctor viewed the profile of student '{student.Name}'{extraDetails}.",
+                    userId: doc.Id,
+                    userName: doc.Name,
+                    userRole: UserRole.Doctor
                 );
             }
-            return View(studentDatails);
+
+            return View(student);
         }
         public async Task<IActionResult> StudentsByDepartment(int id)
         {

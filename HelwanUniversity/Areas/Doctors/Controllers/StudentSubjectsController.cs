@@ -48,10 +48,13 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public IActionResult AddSubject(int studentId, int subjectId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var HB = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+            var HB = highBoardRepository.GetByUserId(userId);
             var studentName = studentRepository.GetStudentName(studentId);
             var subjectName = subjectRepository.GetName(subjectId); 
             var departmentName = departmentRepository.DepartmentByStudent(studentId)?.Name;
+
+            if (studentName == null || subjectName == null || departmentName == null)
+                return NotFound();
 
             if (HB == null) return Forbid();
 
@@ -97,7 +100,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             // Calculate Academic Records
             UpdateAcademicRecords(studentId);
 
-            TempData["Success"] = "Subject has been successfully added.";
+            TempData["SuccessMessage"] = "Subject has been successfully added.";
 
             _logger.Log(
                  actionType: "Enroll Subject",
@@ -115,9 +118,10 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         public IActionResult DeleteSubject(int studentId, int subjectId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var HB = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
+            var HB = highBoardRepository.GetByUserId(userId);
             var subjectName = subjectRepository.GetName(subjectId);
-            var departmentName = departmentRepository.DepartmentByStudent(studentId)?.Name;
+            var department = departmentRepository.DepartmentByStudent(studentId);
+            var departmentName = department?.Name ?? "Unknown";
             var studentName = studentRepository.GetStudentName(studentId);
 
             if (HB == null) return Forbid();
@@ -128,63 +132,59 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                 JobTitle.DeanOfFaculty => $" of {facultyRepository.GetFacultybyDean(HB.Id)?.Name}",
                 _ => ""
             };
-            var links = studentSubjectsRepository.FindStudent(studentId);
-            if (links.Count() == 1)
+
+            var linksCount = studentSubjectsRepository.FindStudent(studentId).Count();
+            if (linksCount == 1)
             {
                 TempData["ErrorMessage"] = "You cannot delete this subject as it's the only one registered. Removing it will delete the student record.";
 
                 _logger.Log(
-                 actionType: "Cancel Enrolling in Subject",
-                 tableName: "StudentSubject",
-                 recordId: subjectId,
-                 description: $"{HB.JobTitle}{positionDetails} Attempted to delete subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}', but it is the only registered subject and cannot be removed.",
-                 userId: HB.Id,
-                 userName: HB.Name,
-                 userRole: UserRole.HighBoard
-              );
-
-                return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
-            }
-            else
-            {
-                var link = studentSubjectsRepository.GetOne(studentId, subjectId);
-                if (link == null)
-                {
-                    TempData["ErrorMessage"] = "you Can't Delete Subject because you Did not Add";
-
-                    _logger.Log(
-                        actionType: "Cancel Enrolling in Subject",
-                        tableName: "StudentSubject",
-                        recordId: subjectId,
-                        description: $"{HB.JobTitle}{positionDetails} Attempted to delete subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}', but it was never registered.",
-                        userId: HB.Id,
-                        userName: HB.Name,
-                        userRole: UserRole.HighBoard
-                    );
-
-                    return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
-                }
-                else
-                {
-                    studentSubjectsRepository.Delete(link);
-                    studentSubjectsRepository.Save();
-
-                    // Update Academic Records
-                    UpdateAcademicRecords(studentId);
-                }
-            }
-            TempData["Success"] = "Subject has been successfully Deleted.";
-
-
-            _logger.Log(
                     actionType: "Cancel Enrolling in Subject",
                     tableName: "StudentSubject",
                     recordId: subjectId,
-                    description: $"{HB.JobTitle}{positionDetails} Successfully deleted subject '{subjectName}' for student '{studentName}' in Department of '{departmentName}'.",
+                    description: $"{HB.JobTitle}{positionDetails} attempted to delete subject '{subjectName}' for student '{studentName}' in department '{departmentName}', but it is the only registered subject and cannot be removed.",
                     userId: HB.Id,
                     userName: HB.Name,
                     userRole: UserRole.HighBoard
                 );
+
+                return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
+            }
+
+            var link = studentSubjectsRepository.GetOne(studentId, subjectId);
+            if (link == null)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this subject because it is not registered.";
+
+                _logger.Log(
+                    actionType: "Cancel Enrolling in Subject",
+                    tableName: "StudentSubject",
+                    recordId: subjectId,
+                    description: $"{HB.JobTitle}{positionDetails} attempted to delete subject '{subjectName}' for student '{studentName}' in department '{departmentName}', but it was never registered.",
+                    userId: HB.Id,
+                    userName: HB.Name,
+                    userRole: UserRole.HighBoard
+                );
+
+                return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
+            }
+
+            studentSubjectsRepository.Delete(link);
+            studentSubjectsRepository.Save();
+
+            UpdateAcademicRecords(studentId);
+
+            TempData["SuccessMessage"] = "Subject has been successfully deleted.";
+
+            _logger.Log(
+                actionType: "Cancel Enrolling in Subject",
+                tableName: "StudentSubject",
+                recordId: subjectId,
+                description: $"{HB.JobTitle}{positionDetails} successfully deleted subject '{subjectName}' for student '{studentName}' in department '{departmentName}'.",
+                userId: HB.Id,
+                userName: HB.Name,
+                userRole: UserRole.HighBoard
+            );
 
             return RedirectToAction("DisplaySubjects", "DepartmentSubjects", new { Studentid = studentId });
         }
