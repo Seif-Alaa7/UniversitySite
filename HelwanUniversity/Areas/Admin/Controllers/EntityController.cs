@@ -4,6 +4,8 @@ using Models;
 using ViewModels;
 using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Models.Enums;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
 {
@@ -17,6 +19,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly IDepartmentRepository departmentRepository;
         private readonly IDoctorRepository doctorRepository;
         private readonly IHighBoardRepository highBoardRepository;
+        private readonly IActivityLogger logger;
 
 
         public EntityController(ISubjectRepository subjectRepository ,
@@ -24,7 +27,8 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             ICloudinaryService cloudinaryService,
             IDepartmentRepository departmentRepository,
             IDoctorRepository doctorRepository,
-            IHighBoardRepository highBoardRepository
+            IHighBoardRepository highBoardRepository,
+            IActivityLogger logger
             )
         {
             this.subjectRepository = subjectRepository;
@@ -33,6 +37,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             this.departmentRepository = departmentRepository;
             this.doctorRepository = doctorRepository;
             this.highBoardRepository = highBoardRepository;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -47,6 +52,11 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddEntity entity)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
+
             switch (entity.EntityType)
             {
 
@@ -58,16 +68,39 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                         FacultyId = entity.FacultyId ?? 0,
                         Allowed = entity.Allowed ?? 0
                     };
+                    
+                    var head = highBoardRepository.GetOne(department.HeadId);
+                    var Faculty = facultyRepository.GetOne(department.FacultyId);
 
                     if (departmentRepository.ExistHeadInDepartment(entity.HeadId??0))
                     {
                         ModelState.AddModelError("HeadId", "This person is already a head of a registered department.");
                         LoadPageData();
+                      
+                        logger.Log(
+                                actionType: "Add Department",
+                                tableName: "Department",
+                                recordId: 0,
+                                description: $"{admin.JobTitle} attempted to add department '{department.Name}' under faculty '{Faculty.Name}' with head '{head.Name}', but head is already assigned to another department.",
+                                userId: admin.Id,
+                                userName: admin.Name,
+                                userRole: UserRole.Admin
+                        );
                         return View("Add", entity);
                     }
 
                     departmentRepository.Add(department);
                     departmentRepository.Save();
+
+                    logger.Log(
+                          actionType: "Add Department",
+                          tableName: "Department",
+                          recordId: department.Id,
+                          description: $"{admin.JobTitle} added department '{department.Name}' under faculty '{Faculty.Name}' with head '{head.Name}'.",
+                          userId: admin.Id,
+                          userName: admin.Name,
+                          userRole: UserRole.Admin
+                    );
                     break;
 
                 case "FacultyVm":
@@ -87,20 +120,53 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                             ViewCount = entity.ViewCount ?? 0
                         };
 
+                        var Dean = highBoardRepository.GetOne(faculty.DeanId);  
                         if (facultyRepository.ExistDeanInFaculty(entity.DeanId ?? 0))
                         {
                             ModelState.AddModelError("DeanId", "This person is already a Dean of a registered Faculty.");
                             LoadPageData();
+
+                            logger.Log(
+                             actionType: "Add Faculty",
+                             tableName: "Faculty",
+                             recordId: 0,
+                             description: $"{admin.JobTitle} attempted to add faculty '{faculty.Name}' with dean '{Dean.Name}', but dean is already assigned to another faculty.",
+                             userId: admin.Id,
+                             userName: admin.Name,
+                             userRole: UserRole.Admin
+                            );
+
                             return View("Add", entity);
                         }
 
                         facultyRepository.Add(faculty);
                         facultyRepository.Save();
+
+                        logger.Log(
+                                   actionType: "Add Faculty",
+                                   tableName: "Faculty",
+                                   recordId: faculty.Id,
+                                   description: $"{admin.JobTitle} added faculty '{faculty.Name}' with dean '{Dean.Name}'.",
+                                   userId: admin.Id,
+                                   userName: admin.Name,
+                                   userRole: UserRole.Admin
+                         );
                     }
                     catch (Exception ex)
                     {
                         ModelState.AddModelError(string.Empty, ex.Message);
                         LoadPageData();
+
+                        logger.Log(
+                                actionType: "Add Faculty",
+                                tableName: "Faculty",
+                                recordId: 0,
+                                description: $"{admin.JobTitle} attempted to add faculty but failed during image upload. Error: {ex.Message}",
+                                userId: admin.Id,
+                                userName: admin.Name,
+                                userRole: UserRole.Admin
+                      );
+
                         return View("Add", entity);
                     }
                     break;
@@ -118,8 +184,20 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                         subjectType = entity.SubjectType ?? 0,
                         Salary = entity.Salary ?? 0
                     };
+
+                    var doctor = doctorRepository.GetOne(subject.DoctorId);
                     subjectRepository.Add(subject);
                     subjectRepository.Save();
+
+                    logger.Log(
+                           actionType: "Add Subject",
+                           tableName: "Subject",
+                           recordId: subject.Id,
+                           description: $"{admin.JobTitle} added subject '{subject.Name}' taught by doctor '{doctor.Name}' for level {subject.Level}, semester {subject.Semester}.",
+                           userId: admin.Id,
+                           userName: admin.Name,
+                           userRole: UserRole.Admin
+                    );
                     break;
                 default:
                     ModelState.AddModelError("", "An Error");
