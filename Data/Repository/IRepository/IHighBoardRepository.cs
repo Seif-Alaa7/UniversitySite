@@ -24,5 +24,6 @@ namespace Data.Repository.IRepository
         HighBoard GetByUserId(string userId);
         HighBoard GetDeanByFaculty(int facultyid);
         HighBoard? GetHeadByDepartment(int departmentid);
+        bool IsHighboard(string userId);
     }
 }

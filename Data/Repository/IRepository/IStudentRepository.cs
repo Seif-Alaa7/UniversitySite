@@ -24,5 +24,6 @@ namespace Data.Repository.IRepository
         Student GetByUserId(string userId);
         Student GetAuthorizedStudent(string userId, int studentId);
         bool IsStudentInDepartment(string userId, int departmentId);
+        bool IsStudent(string userId);
     }
 }

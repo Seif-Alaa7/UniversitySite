@@ -125,5 +125,9 @@ namespace Data.Repository
         {
             return departmentRepository.GetOne(departmentid).HighBoard;
         }
+        public bool IsHighboard(string userId)
+        {
+            return context.HighBoards.Any(s => s.ApplicationUserId == userId);
+        }
     }
 }

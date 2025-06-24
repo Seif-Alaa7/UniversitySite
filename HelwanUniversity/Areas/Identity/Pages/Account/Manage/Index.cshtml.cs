@@ -1,9 +1,13 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 using System.ComponentModel.DataAnnotations;
+using Data.Repository.IRepository;
+using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Models;
+using Models.Enums;
 
 namespace HelwanUniversity.Areas.Identity.Pages.Account.Manage
 {
@@ -11,13 +15,23 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IActivityLogger activityLogger;
+        private readonly IHighBoardRepository highBoardRepository;
+        private readonly IStudentRepository studentRepository;
+        private readonly IDoctorRepository doctorRepository;
 
         public IndexModel(
             UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager,
+            IActivityLogger activityLogger,IHighBoardRepository highBoardRepository,IDoctorRepository doctorRepository,
+            IStudentRepository studentRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            this.activityLogger = activityLogger;
+            this.highBoardRepository = highBoardRepository; 
+            this.studentRepository = studentRepository;
+            this.doctorRepository = doctorRepository;   
         }
 
         /// <summary>
@@ -95,14 +109,64 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account.Manage
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+
             if (Input.PhoneNumber != phoneNumber)
             {
+                var applicationUserId = await _userManager.GetUserIdAsync(user);
+
+                UserRole userRole = UserRole.Admin;
+                string userName = "Unknown";
+                int recordId = 0;
+                string jobTitle = "";
+
+                if (studentRepository.IsStudent(applicationUserId))
+                {
+                    var student = studentRepository.GetByUserId(applicationUserId);
+                    userRole = UserRole.Student;
+                    userName = student.Name;
+                    recordId = student.Id;
+                }
+                else if (doctorRepository.IsDoctor(applicationUserId))
+                {
+                    var doctor = await doctorRepository.GetEntityByUserIdAsync(applicationUserId) as Doctor;
+                    userRole = UserRole.Doctor;
+                    userName = doctor.Name;
+                    recordId = doctor.Id;
+                    jobTitle = doctor.JobTitle.ToString();
+                }
+                else if (highBoardRepository.IsHighboard(applicationUserId))
+                {
+                    var highBoard = highBoardRepository.GetByUserId(applicationUserId);
+                    userName = highBoard.Name;
+                    recordId = highBoard.Id;
+                    jobTitle = highBoard.JobTitle.ToString();
+
+                    if (highBoard.JobTitle == JobTitle.President || highBoard.JobTitle == JobTitle.VicePrecident || highBoard.JobTitle == JobTitle.VP_For_AcademicAffairs)
+                    {
+                        userRole = UserRole.Admin;
+                    }
+                    else
+                    {
+                        userRole = UserRole.HighBoard;
+                    }
+                }
+
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+
+                activityLogger.Log(
+                    actionType: "Change Phone Number",
+                    tableName: "AspNetUsers",
+                    recordId: recordId,
+                    description: $"{userRole} '{userName}' changed their phone number from '{phoneNumber}' to '{Input.PhoneNumber}'.",
+                    userId: recordId,
+                    userName: userName,
+                    userRole: userRole
+                );
             }
 
             await _signInManager.RefreshSignInAsync(user);

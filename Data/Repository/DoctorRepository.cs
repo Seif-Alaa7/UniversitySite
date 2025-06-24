@@ -220,5 +220,9 @@ namespace Data.Repository
         {
             return subjectRepository.GetOne(DoctorId).Doctor;
         }
+        public bool IsDoctor(string userId)
+        {
+            return context.Doctors.Any(s => s.ApplicationUserId == userId);
+        }
     }
 }
