@@ -118,5 +118,39 @@ namespace Data.Repository
                 .Include(h => h.Department)
                 .FirstOrDefault(h => h.ApplicationUserId == userId);
         }
-    }
+        public async Task<T?> GetEntityForHighboardAsync<T>(int doctorId, int entityId, Expression<Func<T, bool>> condition) where T : class
+        {
+            return await context.Set<T>()
+                .Where(condition)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int facultyId)
+        {
+            return await GetEntityForHighboardAsync<Faculty>(
+                doctorId,
+                facultyId,
+                c => c.Id == facultyId && c.DeanId == doctorId
+            );
+        }
+        public async Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId)
+        {
+            return await GetEntityForHighboardAsync<Department>(
+                doctorId,
+                departmentId,
+                c => c.Id == departmentId && c.HeadId == doctorId
+            );
+        }
+        public HighBoard GetDeanByFaculty(int facultyid)
+        {
+            return facultyRepository.GetOne(facultyid).HighBoard;
+        }
+        public HighBoard? GetHeadByDepartment(int departmentid)
+        {
+            return departmentRepository.GetOne(departmentid).HighBoard;
+        }
+        public bool IsHighboard(string userId)
+        {
+            return context.HighBoards.Any(s => s.ApplicationUserId == userId);
+        }
+}
 }

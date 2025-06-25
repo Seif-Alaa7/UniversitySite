@@ -26,5 +26,8 @@ namespace Data.Repository.IRepository
         Task<T?> GetEntityForHighboardAsync<T>(int doctorId, int entityId, Expression<Func<T, bool>> condition) where T : class;
         Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int facultyId);
         Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId);
+        HighBoard GetDeanByFaculty(int facultyid);
+        HighBoard? GetHeadByDepartment(int departmentid);
+        bool IsHighboard(string userId);
     }
 }
