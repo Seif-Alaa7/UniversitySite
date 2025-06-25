@@ -43,9 +43,7 @@
                     Upload
                 </button>
                 <center>
-                    <button type="button" onclick="cancelForm()" class="btn btn-secondary">
-                        Cancel
-                    </button>
+                    <button onclick="window.location.href='@Url.Action("DisplayImages", "UniFile", new { area = "Admin" })'">Cancel</button>
                 </center>
             </div>
         </form>
@@ -56,7 +54,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
         <script src="/js/Image.js"></script>
-
     }
 }
 

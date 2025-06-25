@@ -5,10 +5,15 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Data.Repository;
+using Data.Repository.IRepository;
+using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Models;
+using Models.Enums;
 
 namespace HelwanUniversity.Areas.Identity.Pages.Account.Manage
 {
@@ -17,15 +22,23 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<ChangePasswordModel> _logger;
+        private readonly IActivityLogger activityLogger;
+        private readonly IHighBoardRepository highBoardRepository;
+        private readonly IStudentRepository studentRepository;
+        private readonly IDoctorRepository doctorRepository;
 
         public ChangePasswordModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ILogger<ChangePasswordModel> logger)
+            ILogger<ChangePasswordModel> logger, IActivityLogger Logger,IHighBoardRepository highBoardRepository,
+            IStudentRepository studentRepository,IDoctorRepository doctorRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            this.activityLogger = Logger; 
+            this.highBoardRepository = highBoardRepository; 
+            this.doctorRepository = doctorRepository;
         }
 
         /// <summary>
@@ -118,9 +131,57 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            _logger.LogInformation("User changed their password successfully.");
-            StatusMessage = "Your password has been changed.";
 
+            var applicationUserId = await _userManager.GetUserIdAsync(user);
+
+            UserRole userRole = UserRole.Admin;
+            string userName = "Unknown";
+            int recordId = 0;
+            string jobTitle = "";
+
+            if (studentRepository.IsStudent(applicationUserId))
+            {
+                var student = studentRepository.GetByUserId(applicationUserId);
+                userRole = UserRole.Student;
+                userName = student.Name;
+                recordId = student.Id;
+            }
+            else if (doctorRepository.IsDoctor(applicationUserId))
+            {
+                var doctor = await doctorRepository.GetEntityByUserIdAsync(applicationUserId) as Doctor;
+                userRole = UserRole.Doctor;
+                userName = doctor.Name;
+                recordId = doctor.Id;
+                jobTitle = doctor.JobTitle.ToString();
+            }
+            else if (highBoardRepository.IsHighboard(applicationUserId))
+            {
+                var highBoard = highBoardRepository.GetByUserId(applicationUserId);
+                userName = highBoard.Name;
+                recordId = highBoard.Id;
+                jobTitle = highBoard.JobTitle.ToString();
+
+                if (highBoard.JobTitle == JobTitle.President || highBoard.JobTitle == JobTitle.VicePrecident || highBoard.JobTitle == JobTitle.VP_For_AcademicAffairs)
+                {
+                    userRole = UserRole.Admin;
+                }
+                else
+                {
+                    userRole = UserRole.HighBoard;
+                }
+            }
+
+            activityLogger.Log(
+                actionType: "Change Password",
+                tableName: "AspNetUsers",
+                recordId: recordId,
+                description: $"{userRole} '{userName}' changed their account password.",
+                userId: recordId,
+                userName: userName,
+                userRole: userRole
+            );
+
+            StatusMessage = "Your password has been changed.";
             return RedirectToPage();
         }
     }

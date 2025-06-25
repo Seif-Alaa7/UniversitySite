@@ -39,7 +39,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
             _logger.Log(
                actionType: "Payment Success",
-               tableName: "Students",
+               tableName: "Student",
                recordId: student.Id,
                description: $"Student '{student.Name}' completed payment successfully. PaymentFees set to true.",
                userId: student.Id,
@@ -59,7 +59,7 @@ namespace HelwanUniversity.Areas.Students.Controllers
 
             _logger.Log(
                  actionType: "Cancel Payment",
-                 tableName: "Students",
+                 tableName: "Student",
                  recordId: student.Id,
                  description: $"Student '{student.Name}' canceled the payment process before completion. PaymentFees remains false.",
                  userId: student.Id,

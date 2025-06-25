@@ -5,7 +5,7 @@
 @using Data.Repository.IRepository
 
 @{
-    ViewData["Title"] = $"{Model.Name} Faculty";
+    ViewData["Title"] = $"Faculty of {Model.Name}";
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
     var Highboard = highBoardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);

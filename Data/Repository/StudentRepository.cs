@@ -144,5 +144,9 @@ namespace Data.Repository
             return context.Students
                 .Any(s => s.ApplicationUserId == userId && s.DepartmentId == departmentId);
         }
+        public bool IsStudent(string userId)
+        {
+            return context.Students.Any(s => s.ApplicationUserId == userId);
+        }
     }
 }

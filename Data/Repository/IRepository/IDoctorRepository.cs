@@ -25,5 +25,7 @@ namespace Data.Repository.IRepository
         Task<Subject?> GetCourseForDoctorAsync(int doctorId, int courseId);
         Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int facultyId);
         Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId);
+        Doctor GetDoctorOfSubject(int DoctorId);
+        bool IsDoctor(string userId);
     }
 }

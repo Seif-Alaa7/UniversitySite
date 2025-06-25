@@ -97,7 +97,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                              actionType:"Add Subject From Department",
-                             tableName: "DepartmentSubjects",
+                             tableName: "DepartmentSubject",
                              recordId: model.DepartmentId,
                              description: $"{highBoard.JobTitle}{positionDetails} attempted to add subject '{subjectName}' to department '{departmentName}', but it already exists",
                              userId: highBoard.Id,
@@ -121,7 +121,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                            actionType: "Add Subject From Department",
-                           tableName: "DepartmentSubjects",
+                           tableName: "DepartmentSubject",
                            recordId: model.DepartmentId,
                            description: $"{highBoard.JobTitle}{positionDetails} successfully added subject '{subjectName}' to department '{departmentName}'",
                            userId: highBoard.Id,
@@ -164,7 +164,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             }
             else
             {
-                ViewBag.SuccessMessage = TempData["Success"];
+                ViewBag.SuccessMessage = TempData["SuccessMessage"];
             }
 
             var academicRecord = academicRecordsRepository.GetAll().FirstOrDefault(x => x.StudentId == Studentid);
@@ -210,7 +210,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
                 _logger.Log(
                                 actionType: "Delete Subject From Department",
-                                tableName: "DepartmentSubjects",
+                                tableName: "DepartmentSubject",
                                 recordId: departmentId,
                                 description: $"{highBoard.JobTitle}{positionDetails} attempted to delete subject '{subjectName}' from department '{departmentName}', but no such relation was found",
                                 userId: highBoard.Id,
@@ -225,7 +225,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             _logger.Log(
                      actionType: "Delete Subject From Department",
-                     tableName: "DepartmentSubjects",
+                     tableName: "DepartmentSubject",
                      recordId: departmentId,
                      description: $"{highBoard.JobTitle}{positionDetails} successfully deleted subject '{subjectName}' from department '{departmentName}'",
                      userId: highBoard.Id,
@@ -233,6 +233,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                      userRole: UserRole.HighBoard
             );
 
+            TempData["SuccessMessage"] = "The Subject has been successfully deleted From this department.";
             return RedirectToAction("Details", "Department", new { area = "Doctors", id = departmentId });
         }
     }

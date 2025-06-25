@@ -9,6 +9,12 @@
 <div class="container py-5">
     <h2 class="text-center mb-5 font-weight-bold">Personal Data</h2>
     <div class="card shadow-lg rounded-lg personal-data-card">
+        @if (TempData["SuccessMessageDoctor"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessageDoctor"]
+            </div>
+        }
         <div class="row no-gutters">
             @if (!string.IsNullOrEmpty(Model.Picture))
             {

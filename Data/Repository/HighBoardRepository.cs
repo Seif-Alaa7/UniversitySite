@@ -10,10 +10,15 @@ namespace Data.Repository
     public class HighBoardRepository : IHighBoardRepository
     {
         private readonly ApplicationDbContext context;
+        private readonly IFacultyRepository facultyRepository;
+        private readonly IDepartmentRepository departmentRepository;
 
-        public HighBoardRepository(ApplicationDbContext context)
+        public HighBoardRepository(ApplicationDbContext context,IFacultyRepository facultyRepository,
+            IDepartmentRepository departmentRepository)
         {
             this.context = context;
+            this.facultyRepository = facultyRepository; 
+            this.departmentRepository = departmentRepository;   
         }
         public void Update(HighBoard highBoard)
         {
@@ -112,29 +117,6 @@ namespace Data.Repository
                 .Include(h => h.Faculty)
                 .Include(h => h.Department)
                 .FirstOrDefault(h => h.ApplicationUserId == userId);
-        }
-
-        public async Task<T?> GetEntityForHighboardAsync<T>(int doctorId, int entityId, Expression<Func<T, bool>> condition) where T : class
-        {
-            return await context.Set<T>()
-                .Where(condition)
-                .FirstOrDefaultAsync();
-        }
-        public async Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int facultyId)
-        {
-            return await GetEntityForHighboardAsync<Faculty>(
-                doctorId,
-                facultyId,
-                c => c.Id == facultyId && c.DeanId == doctorId
-            );
-        }
-        public async Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId)
-        {
-            return await GetEntityForHighboardAsync<Department>(
-                doctorId,
-                departmentId,
-                c => c.Id == departmentId && c.HeadId == doctorId
-            );
         }
     }
 }

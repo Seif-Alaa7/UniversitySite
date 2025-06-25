@@ -25,6 +25,8 @@ using ViewModels.Vaildations.StudentsValid;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
+using Data.Repository;
+using System.Security.Claims;
 
 namespace HelwanUniversity.Areas.Identity.Pages.Account
 {
@@ -42,7 +44,8 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
         private readonly ApplicationDbContext _context;
         private readonly ICloudinaryService cloudinaryService;
         private readonly IDepartmentRepository departmentRepository;
-
+        private readonly IActivityLogger activityLogger;
+        private readonly IHighBoardRepository highBoardRepository;
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
@@ -54,6 +57,8 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
             ApplicationDbContext context,
             ICloudinaryService cloudinaryService,
             IDepartmentRepository department
+            ,IActivityLogger Logger
+            ,IHighBoardRepository highBoardRepository
             )
         {
             _userManager = userManager;
@@ -62,11 +67,13 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
+            activityLogger = Logger;
             _emailSender = emailSender;
             _identityOptions = identityOptions;
             _context = context;
             this.cloudinaryService = cloudinaryService;
             departmentRepository = department;
+            this.highBoardRepository = highBoardRepository; 
             ;
         }
 
@@ -218,6 +225,22 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 var userId = user.Id;
+
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var admin = highBoardRepository.GetByUserId(currentUserId);
+                var adminId = admin?.Id ?? 0;
+                var adminName = admin?.Name ?? "Unknown";
+
+                activityLogger.Log(
+                         actionType: "Create Identity Account",
+                         tableName: "AspNetUsers",
+                         recordId: 0,
+                         description: $"{admin.JobTitle} created new Identity account with email '{Input.Email}' and role '{Input.Role}'.",
+                         userId: adminId,
+                         userName: adminName,
+                         userRole: UserRole.Admin
+                );
+
                 try
                 {
                     Input.PicturePath = await cloudinaryService.UploadFile(Input.Picture, string.Empty, "There was an error uploading the file. Please try again.");
@@ -225,6 +248,16 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
+
+                    activityLogger.Log(
+                              actionType: "Photo Upload",
+                              tableName: "User Register",
+                              recordId: 0,
+                              description: $"{admin.JobTitle} failed to upload photo for new user. Error: {ex.Message}",
+                              userId: adminId,
+                              userName: adminName,
+                              userRole: UserRole.Admin
+                     );
                 }
 
                 if (!string.IsNullOrEmpty(Input.Role))
@@ -275,6 +308,18 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
                         _context.academicRecords.Add(academicRecords);
                         await _context.SaveChangesAsync(cancellationToken);
 
+                        TempData["SuccessMessage"] = $"Student '{student.Name}' registered successfully.";
+
+                        activityLogger.Log(
+                            actionType: "Register New Student",
+                            tableName: "Student",
+                            recordId: student.Id,
+                            description: $"{admin.JobTitle} registered new student '{student.Name}' in department '{department?.Name ?? "Unknown"}'.",
+                            userId: adminId,
+                            userName: adminName,
+                            userRole: UserRole.Admin
+                        );
+
                         break;
 
                     case UserType.Doctor:
@@ -296,6 +341,19 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
                             return Page();
                         }
                         _context.Doctors.Add(doctor);
+                        await _context.SaveChangesAsync(cancellationToken);
+
+                        TempData["SuccessMessage"] = $"Doctor '{doctor.Name}' with Job Title '{doctor.JobTitle}' registered successfully.";
+                        activityLogger.Log(
+                                  actionType: "Register New Doctor",
+                                  tableName: "Doctor",
+                                  recordId: doctor.Id,
+                                  description: $"{admin.JobTitle} registered new doctor '{doctor.Name}' with Job Title '{doctor.JobTitle}'.",
+                                  userId: adminId,
+                                  userName: adminName,
+                                  userRole: UserRole.Admin
+                         );
+
                         break;
 
                     case UserType.HighBoard:
@@ -316,10 +374,20 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
                             return Page();
                         }
                         _context.HighBoards.Add(highBoard);
+                        await _context.SaveChangesAsync(cancellationToken);
+
+                        TempData["SuccessMessage"] = $"HighBoard member '{highBoard.Name}' with Job Title '{highBoard.JobTitle}' registered successfully.";
+                        activityLogger.Log(
+                            actionType: "Register New HighBoard",
+                            tableName: "HighBoard",
+                            recordId: highBoard.Id,
+                            description: $"{admin.JobTitle} registered new highboard member '{highBoard.Name}' with Job Title '{highBoard.JobTitle}'.",
+                            userId: adminId,
+                            userName: adminName,
+                            userRole: UserRole.Admin
+                        );
                         break;
                 }
-                await _context.SaveChangesAsync(cancellationToken);
-
                 _logger.LogInformation("User created a new account with password.");
 
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

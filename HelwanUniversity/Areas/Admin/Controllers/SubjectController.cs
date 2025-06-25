@@ -1,9 +1,14 @@
 ﻿using Data.Repository;
 using Data.Repository.IRepository;
+using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Enums;
+using NuGet.Protocol.Plugins;
+using System.Security.Claims;
 using ViewModels;
+using ViewModels.FacultyVMs;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
 {
@@ -16,16 +21,21 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly IDepartmentRepository departmentRepository;
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
         private readonly IAcademicRecordsRepository academicRecordsRepository;
+        private readonly IActivityLogger _logger;
+        private readonly IHighBoardRepository _highBoardRepository; 
 
         public SubjectController(ISubjectRepository subjectRepository,IDoctorRepository doctorRepository,
             IDepartmentRepository departmentRepository,
-            IDepartmentSubjectsRepository departmentSubjectsRepository,IAcademicRecordsRepository academicRecordsRepository)
+            IDepartmentSubjectsRepository departmentSubjectsRepository,IAcademicRecordsRepository academicRecordsRepository,IHighBoardRepository highBoardRepository
+            ,IActivityLogger logger)
         {
             this.subjectRepository = subjectRepository;
             this.doctorRepository = doctorRepository;
             this.departmentRepository = departmentRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
+            this._highBoardRepository = highBoardRepository;
+            this._logger = logger;
         }
         public IActionResult Index()
         {
@@ -71,16 +81,57 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult SaveEdit(SubjectVM model)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = _highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
+
             var subject = subjectRepository.GetOne(model.Id);
-            if (model.Name != subject.Name)
+
+            if (model.Name != subject.Name && subjectRepository.ExistSubject(model.Name))
             {
-                var exist = subjectRepository.ExistSubject(model.Name);
-                if (exist)
-                {
-                    ModelState.AddModelError("Name", "This Name is Already Exist");
-                    return View("Edit", model);
-                }
+                ModelState.AddModelError("Name", "This name already exists.");
+
+                _logger.Log(
+                    actionType: "Update Subject Name",
+                    tableName: "Subject",
+                    recordId: subject.Id,
+                    description: $"{admin.JobTitle} failed to update the name of subject '{subject.Name}' to '{model.Name}' as the name already exists.",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+
+                return View("Edit", model);
             }
+
+            var changes = new List<string>();
+
+            if (subject.Name != model.Name)
+                changes.Add($"Name changed to '{model.Name}'");
+
+            if (subject.Level != model.Level)
+                changes.Add($"Level changed to '{model.Level}'");
+
+            if (subject.Semester != model.Semester)
+                changes.Add($"Semester changed to '{model.Semester}'");
+
+            if (subject.summerStatus != model.summerStatus)
+                changes.Add($"Summer Status changed to '{model.summerStatus}'");
+
+            if (subject.subjectType != model.subjectType)
+                changes.Add($"Subject Type changed to '{model.subjectType}'");
+
+            if (subject.Salary != model.Salary)
+                changes.Add($"Salary changed to '{model.Salary}'");
+
+            if (subject.DoctorId != model.DoctorId)
+            {
+                var oldDoctor = doctorRepository.GetDoctorOfSubject(subject.Id).Name;
+                var newDoctor = doctorRepository.GetDoctorOfSubject(model.DoctorId).Name;
+                changes.Add($"Doctor changed from '{oldDoctor}' to '{newDoctor}'");
+            }
+
             subject.Name = model.Name;
             subject.Level = model.Level;
             subject.Semester = model.Semester;
@@ -97,41 +148,95 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             var department = departmentRepository.GetOne(model.departmentId);
             var departmentOld = departmentRepository.GetOne(model.OriginalDepartmentId);
 
-            var departmentSubjectOld = new DepartmentSubjects()
+            var departmentSubjectOld = new DepartmentSubjects
             {
                 SubjectId = subject.Id,
-                DepartmentId = departmentOld.Id,
+                DepartmentId = departmentOld.Id
             };
 
-            var departmentSubject = new DepartmentSubjects()
+            var departmentSubject = new DepartmentSubjects
             {
-                DepartmentId = department.Id,
                 SubjectId = subject.Id,
+                DepartmentId = department.Id
             };
 
-            var exists = departmentSubjectsRepository.Exist(departmentSubject);
-            if (exists)
+            if (departmentSubjectsRepository.Exist(departmentSubject))
             {
+                if (changes.Count > 0)
+                {
+                    _logger.Log(
+                        actionType: "Update Subject Details",
+                        tableName: "Subject",
+                        recordId: subject.Id,
+                        description: $"{admin.JobTitle} updated subject '{subject.Name}'. The subject was already linked to department '{department.Name}', so department association remained unchanged. Other updates applied: {string.Join(", ", changes)}.",
+                        userId: admin.Id,
+                        userName: admin.Name,
+                        userRole: UserRole.Admin
+                    );
+                }
+
                 return RedirectToAction("Details", "Department", new { id = departmentSubject.DepartmentId });
             }
             departmentSubjectsRepository.Delete(departmentSubjectOld);
             departmentSubjectsRepository.Add(departmentSubject);
             departmentRepository.Save();
 
+            changes.Add($"Department changed from '{departmentOld.Name}' to '{department.Name}'");
+
+            _logger.Log(
+                actionType: "Update Subject Details",
+                tableName: "Subject",
+                recordId: subject.Id,
+                description: $"{admin.JobTitle} updated subject '{subject.Name}': Department association changed from '{departmentOld.Name}' to '{department.Name}'. Other updates applied: {string.Join(", ", changes)}.",
+                userId: admin.Id,
+                userName: admin.Name,
+                userRole: UserRole.Admin
+            );
+
             return RedirectToAction("Details", "Department", new { id = departmentSubject.DepartmentId });
         }
-        public IActionResult DeleteForever(int id,int Departmentid)
+
+        public IActionResult DeleteForever(int id, int Departmentid)
         {
-            var Departments = departmentSubjectsRepository.SubjectDepartments(id);
-            foreach (var department in Departments)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = _highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
+
+            var departments = departmentSubjectsRepository.SubjectDepartments(id).ToList();
+            var deletedDepartmentNames = departments
+                .Select(d => departmentRepository.GetOne(d.DepartmentId)?.Name ?? "Unknown")
+                .ToList();
+
+            var departmentsCount = deletedDepartmentNames.Count;
+            string departmentLabel = departmentsCount == 1 ? "department" : "departments";
+
+            foreach (var department in departments)
             {
                 departmentSubjectsRepository.Delete(department);
             }
-            var subject = subjectRepository.GetOne(id);
-            subjectRepository.Delete(subject);
             departmentSubjectsRepository.Save();
 
+            var subject = subjectRepository.GetOne(id);
+            var subjectName = subject.Name;
+            var subjectId = subject.Id;
+
+            subjectRepository.Delete(subject);
+            subjectRepository.Save();
+
+            string departmentList = string.Join(", ", deletedDepartmentNames);
+
             TempData["SuccessMessage"] = "The Subject has been successfully deleted Forever.";
+
+            _logger.Log(
+                actionType: "Delete Subject",
+                tableName: "Subject",
+                recordId: subjectId,
+                description: $"{admin.JobTitle} permanently deleted subject '{subjectName}' from {departmentsCount} {departmentLabel}: {departmentList}",
+                userId: admin.Id,
+                userName: admin.Name,
+                userRole: UserRole.Admin
+            );
 
             return RedirectToAction("Details", "Department", new { id = Departmentid });
         }

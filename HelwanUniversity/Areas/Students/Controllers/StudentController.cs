@@ -95,8 +95,8 @@ namespace HelwanUniversity.Areas.Students.Controllers
                 ModelState.AddModelError(string.Empty, ex.Message);
 
                 _logger.Log(
-                    actionType: "Update",
-                    tableName: "Students",
+                    actionType: "Update Personal Picture",
+                    tableName: "Student",
                     recordId: currentStudent.Id,
                     description: "Failed to update profile picture due to Cloudinary error.",
                     userId: currentStudent.Id,
@@ -114,8 +114,8 @@ namespace HelwanUniversity.Areas.Students.Controllers
                 studentRepository.Save();
 
                 _logger.Log(
-                    actionType: "Update",
-                    tableName: "Students",
+                    actionType: "Update Personal Picture",
+                    tableName: "Student",
                     recordId: currentStudent.Id,
                     description: "Student updated their profile picture successfully.",
                     userId: currentStudent.Id,
@@ -130,8 +130,8 @@ namespace HelwanUniversity.Areas.Students.Controllers
                 ModelState.AddModelError(string.Empty, "Picture upload failed unexpectedly.");
 
                 _logger.Log(
-                    actionType: "Update",
-                    tableName: "Students",
+                    actionType: "Update Personal Picture",
+                    tableName: "Student",
                     recordId: currentStudent.Id,
                     description: "Upload returned empty picture URL despite no exception. Possibly a silent failure.",
                     userId: currentStudent.Id,

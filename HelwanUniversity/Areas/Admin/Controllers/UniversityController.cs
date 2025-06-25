@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ViewModels;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Models.Enums;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
 {
@@ -18,7 +19,10 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly IFacultyRepository facultyRepository;
         private readonly IDoctorRepository doctorRepository;
         private readonly IStudentRepository studentRepository;
-        public UniversityController(IUniversityRepository universityRepository, ICloudinaryService cloudinaryService, IUniFileRepository uniFileRepository, IHighBoardRepository highBoardRepository,IFacultyRepository facultyRepository,IDoctorRepository doctorRepository,IStudentRepository studentRepository)
+        private readonly IActivityLogger _logger;
+
+        public UniversityController(IUniversityRepository universityRepository, ICloudinaryService cloudinaryService, IUniFileRepository uniFileRepository, IHighBoardRepository highBoardRepository,IFacultyRepository facultyRepository,IDoctorRepository doctorRepository,IStudentRepository studentRepository
+            ,IActivityLogger logger)
         {
             this.universityRepository = universityRepository;
             this.cloudinaryService = cloudinaryService;
@@ -27,6 +31,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             this.facultyRepository = facultyRepository;
             this.doctorRepository = doctorRepository;
             this.studentRepository = studentRepository;
+            this._logger = logger;  
         }
         public IActionResult Index()
         {
@@ -93,7 +98,12 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveUpdate(UniversityVM newUniVm)
         {
-                var uni = universityRepository.Get();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
+
+            var uni = universityRepository.Get();
                 try
                 {
                     newUniVm.Logo = await cloudinaryService.UploadFile(newUniVm.LogoFile, uni.Logo, "An error occurred while uploading the logo. Please try again.");
@@ -101,7 +111,19 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
-                    return View("Update", newUniVm);
+
+
+                _logger.Log(
+                    actionType: "Update University Logo",
+                    tableName: "University",
+                    recordId: uni.Id,
+                    description: $"{admin.JobTitle} failed to update the university logo. Error: {ex.Message}",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+
+                return View("Update", newUniVm);
                 }
                 try
                 {
@@ -111,11 +133,36 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
-                    return View("Update", newUniVm);
+
+                _logger.Log(
+                     actionType: "Update University Main Picture",
+                     tableName: "University",
+                     recordId: uni.Id,
+                     description: $"{admin.JobTitle} failed to update the university main picture. Error: {ex.Message}",
+                     userId: admin.Id,
+                     userName: admin.Name,
+                     userRole: UserRole.Admin
+                 );
+
+                return View("Update", newUniVm);
 
                 }
 
-                uni.Name = newUniVm.Name;
+            List<string> changes = new();
+            if (uni.Name != newUniVm.Name)
+                changes.Add($"Name changed to '{newUniVm.Name}'");
+
+            if (uni.Logo != newUniVm.Logo)
+                changes.Add("Logo updated");
+
+            if (uni.MainPicture != newUniVm.MainPicture)
+                changes.Add("Main Picture updated");
+
+            if (uni.MainPage != newUniVm.MainPage)
+                changes.Add("Main Website updated");
+
+
+            uni.Name = newUniVm.Name;
                 uni.Logo = newUniVm.Logo;
                 uni.MainPicture = newUniVm.MainPicture;
                 uni.Description = newUniVm.Description;
@@ -130,7 +177,21 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                 universityRepository.Update(uni);
                 universityRepository.Save();
 
-                return RedirectToAction("Index");
+
+            if (changes.Count > 0)
+            {
+                _logger.Log(
+                    actionType: "Update University Details",
+                    tableName: "University",
+                    recordId: uni.Id,
+                    description: $"{admin.JobTitle} updated university details: {string.Join(", ", changes)}.",
+                    userId: admin.Id,
+                    userName: admin.Name,
+                    userRole: UserRole.Admin
+                );
+            }
+
+            return RedirectToAction("Index");
         }
         public IActionResult DisplayMap()
         {

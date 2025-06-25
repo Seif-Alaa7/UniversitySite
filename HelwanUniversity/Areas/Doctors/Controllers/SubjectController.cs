@@ -165,8 +165,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
                     ModelState.AddModelError("Name", "This Name is Already Exist");
 
                     _logger.Log(
-                        actionType: "Edit Subject",
-                        tableName: "Subjects",
+                        actionType: "Update Subject",
+                        tableName: "Subject",
                         recordId: subject.Id,
                         description: $"{highBoard.JobTitle}{positionDetails} failed to update subject '{subject.Name}' to '{model.Name}' due to duplicate name",
                         userId: highBoard.Id,
@@ -231,8 +231,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             if (department.Id == departmentOld.Id)
             {
                 _logger.Log(
-                    actionType: "Edit Subject",
-                    tableName: "Subjects",
+                    actionType: "Update Subject",
+                    tableName: "Subject",
                     recordId: subject.Id,
                     description: $"{highBoard.JobTitle}{positionDetails} updated subject '{subject.Name}'{changeSummary} without changing department '{department.Name}'",
                     userId: highBoard.Id,
@@ -246,8 +246,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             if (exists)
             {
                 _logger.Log(
-                    actionType: "Edit Subject",
-                    tableName: "Subjects",
+                    actionType: "Update Subject",
+                    tableName: "Subject",
                     recordId: subject.Id,
                     description: $"{highBoard.JobTitle}{positionDetails} updated subject '{subject.Name}'{changeSummary} and attempted to change department from '{departmentOld.Name}' to '{department.Name}' but link already existed",
                     userId: highBoard.Id,
@@ -263,8 +263,8 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             departmentRepository.Save();
 
             _logger.Log(
-                actionType: "Edit Subject",
-                tableName: "Subjects",
+                actionType: "Update Subject",
+                tableName: "Subject",
                 recordId: subject.Id,
                 description: $"{highBoard.JobTitle}{positionDetails} updated subject '{subject.Name}'{changeSummary} and successfully transferred it from department '{departmentOld.Name}' to department '{department.Name}'",
                 userId: highBoard.Id,
@@ -292,6 +292,9 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             if (subject == null)
                 return NotFound();
 
+            var subjectId = subject.Id;
+            var subjectName = subject.Name;
+
             var departments = departmentSubjectsRepository.SubjectDepartments(id).ToList();
             var deletedDepartmentNames = departments
                 .Select(d => departmentRepository.GetOne(d.DepartmentId)?.Name ?? "Unknown")
@@ -304,21 +307,24 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 departmentSubjectsRepository.Delete(department);
             }
+            departmentSubjectsRepository.Save();
 
             subjectRepository.Delete(subject);
-            departmentSubjectsRepository.Save();
+            subjectRepository.Save();
 
             string departmentList = string.Join(", ", deletedDepartmentNames);
 
             _logger.Log(
                 actionType: "Delete Subject",
-                tableName: "Subjects",
-                recordId: subject.Id,
-                description: $"{highBoard.JobTitle}{positionDetails} permanently deleted subject '{subject.Name}' from {departmentsCount} {departmentLabel}: {departmentList}",
+                tableName: "Subject",
+                recordId: subjectId,
+                description: $"{highBoard.JobTitle}{positionDetails} permanently deleted subject '{subjectName}' from {departmentsCount} {departmentLabel}: {departmentList}",
                 userId: highBoard.Id,
                 userName: highBoard.Name,
                 userRole: UserRole.HighBoard
             );
+
+            TempData["SuccessMessage"] = "The Subject has been successfully deleted Forever.";
 
             return RedirectToAction("Details", "Department", new { id = Departmentid });
         }

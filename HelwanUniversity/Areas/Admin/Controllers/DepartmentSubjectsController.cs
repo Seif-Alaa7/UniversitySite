@@ -1,8 +1,11 @@
 ﻿using Data.Repository;
 using Data.Repository.IRepository;
+using HelwanUniversity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Enums;
+using System.Security.Claims;
 using ViewModels;
 
 namespace HelwanUniversity.Areas.Admin.Controllers
@@ -16,16 +19,21 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly IDepartmentSubjectsRepository departmentSubjectsRepository;
         private readonly IAcademicRecordsRepository academicRecordsRepository;
         private readonly IDoctorRepository doctorRepository;
+        private readonly IActivityLogger logger;    
+        private readonly IHighBoardRepository highBoardRepository;
 
         public DepartmentSubjectsController(IDepartmentRepository departmentRepository,ISubjectRepository subjectRepository,
             IDepartmentSubjectsRepository departmentSubjectsRepository
-            ,IAcademicRecordsRepository academicRecordsRepository,IDoctorRepository doctorRepository)
+            ,IAcademicRecordsRepository academicRecordsRepository,IDoctorRepository doctorRepository,IActivityLogger logger
+            ,IHighBoardRepository highBoardRepository)
         {
             this.departmentRepository = departmentRepository;
             this.subjectRepository = subjectRepository;
             this.departmentSubjectsRepository = departmentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
-            this.doctorRepository = doctorRepository;   
+            this.doctorRepository = doctorRepository; 
+            this.highBoardRepository = highBoardRepository;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -41,6 +49,14 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult SaveAdd(DepartmentSubjects model) 
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
+
+            var subjectName = subjectRepository.GetName(model.SubjectId);
+            var departmentName = departmentRepository.GetOne(model.DepartmentId)?.Name ?? "Unknown";
+
             var ExistDepartmentSubject = departmentSubjectsRepository.Exist(model);
 
             if (ExistDepartmentSubject)
@@ -48,6 +64,18 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                 ViewData["DepartId"] = model.DepartmentId;
                 ModelState.AddModelError("SubjectId", "This Subject is Already Exist in this Department..");
                 ViewData["Subjects"] = subjectRepository.Select();
+
+
+                logger.Log(
+                             actionType: "Add Subject From Department",
+                             tableName: "DepartmentSubject",
+                             recordId: model.DepartmentId,
+                             description: $"{admin.JobTitle} attempted to add subject '{subjectName}' to department '{departmentName}', but it already exists",
+                             userId: admin.Id,
+                             userName: admin.Name,
+                             userRole: UserRole.Admin
+                          );
+
                 return View("Add");
             }
             else
@@ -61,21 +89,62 @@ namespace HelwanUniversity.Areas.Admin.Controllers
                 departmentSubjectsRepository.Save();
 
             }
+
+            logger.Log(
+                       actionType: "Add Subject From Department",
+                       tableName: "DepartmentSubject",
+                       recordId: model.DepartmentId,
+                       description: $"{admin.JobTitle} successfully added subject '{subjectName}' to department '{departmentName}'",
+                       userId: admin.Id,
+                       userName: admin.Name,
+                       userRole: UserRole.Admin
+            );
+
             return RedirectToAction("Details", "Department", new { area = "Admin", id = model.DepartmentId });
         }
         public IActionResult Delete(int subjectId, int departmentId)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var admin = highBoardRepository.GetByUserId(userId);
+            if (admin == null)
+                return Forbid();
+
+            var subjectName = subjectRepository.GetName(subjectId);
+            var departmentName = departmentRepository.GetOne(departmentId)?.Name ?? "Unknown";
+
             var link = departmentSubjectsRepository.DeleteRelation(subjectId, departmentId);
 
             if (link == null)
             {
                 TempData["ErrorMessage"] = "The relationship between the subject and department could not be found.";
+
+
+                logger.Log(
+                             actionType: "Delete Subject From Department",
+                             tableName: "DepartmentSubject",
+                             recordId: departmentId,
+                             description: $"{admin.JobTitle} attempted to delete subject '{subjectName}' from department '{departmentName}', but no such relation was found",
+                             userId: admin.Id,
+                             userName: admin.Name,
+                             userRole: UserRole.Admin
+                    );
+
                 return RedirectToAction("Details", "Department", new { area = "Admin", id = departmentId });
 
             }
 
             departmentSubjectsRepository.Delete(link);
             departmentSubjectsRepository.Save();
+
+            logger.Log(
+                actionType: "Delete Subject From Department",
+                tableName: "DepartmentSubject",
+                recordId: departmentId,
+                description: $"{admin.JobTitle} successfully deleted subject '{subjectName}' from department '{departmentName}'",
+                userId: admin.Id,
+                userName: admin.Name,
+                userRole: UserRole.HighBoard
+            );
 
             TempData["SuccessMessage"] = "The Subject has been successfully deleted From this department.";
             return RedirectToAction("Details", "Department", new { area = "Admin", id = departmentId });
@@ -88,7 +157,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             }
             else
             {
-                ViewBag.SuccessMessage = TempData["Success"];
+                ViewBag.SuccessMessage = TempData["SuccessMessage"];
             }
 
             var department = departmentRepository.DepartmentByStudent(Studentid);

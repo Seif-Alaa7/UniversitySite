@@ -15,7 +15,10 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Models.Enums;
+using Models;
 using ViewModels.Vaildations.ApplicationUserValid;
+using HelwanUniversity.Services;
 
 namespace HelwanUniversity.Areas.Identity.Pages.Account
 {
@@ -24,12 +27,22 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly IUniFileRepository uniFileRepository;
+        private readonly IActivityLogger activityLogger;
+        private readonly IHighBoardRepository highBoardRepository;
+        private readonly IStudentRepository studentRepository;
+        private readonly IDoctorRepository doctorRepository;
 
-        public ForgotPasswordModel(UserManager<IdentityUser> userManager, IEmailSender emailSender,IUniFileRepository uniFileRepository)
+        public ForgotPasswordModel(UserManager<IdentityUser> userManager, IEmailSender emailSender,IUniFileRepository uniFileRepository
+            , IActivityLogger activityLogger, IHighBoardRepository highBoardRepository, IDoctorRepository doctorRepository,
+            IStudentRepository studentRepository)
         {
             _userManager = userManager;
             _emailSender = emailSender;
             this.uniFileRepository = uniFileRepository;
+            this.activityLogger = activityLogger;
+            this.highBoardRepository = highBoardRepository;
+            this.studentRepository = studentRepository;
+            this.doctorRepository = doctorRepository;
         }
 
         /// <summary>
@@ -66,8 +79,45 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
+                var applicationUserId = await _userManager.GetUserIdAsync(user);
+
+                UserRole userRole = UserRole.Admin;
+                string userName = "Unknown";
+                int recordId = 0;
+                string jobTitle = "";
+
+                if (studentRepository.IsStudent(applicationUserId))
+                {
+                    var student = studentRepository.GetByUserId(applicationUserId);
+                    userRole = UserRole.Student;
+                    userName = student.Name;
+                    recordId = student.Id;
+                }
+                else if (doctorRepository.IsDoctor(applicationUserId))
+                {
+                    var doctor = await doctorRepository.GetEntityByUserIdAsync(applicationUserId) as Doctor;
+                    userRole = UserRole.Doctor;
+                    userName = doctor.Name;
+                    recordId = doctor.Id;
+                    jobTitle = doctor.JobTitle.ToString();
+                }
+                else if (highBoardRepository.IsHighboard(applicationUserId))
+                {
+                    var highBoard = highBoardRepository.GetByUserId(applicationUserId);
+                    userName = highBoard.Name;
+                    recordId = highBoard.Id;
+                    jobTitle = highBoard.JobTitle.ToString();
+
+                    if (highBoard.JobTitle == JobTitle.President || highBoard.JobTitle == JobTitle.VicePrecident || highBoard.JobTitle == JobTitle.VP_For_AcademicAffairs)
+                    {
+                        userRole = UserRole.Admin;
+                    }
+                    else
+                    {
+                        userRole = UserRole.HighBoard;
+                    }
+                }
+
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
@@ -80,6 +130,16 @@ namespace HelwanUniversity.Areas.Identity.Pages.Account
                     Input.Email,
                     "Reset Password",
                     $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                activityLogger.Log(
+                    actionType: "Password Reset Request",
+                    tableName: "AspNetUsers",
+                    recordId: recordId,
+                    description: $"{userRole} '{userName}' requested to reset their password. Reset link sent to '{Input.Email}'.",
+                    userId: recordId,
+                    userName: userName,
+                    userRole: userRole
+                );
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
