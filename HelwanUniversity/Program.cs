@@ -29,7 +29,7 @@ namespace HelwanUniversity
             builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
             StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
-            builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+            object value = builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
@@ -62,6 +62,13 @@ namespace HelwanUniversity
             var cloudinary = new Cloudinary(cloudinaryAccount);
             builder.Services.AddSingleton(cloudinary);
             builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddHttpClient<IActivityLogger, ActivityLogger>(client =>
+            {
+                client.BaseAddress = new Uri("https://api.cohere.ai/");
+            });
+            builder.Services.AddMemoryCache();
+
 
             var app = builder.Build();
 

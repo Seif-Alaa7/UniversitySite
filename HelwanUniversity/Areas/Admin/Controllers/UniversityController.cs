@@ -220,5 +220,20 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             return View(university);
         }
+        public async Task<IActionResult> AuditingCenter()
+        {
+            var allLogs = _logger.GetActivityLogs();
+            var categoryCounts = await _logger.GetCategoryCountsCachedAsync();
+
+            int total = categoryCounts.Values.Sum();
+
+            ViewBag.Total = total;
+            ViewBag.ThreatCount = categoryCounts["Security Threat"];
+            ViewBag.IssueCount = categoryCounts["System Issue"];
+            ViewBag.SensitiveCount = categoryCounts["Sensitive Activity"];
+            ViewBag.NormalCount = categoryCounts["Normal Activity"];
+
+            return View(allLogs);
+        }
     }
 }

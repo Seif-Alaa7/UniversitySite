@@ -1,0 +1,102 @@
+﻿@model List<Models.ActivityLog>
+
+@{
+    ViewBag.Title = "Audit Center";
+    var total = ViewBag.Total ?? 0;
+    var threatCount = ViewBag.ThreatCount ?? 0;
+    var issueCount = ViewBag.IssueCount ?? 0;
+    var sensitiveCount = ViewBag.SensitiveCount ?? 0;
+    var normalCount = ViewBag.NormalCount ?? 0;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="~/css/audit-center.css" />
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+<script src="~/js/audit-center.js" defer></script>
+
+<h1 class="text-center mt-4 mb-4">Audit Center</h1>
+
+<p>Total Logs: @total</p>
+
+@if (total > 0)
+{
+    <div class="alert alert-info text-center fw-bold mt-2">
+        <i class="bi bi-shield-fill-exclamation text-danger"></i> Security Threats: @(((double)threatCount / total * 100).ToString("0.00"))% &nbsp; | &nbsp;
+        <i class="bi bi-tools text-warning"></i> System Issues: @(((double)issueCount / total * 100).ToString("0.00"))% &nbsp; | &nbsp;
+        <i class="bi bi-eye-fill text-primary"></i> Sensitive Activities: @(((double)sensitiveCount / total * 100).ToString("0.00"))% &nbsp; | &nbsp;
+        <i class="bi bi-check-circle-fill text-success"></i> Normal Activities: @(((double)normalCount / total * 100).ToString("0.00"))%
+    </div>
+}
+else
+{
+    <div class="alert alert-warning text-center mt-3">
+        No logs available to analyze.
+    </div>
+}
+
+<div class="container mb-4">
+    <button class="btn btn-outline-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#searchFilters" aria-expanded="false" aria-controls="searchFilters">
+        🔍 Search Logs
+    </button>
+
+    <div class="collapse" id="searchFilters">
+        <div class="card card-body">
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm column-filter" data-col="0" placeholder="Action Type" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm column-filter" data-col="1" placeholder="Table Name" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm column-filter" data-col="4" placeholder="User Name" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm column-filter" data-col="5" placeholder="Role" />
+                </div>
+                <div class="col-md-2">
+                    <label for="dateFrom" class="form-label mb-0">From:</label>
+                    <input type="date" id="dateFrom" class="form-control form-control-sm" />
+                </div>
+                <div class="col-md-2">
+                    <label for="dateTo" class="form-label mb-0">To:</label>
+                    <input type="date" id="dateTo" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive mt-4">
+    <table class="table table-bordered table-hover text-center align-middle w-auto mx-auto">
+        <thead class="table-dark">
+            <tr>
+                <th>Action</th>
+                <th>Table</th>
+                <th>RecordID</th>
+                <th>Description</th>
+                <th>User</th>
+                <th>Role</th>
+                <th>Date</th>
+                <th>IP</th>
+                <th>User Agent</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ActionType</td>
+                    <td>@item.TableName</td>
+                    <td>@item.RecordId</td>
+                    <td class="description-cell">@item.Description</td>
+                    <td>@item.UserName</td>
+                    <td>@item.UserRole</td>
+                    <td>@item.ActionDate.ToString("yyyy-MM-dd")</td>
+                    <td class="truncate" title="@item.IPAddress">@item.IPAddress</td>
+                    <td class="truncate" title="@item.UserAgent">@item.UserAgent</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
