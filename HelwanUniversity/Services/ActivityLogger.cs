@@ -7,6 +7,9 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text;
 using Microsoft.Extensions.Caching.Memory;
+using System.Buffers.Text;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace HelwanUniversity.Services
 {
@@ -64,7 +67,17 @@ namespace HelwanUniversity.Services
         {
             try
             {
-                var prompt = $"Based on the following activity description, classify it into one of these categories only: 'Security Threat', 'System Issue', 'Sensitive Activity', or 'Normal Activity'. Just return the category name without extra text.\n\nDescription: {description}\nCategory:";
+                var prompt = $@"Based on the following activity description, classify it into one of these categories only:
+
+                  - 'Security Threat' → For activities that indicate suspicious behavior, unauthorized access attempts, data breaches, or malicious intent.
+                  - 'System Issue' → For failures caused by technical problems in the system such as server errors, database issues, system crashes, or timeouts.
+                  - 'Sensitive Activity' → For activities involving modifications to critical system configurations, user permissions, or sensitive data, even if successful.
+                  - 'Normal Activity' → For routine successful actions, or user mistakes such as invalid input, duplicate values, or failed attempts due to incorrect user data that are not caused by system failure.
+
+                  Only return the category name without any extra text.
+
+                  Description: {description}
+                  Category:";
 
                 var payload = new
                 {
