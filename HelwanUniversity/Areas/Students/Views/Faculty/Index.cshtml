@@ -30,7 +30,7 @@
                                 faculty.Description)
                         </p>
                         <p class="card-text"><small class="text-muted">Number of departments: @faculty.Departments?.Count</small></p>
-                        <a href="@Url.Action("Details", "Faculty", new { id = faculty.Id })" class="btn btn-primary btn-custom">
+                        <a href="@Url.Action("DetailsStudent", "Faculty", new { id = faculty.Id })" class="btn btn-primary btn-custom">
                             <i class="fas fa-info-circle"></i>
                         </a>
                     </div>

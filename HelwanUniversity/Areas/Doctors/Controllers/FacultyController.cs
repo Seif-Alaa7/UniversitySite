@@ -8,6 +8,7 @@ using Models;
 using Models.Enums;
 using NuGet.Protocol.Plugins;
 using System.Security.Claims;
+using ViewModels;
 using ViewModels.FacultyVMs;
 
 namespace HelwanUniversity.Areas.Doctors.Controllers
@@ -152,20 +153,16 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             {
                 return NotFound();
             }
-            if (entity is Doctor doctor)
+            if (entity is not HighBoard highboard)
             {
-                /*{
-                    return Forbid();
-                }*/
-            }
-            if (entity is HighBoard highboard)
-            {
-                /*int highboardId = highboard.Id;
-                var course = await doctorRepository.GetDepartmentForHeadAsync(highboardId, id);
-                if (course == null)
                 {
-                    return NotFound();
-                }*/
+                    return Forbid();
+                }
+            }
+            var department = await highBoardRepository.GetDepartmentForDeanAsync(highboard.Id, facultyId);
+            if (department == null)
+            {
+                return Forbid();
             }
             ViewBag.departments = departmentRepository.GetDepartmentsByCollegeId(facultyId);
             return View();

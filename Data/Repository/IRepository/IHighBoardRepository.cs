@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Models;
 using Models.Enums;
+using System.Linq.Expressions;
 
 namespace Data.Repository.IRepository
 {
@@ -22,6 +23,9 @@ namespace Data.Repository.IRepository
         void DeleteUser(string id);
         Task<object?> GetEntityByUserIdAsync(string userId);
         HighBoard GetByUserId(string userId);
+        Task<T?> GetEntityForHighboardAsync<T>(int doctorId, int entityId, Expression<Func<T, bool>> condition) where T : class;
+        Task<Faculty?> GetDepartmentForDeanAsync(int doctorId, int facultyId);
+        Task<Department?> GetDepartmentForHeadAsync(int doctorId, int departmentId);
         HighBoard GetDeanByFaculty(int facultyid);
         HighBoard? GetHeadByDepartment(int departmentid);
         bool IsHighboard(string userId);
