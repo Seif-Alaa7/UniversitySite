@@ -34,6 +34,7 @@ namespace HelwanUniversity
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
 
+            builder.Services.AddHttpClient();
             builder.Services.AddRazorPages();
 
             builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -78,7 +79,6 @@ namespace HelwanUniversity
                 app.UseHsts();
             }
 
-            app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
