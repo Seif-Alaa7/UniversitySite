@@ -316,29 +316,42 @@
                 </div>
             </div>
         </div>
-        <div class="container" >
+        <div class="container">
             <div class="row text-center">
-                <div class="col-xl-3 col-sm-6 mb-5">
-                    <div class="bg-white rounded shadow-sm py-5 px-4 icon-zoom card-shadow">
-                        <img src="@ViewBag.VPAcademicAffairs.Picture" alt="VPAcademicAffairs" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
-                        <h5 class="mb-0">@ViewBag.VPAcademicAffairs.Name</h5><span class="small text-uppercase text-muted">VB Academic Affairs</span>
-                    </div>
-                </div>
-                @foreach (var Vice in ViewBag.VicePresidents)
+
+                @if (ViewBag.VPAcademicAffairs != null)
                 {
                     <div class="col-xl-3 col-sm-6 mb-5">
-                        <div class="bg-white rounded shadow-sm py-5 px-4 icon-zoom card-shadow ">
-                            <img src="@Vice.Picture" alt="VicePresidents" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
-                            <h5 class="mb-0">@Vice.Name</h5><span class="small text-uppercase text-muted">Vice President</span>
+                        <div class="bg-white rounded shadow-sm py-5 px-4 icon-zoom card-shadow">
+                            <img src="@ViewBag.VPAcademicAffairs.Picture" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+                            <h5 class="mb-0">@ViewBag.VPAcademicAffairs.Name</h5><span class="small text-uppercase text-muted">VP Academic Affairs</span>
                         </div>
                     </div>
                 }
-                <div class="col-xl-3 col-sm-6 mb-5">
-                    <div class="bg-white rounded shadow-sm py-5 px-4 icon-zoom card-shadow">
-                        <img src="@ViewBag.President.Picture" alt="President" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
-                        <h5 class="mb-0">@ViewBag.President.Name</h5><span class="small text-uppercase text-muted">President</span>
+
+                @if (ViewBag.VicePresidents != null)
+                {
+                    foreach (var Vice in ViewBag.VicePresidents)
+                    {
+                        <div class="col-xl-3 col-sm-6 mb-5">
+                            <div class="bg-white rounded shadow-sm py-5 px-4 icon-zoom card-shadow">
+                                <img src="@Vice.Picture" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+                                <h5 class="mb-0">@Vice.Name</h5><span class="small text-uppercase text-muted">Vice President</span>
+                            </div>
+                        </div>
+                    }
+                }
+
+                @if (ViewBag.President != null)
+                {
+                    <div class="col-xl-3 col-sm-6 mb-5">
+                        <div class="bg-white rounded shadow-sm py-5 px-4 icon-zoom card-shadow">
+                            <img src="@ViewBag.President.Picture" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+                            <h5 class="mb-0">@ViewBag.President.Name</h5><span class="small text-uppercase text-muted">President</span>
+                        </div>
                     </div>
-                </div>
+                }
+
             </div>
         </div>
     </main>
