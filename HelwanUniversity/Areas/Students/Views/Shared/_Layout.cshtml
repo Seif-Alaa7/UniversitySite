@@ -118,6 +118,28 @@
             </div>
         </footer>
     </div>
+    <button id="chatToggleBtn" class="chat-toggle" title="Chat with us">
+    💬
+</button>
+
+<!-- Chat Popup Window -->
+<div id="chatPopup" class="chat-popup hidden">
+    <div class="chat-header">
+        <span>University Chatbot</span>
+        <button id="closeChat" class="close-btn fa-solid fa-window-minimize" style="color: #ffffff;"></button>
+    </div>
+    <iframe src="/Students/Student/chat" class="chat-iframe"></iframe>
+</div>
+<script>
+    
+    document.getElementById('chatToggleBtn').addEventListener('click', function () {
+        document.getElementById('chatPopup').classList.toggle('hidden');
+    });
+
+    document.getElementById('closeChat').addEventListener('click', function () {
+        document.getElementById('chatPopup').classList.add('hidden');
+    });
+</script>
 
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
