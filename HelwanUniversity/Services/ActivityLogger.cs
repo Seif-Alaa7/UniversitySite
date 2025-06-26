@@ -18,7 +18,7 @@ namespace HelwanUniversity.Services
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly string _cohereApiKey = "B5nTdX6QePyPYKiIUuEWVTIHglW0ULa1sWPkNzPG";
+        private readonly string _cohereApiKey = "azFcOn9tOyfvmFKaBMIZTuOYtXEEqhedSZm32avo";
         private readonly IMemoryCache _cache;
 
 
