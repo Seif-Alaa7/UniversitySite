@@ -1,14 +1,14 @@
 ﻿@model List<Faculty>
 
 @{
-    ViewData["Title"] = "Faculty";
+    ViewData["Title"] = "Faculties";
 }
 
 <!-- External Stylesheets -->
 <link rel="stylesheet" href="/css/Faculty.css">
 
 <div class="container">
-    <h1 class="text-center my-4">Faculities</h1>
+    <h1 class="text-CENTER my-4">Faculties</h1>
     <div class="row">
         @foreach (var faculty in Model)
         {
@@ -30,7 +30,7 @@
                                 faculty.Description)
                         </p>
                         <p class="card-text"><small class="text-muted">Number of departments: @faculty.Departments?.Count</small></p>
-                        <a href="@Url.Action("DetailsStudent", "Faculty", new { id = faculty.Id })" class="btn btn-primary btn-custom">
+                        <a href="@Url.Action("Details", "Faculty", new { id = faculty.Id })" class="btn btn-primary btn-custom">
                             <i class="fas fa-info-circle"></i>
                         </a>
                     </div>
