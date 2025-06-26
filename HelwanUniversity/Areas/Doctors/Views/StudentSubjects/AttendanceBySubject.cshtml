@@ -1,0 +1,52 @@
+﻿@model List<Models.AttendanceRecord>
+@{
+    var dateToLectureMap = ViewBag.DateToLectureMap as Dictionary<DateTime, int>;
+    var distinctLectures = dateToLectureMap.Values.Distinct().OrderBy(x => x).ToList();
+
+    ViewData["Title"] = $"Attendance Sheet for \"{ViewBag.SubjectName}\"";
+}
+<link rel="stylesheet" href="~/css/audit-center.css" />
+
+<h1 class="text-center mt-4 mb-4">@ViewData["Title"]</h1>
+<br />
+<div class="row mb-3">
+    <div class="col-md-4">
+        <input type="text" id="nameFilter" class="form-control" placeholder="Search by Student Name" />
+    </div>
+    <div class="col-md-4">
+        <input type="date" id="dateFilter" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <select id="lectureFilter" class="form-select">
+            <option value="">Select Lecture</option>
+            @foreach (var lecture in distinctLectures)
+            {
+                <option value="@lecture">Lecture @lecture</option>
+            }
+        </select>
+    </div>
+</div>
+
+<table class="table table-bordered table-hover text-center">
+    <thead class="table-dark">
+        <tr>
+            <th>Student Id</th>
+            <th>Student Name</th>
+            <th>Attendance Date</th>
+            <th>Lecture</th>
+        </tr>
+    </thead>
+    <tbody id="attendanceTable">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.StudentId</td>
+                <td class="student-name">@item.Student.Name</td>
+                <td class="attendance-date">@item.AttendanceDate.ToString("yyyy-MM-dd")</td>
+                <td class="lecture-number">@dateToLectureMap[item.AttendanceDate.Date]</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="~/js/AttendenceTable.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>

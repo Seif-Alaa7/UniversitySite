@@ -18,7 +18,13 @@
         <i class="fas fa-calendar-alt icon-spacing"></i><strong>Semester:</strong> @ViewBag.Semester
     </h4>
 </div>
-
+@if (ViewBag.Recommendation != null)
+{
+    <h4>
+        <i class="fas fa-lightbulb icon-spacing"></i>
+        <strong>Recommendation:</strong> @ViewBag.Recommendation
+    </h4>
+}
 <div class="dropdown" align="right">
     <button class="btn btn-info dropdown-toggle" type="button" id="excelOptionsBtn"
             data-bs-toggle="dropdown" aria-expanded="false"
@@ -59,6 +65,7 @@
                 <tr>
                     <th>@Html.DisplayNameFor(model => model.Id)</th>
                     <th>@Html.DisplayNameFor(model => model.Name)</th>
+                    <th>Attendance Count</th>
                     <th>Degree</th>
                     <th>Grade</th>
                     <th class="no-export">Register Degree</th>
@@ -74,6 +81,9 @@
                             <a href="@Url.Action("Details", "Student", new { id = item.Id })" class="ml-2" title="View Student">
                                 <i class="fas fa-user"></i>
                             </a>
+                        </td>
+                        <td>
+                            @ViewBag.AttendanceCount[item.Id]
                         </td>
                         <td>
                             @if (ViewData["StudentDegree"] != null && ((Dictionary<int, int>)ViewData["StudentDegree"]).ContainsKey(item.Id))

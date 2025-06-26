@@ -23,13 +23,14 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
         private readonly IDepartmentRepository departmentRepository;
         private readonly IHighBoardRepository highBoardRepository;
         private readonly IActivityLogger _logger;
-        private readonly IFacultyRepository facultyRepository;  
+        private readonly IFacultyRepository facultyRepository;
+        private readonly IAttendanceRecordRepository attendanceRecordRepository;
 
 
         public StudentSubjectsController(IStudentSubjectsRepository studentSubjectsRepository,
             IAcademicRecordsRepository academicRecordsRepository, ISubjectRepository subjectRepository, IStudentRepository studentRepository,
             IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository, IHighBoardRepository highBoardRepository,
-            IActivityLogger logger,IFacultyRepository facultyRepository)
+            IActivityLogger logger,IFacultyRepository facultyRepository,IAttendanceRecordRepository attendanceRecordRepository)
         {
             this.studentSubjectsRepository = studentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
@@ -40,6 +41,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             this.highBoardRepository = highBoardRepository;
             this._logger = logger;  
             this.facultyRepository = facultyRepository; 
+            this.attendanceRecordRepository = attendanceRecordRepository;   
         }
         public IActionResult Index()
         {
@@ -355,7 +357,28 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
             ViewData["StudentDegree"] = studentDegree;
             ViewData["StudentGrade"] = studentGrade;
 
+            ViewBag.AttendanceCount = attendanceRecordRepository.GetAttendanceCount(id);
+
+            var (recommendedAttendance, correlation) = attendanceRecordRepository.RecommendAttendanceBasedOnAnalysis(id);
+
+            if (recommendedAttendance > 0)
+            {
+                ViewBag.Recommendation = $"Based on data analysis (correlation = {correlation}), students are recommended to attend at least {recommendedAttendance} lectures to increase their chances of success.";
+            }
+            else
+            {
+                ViewBag.Recommendation = "No strong correlation found between attendance and grades, No strict attendance recommendation can be made based on current data.";
+            }
             return View(students);
+        }
+        public async Task<IActionResult> AttendanceBySubject(int subjectId)
+        {
+            var attendence = await attendanceRecordRepository.GetAttendanceBySubjectIdAsync(subjectId);
+            var lectureMap = attendanceRecordRepository.GetLectureNumbersBySubject(subjectId);
+
+            ViewBag.DateToLectureMap = lectureMap;
+            ViewBag.SubjectName = subjectRepository.GetName(subjectId);
+            return View(attendence.OrderBy(a => a.AttendanceDate).ToList());
         }
         private void UpdateAcademicRecords(int studentId)
         {
