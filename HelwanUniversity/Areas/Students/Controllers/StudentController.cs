@@ -142,5 +142,11 @@ namespace HelwanUniversity.Areas.Students.Controllers
                 return View("ChangePicture", ModelVM);
             }
         }
+        [HttpGet]
+        public IActionResult Chat()
+        {
+            return View();
+        }
+
     }
 }
