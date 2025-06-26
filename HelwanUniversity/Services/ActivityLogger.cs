@@ -18,7 +18,7 @@ namespace HelwanUniversity.Services
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly string _cohereApiKey = "H19269cuq3GmYmO4BFNNSHloB1bc1k3lrzwNiw1P";
+        private readonly string _cohereApiKey = "B5nTdX6QePyPYKiIUuEWVTIHglW0ULa1sWPkNzPG";
         private readonly IMemoryCache _cache;
 
 
@@ -49,7 +49,8 @@ namespace HelwanUniversity.Services
                 ActionDate = DateTime.Now,
                 UserRole = userRole,
                 IPAddress = ip,
-                UserAgent = agent
+                UserAgent = agent,
+                Category = AnalyzeDescriptionAsync(description).Result
             };
             _context.ActivityLogs.Add(log);
             _context.SaveChanges();
@@ -128,18 +129,18 @@ namespace HelwanUniversity.Services
         public async Task<Dictionary<string, int>> GetCategoryCountsAsync()
         {
             var counts = new Dictionary<string, int>
-            {
-                { "Security Threat", 0 },
-                { "System Issue", 0 },
-                { "Sensitive Activity", 0 },
-                { "Normal Activity", 0 }
-            };
+        {
+             { "Security Threat", 0 },
+             { "System Issue", 0 },
+             { "Sensitive Activity", 0 },
+             { "Normal Activity", 0 }
+        };
 
             var logs = _context.ActivityLogs.ToList();
 
             foreach (var log in logs)
             {
-                var category = await AnalyzeDescriptionAsync(log.Description);
+                var category = log.Category ?? "Unknown";
 
                 if (counts.ContainsKey(category))
                 {

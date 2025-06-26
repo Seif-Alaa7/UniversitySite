@@ -65,7 +65,6 @@ namespace Data.Repository
                             .Where(ar => ar.SubjectId == subjectId)
                             .Include(ar => ar.Student)
                             .Include(ar => ar.Subject)
-                            .Include(ar => ar.Doctor)
                             .ToListAsync();
         }
 
@@ -105,7 +104,7 @@ namespace Data.Repository
                 lectureCounter++;
             }
 
-            return dateToLectureMap;
+            return dateToLectureMap ?? new Dictionary<DateTime, int>();
         }
         public Dictionary<int, int> GetAttendanceCount(int subjectId)
         {

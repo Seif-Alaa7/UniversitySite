@@ -378,6 +378,7 @@ namespace HelwanUniversity.Areas.Doctors.Controllers
 
             ViewBag.DateToLectureMap = lectureMap;
             ViewBag.SubjectName = subjectRepository.GetName(subjectId);
+
             return View(attendence.OrderBy(a => a.AttendanceDate).ToList());
         }
         private void UpdateAcademicRecords(int studentId)

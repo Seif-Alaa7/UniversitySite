@@ -21,13 +21,14 @@ namespace HelwanUniversity.Areas.Admin.Controllers
         private readonly IDoctorRepository doctorRepository;
         private readonly IHighBoardRepository highBoardRepository;
         private readonly IDepartmentRepository departmentRepository;
-        private readonly IFacultyRepository facultyRepository;  
+        private readonly IFacultyRepository facultyRepository;
+        private readonly IAttendanceRecordRepository attendanceRecordRepository;
         private readonly IActivityLogger _logger;
 
         public StudentSubjectsController(IStudentSubjectsRepository studentSubjectsRepository,
             IAcademicRecordsRepository academicRecordsRepository, ISubjectRepository subjectRepository, IStudentRepository studentRepository,
             IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository,IActivityLogger logger, IHighBoardRepository highBoardRepository
-            ,IFacultyRepository facultyRepository)
+            ,IFacultyRepository facultyRepository,IAttendanceRecordRepository attendanceRecordRepository)
         {
             this.studentSubjectsRepository = studentSubjectsRepository;
             this.academicRecordsRepository = academicRecordsRepository;
@@ -38,6 +39,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             this._logger = logger;
             this.facultyRepository = facultyRepository;
             this.highBoardRepository = highBoardRepository;
+            this.attendanceRecordRepository = attendanceRecordRepository;
         }
         public IActionResult Index()
         {
@@ -279,7 +281,15 @@ namespace HelwanUniversity.Areas.Admin.Controllers
 
             return RedirectToAction("Index", "Student");
         }
+        public async Task<IActionResult> AttendanceBySubject(int subjectId)
+        {
+            var attendence = await attendanceRecordRepository.GetAttendanceBySubjectIdAsync(subjectId);
+            var lectureMap = attendanceRecordRepository.GetLectureNumbersBySubject(subjectId);
 
+            ViewBag.DateToLectureMap = lectureMap;
+            ViewBag.SubjectName = subjectRepository.GetName(subjectId);
+            return View(attendence.OrderBy(a => a.AttendanceDate).ToList());
+        }
 
         private void UpdateAcademicRecords(int studentId)
         {
