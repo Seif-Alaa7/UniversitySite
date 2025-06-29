@@ -1,304 +1,270 @@
-const SubId = window.subjectId;
+const subjectId = window.subjectId;
 
-//fetching the data
-async function fetchData() {
-  try {
-    const response = await fetch(`/Doctors/Subject/GetGrades?SubjectId=${SubId}`); 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+// === Constants ===
+const GRADE_DATA = {
+    labels: ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F'],
+    colors: [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(201, 130, 207, 0.6)',
+        'rgba(99, 99, 99, 0.6)'
+    ],
+    get borderColors() {
+        return this.colors.map(c => c.replace('0.6', '1'));
     }
-    const data = await response.json();
-    console.log(data)
-    return data
-    
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
-//toggle chart Start
-function toggleFullWidth(chartElement) {
-  const chartBox = chartElement.closest('.chartBox1, .chartBox2, .chartBox3, .chartBox4');
-  if (chartBox) {
-      chartBox.classList.toggle('full-width');
-  }
-}
-
-document.querySelectorAll('canvas').forEach(canvas => {
-  canvas.addEventListener('click', function() {
-      toggleFullWidth(this);
-  });
-});
-//Charting the data 
-// setup 
-const data = {
-  labels: [],
-  datasets: [{
-    label: 'no. of students achive that grade ',
-    data: [],
-    backgroundColor: [
-      'rgba(255, 26, 104, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(255, 26, 104, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-    ],
-    borderColor: [
-      'rgba(255, 26, 104, 1)',
-      'rgba(54, 162, 235, 1)',
-    ],
-    borderWidth: 1
-  }]
 };
 
-// config 
-const config = {
-  type: 'bar',
-  data,
-  options: {
-    plugins: {
-    legend: {
-        display: false,
-        
-    }
-},
-      scales: {
-          y: {
-              beginAtZero: true,
-              ticks: {
-                  stepSize: 1, 
-                  callback: function(value) {
-                      if (Number.isInteger(value)) {
-                          return value; 
-                      }
-                      return null; 
-                  }
-              }
-          }
-      }
-  }
-};
-
-
-// render init block
-const myChart = new Chart(
-  document.getElementById('NoOfStudentsPerGrade'),
-  config
+const HISTOGRAM_RANGES = Array.from({ length: 10 }, (_, i) =>
+    i === 9 ? '90-100' : `${i * 10}-${i * 10 + 9}`
 );
 
-//Charting the data 
-// setup 
-const dataHistogram = {
-  labels: [],
-  datasets: [{
-    label: 'no. of students achive that degree ',
-    data: [],
-    backgroundColor: [
-      'rgba(54, 162, 235, 0.8)'
-    ],
-    borderColor: [
-      'rgba(0,0,0,1)'
-    ],
-    borderWidth: 1,
-    barPercentage:1,
-    categoryPercentage:1
-  },
-
-]
+// === DOM Elements ===
+const elements = {
+    gradeChart: document.getElementById('NoOfStudentsPerGrade'),
+    histogramChart: document.getElementById('histogramChart'),
+    topTableBody: document.querySelector('#topStudentsTable tbody'),
+    bottomTableBody: document.querySelector('#bottomStudentsTable tbody'),
+    topStudentsChart: document.getElementById('topStudentsChart'),
+    bottomStudentsChart: document.getElementById('bottomStudentsChart'),
+    topTableWrapper: document.getElementById('topStudentsTableWrapper'),
+    bottomTableWrapper: document.getElementById('bottomStudentsTableWrapper'),
+    topCountInput: document.getElementById('topCount'),
+    bottomCountInput: document.getElementById('bottomCount'),
+    chartContainers: document.querySelectorAll('.chartBox1, .chartBox2, .chartBox3, .chartBox4')
 };
 
-// config 
-const configHistogram = {
-  type: 'bar',
-  data:dataHistogram,
-  options: {
-    plugins: {
-      legend: {
-          display: false,
-          
-      }
-  },
-      scales: {
-          y: {
-              beginAtZero: true,
-              ticks: {
-                  stepSize: 1, 
-                  callback: function(value) {
-                      if (Number.isInteger(value)) {
-                          return value; 
-                      }
-                      return null; 
-                  }
-              }
-          }
-      }
-  }
+// === Chart Instances ===
+let topChart, bottomChart;
+
+// === Utility Functions ===
+const toggleFullWidth = element =>
+    element.closest('.chartBox1, .chartBox2, .chartBox3, .chartBox4')?.classList.toggle('full-width');
+
+const handleChartClick = ({ currentTarget }) => toggleFullWidth(currentTarget);
+
+const formatDegree = degree => parseFloat(degree).toFixed(2);
+
+// === Data Fetching ===
+const fetchGradeData = async () => {
+    try {
+        const response = await fetch(`/Doctors/Subject/GetGrades?SubjectId=${subjectId}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+    } catch (err) {
+        console.error('❌ Error fetching data:', err);
+        return [];
+    }
 };
 
-
-// render init block
-const myChartHistogram = new Chart(
-  document.getElementById('histogramChart'),
-  configHistogram
-);
-
-//Fetching the data and updating the charts
-fetchData().then(data => {
-  const gradesArray = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F'];
-  const scores=[] //I will push the degrees here
-  // Count occurrences of each grade
-  const gradeCount = {};
-  data.forEach(index => {
-      gradeCount[index.grade] = (gradeCount[index.grade] || 0) + 1;
-  });
-//Charting the data 
-// setup 
-const Top10data = {
-  labels: [],
-  datasets: [{
-    label: 'Top 10 Students',
-    data: [],
-    backgroundColor: [
-      'rgba(255, 26, 104, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(255, 26, 104, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-    ],
-    borderColor: [
-      'rgba(255, 26, 104, 1)',
-      'rgba(54, 162, 235, 1)',
-    ],
-    borderWidth: 1
-  }]
-};
-
-// config 
-const configTop10 = {
-  type: 'bar',
-  data: Top10data,
-  options: {
-    indexAxis: 'y', // Horizontal bar chart
-    plugins: {
-      legend: {
-        display: false,
-      }
+// === Chart Setup ===
+const createChartConfig = (type, labels, datasetConfig, chartTitle, xAxisLabel, yAxisLabel) => ({
+    type,
+    data: {
+        labels,
+        datasets: [Object.assign({}, datasetConfig, { borderWidth: 1 })]
     },
-    scales: {
-      x: { // Keep 'x' for scores
-        beginAtZero: true
-      },
-      y: { // Ensure student names appear
-        ticks: {
-          autoSkip: false, // Prevent skipping names
+    options: {
+        plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: chartTitle,
+                font: { size: 16, weight: 'bold' },
+                padding: { top: 10, bottom: 20 }
+            }
+        },
+        scales: {
+            x: {
+                title: { display: true, text: xAxisLabel, font: { weight: 'bold' } }
+            },
+            y: {
+                beginAtZero: true,
+                title: { display: true, text: yAxisLabel, font: { weight: 'bold' } },
+                ticks: {
+                    stepSize: 1,
+                    callback: value => Number.isInteger(value) ? value : null
+                }
+            }
         }
-      }
     }
-  }
-};
-
-
-// render init block
-const myChartTop10 = new Chart(
-  document.getElementById('Top10'),
-  configTop10
-);//Charting the data 
-// setup 
-const Bottom10Data = {
-  labels: [],
-  datasets: [{
-    label: 'Bottom10 Students',
-    data: [],
-    backgroundColor: [
-      'rgba(255, 26, 104, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(255, 26, 104, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-    ],
-    borderColor: [
-      'rgba(255, 26, 104, 1)',
-      'rgba(54, 162, 235, 1)',
-    ],
-    borderWidth: 1
-  }]
-};
-
-// config 
-const configBottom10 = {
-  type: 'bar',
-  data: Bottom10Data,
-  options: {
-    indexAxis: 'y', // Horizontal bar chart
-    plugins: {
-      legend: {
-        display: false,
-      }
-    },
-    scales: {
-      x: { 
-        beginAtZero: true
-      },
-      y: { 
-        ticks: {
-          autoSkip: false, // Prevent skipping names
-        }
-      }
-    }
-  }
-};
-
-// render init block
-const myChartBottom10 = new Chart(
-  document.getElementById('Bottom10'),
-  configBottom10 
-);
-  
-  const grades = [];
-  const grades2 = [];
-  gradesArray.forEach((grade, i) => {
-      if (gradeCount[i] !== undefined) { 
-          grades.push(grade); 
-          grades2.push(gradeCount[i]); 
-      }
-  });
-  //barchart for the grade End
-
-  //histogram Start
-  const degreeCounts = Array(10).fill(0); 
-      data.forEach(item => {
-        const degree = item.degree;
-        const index = Math.floor(degree / 10); 
-        if (index < 10) {
-          degreeCounts[index]++;
-        }
-      });
-//histogram End
-
-//Top10 Students Start
-data.sort((a, b) => b.degree - a.degree);
-let Top10Names = data.slice(0,3).map(student => student.studentName);
-let Top10Degrees = data.slice(0,3).map(student => student.degree);
-
-//Top10 Students End
-
-//bottom10 Students Start
-let Bottom10Names = data.slice(-3).map(student => student.studentName);
-let Bottom10Degrees = data.slice(-3).map(student => student.degree);
-
-
-
-
-  //setting the data
-  myChart.config.data.labels = grades;
-  myChart.data.datasets[0].data = grades2;
-  myChartHistogram.config.data.labels = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-100'];
-  myChartHistogram.data.datasets[0].data = degreeCounts;
-  myChartTop10.config.data.labels =Top10Names
-  myChartTop10.data.datasets[0].data =Top10Degrees
-  myChartBottom10.config.data.labels =Bottom10Names
-  myChartBottom10.data.datasets[0].data =Bottom10Degrees
-  
-  // Update the charts
-  myChart.update();
-  myChartHistogram.update();
-  myChartTop10.update();
-  myChartBottom10.update();
 });
 
+// === Chart Initialization ===
+const gradeChart = new Chart(elements.gradeChart, createChartConfig(
+    'bar',
+    GRADE_DATA.labels,
+    {
+        label: 'No. of students who achieved that grade',
+        backgroundColor: GRADE_DATA.colors,
+        borderColor: GRADE_DATA.borderColors
+    },
+    'Grade Distribution',
+    'Grades',
+    'Number of Students'
+));
+
+const histogramChart = new Chart(elements.histogramChart, createChartConfig(
+    'bar',
+    HISTOGRAM_RANGES,
+    {
+        label: 'No. of students who achieved that degree',
+        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+        borderColor: 'rgba(0, 0, 0, 1)',
+        barPercentage: 1,
+        categoryPercentage: 1
+    },
+    'Histogram of Student Degrees',
+    'Degree Range',
+    'Number of Students'
+));
+
+// === Data Processing ===
+const processGradeData = data => {
+    const counts = Array(GRADE_DATA.labels.length).fill(0);
+    data.forEach(({ grade }) => {
+        const i = parseInt(grade) - 1;
+        if (i >= 0 && i < counts.length) counts[i]++;
+    });
+    return counts;
+};
+
+const processHistogramData = data => {
+    const counts = Array(10).fill(0);
+    data.forEach(({ degree }) => {
+        const d = parseFloat(degree);
+        if (!isNaN(d)) {
+            const i = Math.min(Math.floor(d / 10), 9);
+            counts[i]++;
+        }
+    });
+    return counts;
+};
+
+// === Render Table and Bar Chart ===
+const renderStudentTable = (tbody, students, isTop = true) => {
+    tbody.innerHTML = students.map((s, i) => `
+        <tr>
+            <td>${isTop ? i + 1 : students.length - i}</td>
+            <td>${s.studentName}</td>
+            <td>${formatDegree(s.degree)}</td>
+        </tr>
+    `).join('');
+};
+
+const renderBarChart = (canvas, students, title) => {
+    const names = students.map(s => s.studentName);
+    const degrees = students.map(s => parseFloat(s.degree));
+    return new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: names,
+            datasets: [{
+                label: title,
+                data: degrees,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: title,
+                    font: { size: 16, weight: 'bold' },
+                    padding: { top: 10, bottom: 20 }
+                }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Student Name', font: { weight: 'bold' } } },
+                y: { beginAtZero: true, title: { display: true, text: 'Degree', font: { weight: 'bold' } } }
+            }
+        }
+    });
+};
+
+// === Render Dynamic Charts ===
+const renderTopBottom = (data, topCount, bottomCount) => {
+    const sorted = [...data].sort((a, b) => b.degree - a.degree);
+    const top = sorted.slice(0, topCount);
+    const bottom = sorted.slice(-bottomCount).reverse();
+
+    renderStudentTable(elements.topTableBody, top, true);
+    renderStudentTable(elements.bottomTableBody, bottom, false);
+
+    if (topChart) topChart.destroy();
+    if (bottomChart) bottomChart.destroy();
+
+    topChart = renderBarChart(elements.topStudentsChart, top, `Top ${topCount} Student Degrees`);
+    bottomChart = renderBarChart(elements.bottomStudentsChart, bottom, `Bottom ${bottomCount} Student Degrees`);
+};
+
+// === View Toggling ===
+function toggleView(type, view) {
+    const tableWrapper = elements[`${type}TableWrapper`];
+    const chart = elements[`${type}StudentsChart`];
+    if (view === 'table') {
+        tableWrapper.style.display = 'block';
+        chart.style.display = 'none';
+    } else {
+        tableWrapper.style.display = 'none';
+        chart.style.display = 'block';
+    }
+}
+
+// === Main Init ===
+const initialize = async () => {
+  elements.chartContainers.forEach(container => {
+    container.addEventListener('click', function (e) {
+        if (
+            e.target.closest('input') ||
+            e.target.closest('label') ||
+            e.target.closest('select') ||
+            e.target.closest('textarea') ||
+            e.target.closest('button')
+        ) return;
+
+        toggleFullWidth(container);
+    });
+});
+
+    const data = await fetchGradeData();
+    if (!Array.isArray(data)) return;
+
+    gradeChart.data.datasets[0].data = processGradeData(data);
+    gradeChart.update();
+
+    histogramChart.data.datasets[0].data = processHistogramData(data);
+    histogramChart.update();
+
+    // Initial render
+    let topCount = parseInt(elements.topCountInput.value) || 10;
+    let bottomCount = parseInt(elements.bottomCountInput.value) || 10;
+    renderTopBottom(data, topCount, bottomCount);
+
+    // Input event listeners
+    elements.topCountInput.addEventListener('input', () => {
+        topCount = parseInt(elements.topCountInput.value) || 1;
+        renderTopBottom(data, topCount, bottomCount);
+    });
+
+    elements.bottomCountInput.addEventListener('input', () => {
+        bottomCount = parseInt(elements.bottomCountInput.value) || 1;
+        renderTopBottom(data, topCount, bottomCount);
+    });
+
+    // View radio buttons
+    document.querySelectorAll('input[name="topView"]').forEach(radio => {
+        radio.addEventListener('change', () => toggleView('top', radio.value));
+    });
+    document.querySelectorAll('input[name="bottomView"]').forEach(radio => {
+        radio.addEventListener('change', () => toggleView('bottom', radio.value));
+    });
+};
+
+initialize();

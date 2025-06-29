@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    ViewData["Title"] = "Charts";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,29 +11,65 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-    <title>Charts</title>
+    <title>@ViewData["Title"]</title>
 </head>
 <body>
-
     <div class="maincontainer">
+        <!-- Grade Chart -->
         <div class="chartBox1">
-            <p>No. Of Students Per Grade</p>
             <canvas id="NoOfStudentsPerGrade"></canvas>
         </div>
+
+        <!-- Histogram Chart -->
         <div class="chartBox2">
-            <p>no. of students achive that degree</p>
             <canvas id="histogramChart"></canvas>
         </div>
-        <div class="chartBox3">
-            <p>Top 10 Students</p>
-            <canvas id="Top10"></canvas>
+
+        <!-- Top Students -->
+        <div class="chartBox3 table-container">
+            <div>
+                <label><input type="radio" name="topView" value="table" checked> Table</label>
+                <label><input type="radio" name="topView" value="chart"> Chart</label>
+                <label>Show:
+                    <input type="number" id="topCount" min="1" max="100" value="10" style="width: 60px;" />
+                    students
+                </label>
+            </div>
+            <div id="topStudentsTableWrapper">
+                <table id="topStudentsTable">
+                    <thead>
+                        <tr><th>Rank</th><th>Student Name</th><th>Degree</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <canvas id="topStudentsChart" style="display:none; max-height: 300px;"></canvas>
         </div>
-        <div class="chartBox4">
-            <p>Bottom 10 Students</p>
-            <canvas id="Bottom10"></canvas>
+
+        <!-- Bottom Students -->
+        <div class="chartBox4 table-container">
+            <div>
+                <label><input type="radio" name="bottomView" value="table" checked> Table</label>
+                <label><input type="radio" name="bottomView" value="chart"> Chart</label>
+                <label>Show:
+                    <input type="number" id="bottomCount" min="1" max="100" value="10" style="width: 60px;" />
+                    students
+                </label>
+            </div>
+            <div id="bottomStudentsTableWrapper">
+                <table id="bottomStudentsTable">
+                    <thead>
+                        <tr><th>Rank</th><th>Student Name</th><th>Degree</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <canvas id="bottomStudentsChart" style="display:none; max-height: 300px;"></canvas>
         </div>
+
         <div class="full-width"></div>
     </div>
+
     <script>
         window.subjectId = @ViewBag.SubjectId;
     </script>
