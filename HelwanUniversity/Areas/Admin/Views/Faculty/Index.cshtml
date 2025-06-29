@@ -4,7 +4,7 @@
 @inject IHighBoardRepository highboardRepository
 
 @{
-    ViewData["Title"] = "Faculities";
+    ViewData["Title"] = "Faculties";
 
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     var admin = highboardRepository.GetAll().FirstOrDefault(h => h.ApplicationUserId == userId);
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/css/Faculty.css">
 
 <div class="container">
-    <h2 class="text-CENTER my-4">Faculties</h2>
+    <h1 class="text-CENTER my-4">Faculties</h1>
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success">

@@ -19,5 +19,8 @@ namespace Data.Repository.IRepository
         Task<IEnumerable<AttendanceRecord>> GetAttendanceBySubjectIdAsync(int subjectId);
         Task<IEnumerable<AttendanceRecord>> GetAttendanceForCourseOnDateAsync(int subjectId, DateTime date);
         Task<bool> HasStudentAttendedSubjectOnDateAsync(int studentId, int subjectId, DateTime date);
+        Dictionary<DateTime, int> GetLectureNumbersBySubject(int subjectId);
+        Dictionary<int, int> GetAttendanceCount(int subjectId);
+        public (int recommendedAttendance, double correlation) RecommendAttendanceBasedOnAnalysis(int subjectId);
     }
 }

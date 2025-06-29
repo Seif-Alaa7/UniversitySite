@@ -30,7 +30,7 @@
         {
             <img src="@Model.Logo" class="faculty-logo" alt="Logo">
         }
-        <h2 class="text-CENTER">@Model.Name Faculty</h2>
+        <h2 class="text-CENTER">@ViewData["Title"]</h2>
         <div class="faculty-detail mt-4">
             <div class="faculty-image-wrapper">
                 @if (!string.IsNullOrEmpty(Model.Picture))

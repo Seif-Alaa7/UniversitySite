@@ -51,7 +51,7 @@ namespace HelwanUniversity.Areas.Admin.Controllers
             ViewData["LogoTitle"] = Images[0].File;
             ViewData["Images"] = Images;
             ViewData["Mail"] = $"mailto:{UNI.ContactMail}";
-            ViewData["President"]= Hboards.FirstOrDefault(a=>a.JobTitle == Models.Enums.JobTitle.President);
+            ViewData["President"] = Hboards.FirstOrDefault(a => a.JobTitle == Models.Enums.JobTitle.President);
             ViewData["VicePresidents"]= Hboards.Where(a=>a.JobTitle == Models.Enums.JobTitle.VicePrecident).ToList();
             ViewData["VPAcademicAffairs"] = Hboards.FirstOrDefault(a => a.JobTitle == Models.Enums.JobTitle.VP_For_AcademicAffairs);
 

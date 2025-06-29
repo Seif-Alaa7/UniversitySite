@@ -1,7 +1,7 @@
 ﻿@model Faculty
 
 @{
-    ViewData["Title"] = $"{Model.Name} Faculty";
+    ViewData["Title"] = $"Faculty of {Model.Name}";
     Layout = null;
 }
 
@@ -26,7 +26,7 @@
             {
                 <img src="@Model.Logo" class="faculty-logo" alt="Logo">
             }
-            <h2 class="text-center">@Model.Name Faculty</h2>
+            <h2 class="text-CENTER">@ViewData["Title"]</h2>
             <div class="faculty-detail mt-4">
                 <div class="faculty-image-wrapper">
                     @if (!string.IsNullOrEmpty(Model.Picture))

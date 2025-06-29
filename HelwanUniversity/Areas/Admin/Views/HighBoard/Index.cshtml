@@ -8,67 +8,82 @@
 <h1 class="text-center" style="font-size: 80px;">@ViewData["Title"]</h1>
 <br />
 <div class="container">
-    <div class="box president-box">
-        <div class="imgBox">
-            <img src="@ViewBag.President.Picture" alt="@ViewBag.President.Name">
-        </div>
-        <div class="content">
-            <h2 class="name">@ViewBag.President.Name</h2>
-            <h3 class="job-title">President</h3>
-            <p class="description">@ViewBag.President.Description</p>
-            <div class="actions">
-                <a href="@Url.Action("Edit", "Highboard", new { id = @ViewBag.President.Id })" class="action-link text-decoration-none mx-1">
-                    <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/create-new--v2.png" alt="Edit" />
-                </a>
-                <form asp-action="Delete" asp-route-id="@ViewBag.President.Id" method="post" style="display: inline;" class="mx-1 delete-form">
-                    @Html.AntiForgeryToken()
-                    <img src="https://img.icons8.com/pastel-glyph/64/1A1A1A/trash.png"
-                         alt="trash"
-                         width="20"
-                         height="20"
-                         class="delete-btn"
-                         style="cursor: pointer;" />
-                </form>
+    @if (ViewBag.President != null)
+    {
+        <div class="box president-box">
+            <div class="imgBox">
+                <img src="@ViewBag.President.Picture" alt="@ViewBag.President.Name">
+            </div>
+            <div class="content">
+                <h2 class="name">@ViewBag.President.Name</h2>
+                <h3 class="job-title">President</h3>
+                <p class="description">@ViewBag.President.Description</p>
+                <div class="actions">
+                    <a href="@Url.Action("Edit", "Highboard", new { id = @ViewBag.President.Id })" class="action-link text-decoration-none mx-1">
+                        <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/create-new--v2.png" alt="Edit" />
+                    </a>
+                    <form asp-action="Delete" asp-route-id="@ViewBag.President.Id" method="post" style="display: inline;" class="mx-1 delete-form">
+                        @Html.AntiForgeryToken()
+                        <img src="https://img.icons8.com/pastel-glyph/64/1A1A1A/trash.png"
+                             alt="trash"
+                             width="20"
+                             height="20"
+                             class="delete-btn"
+                             style="cursor: pointer;" />
+                    </form>
+                </div>
             </div>
         </div>
+    }
     </div>
 
+@if (Model != null)
+{
     <div class="vice-presidents">
         @foreach (var item in Model.Where(i => i.JobTitle == Models.Enums.JobTitle.VicePrecident))
         {
-            <div class="box">
-                <div class="imgBox">
-                    <img src="@item.Picture" alt="@item.Name">
-                </div>
-                <div class="content">
-                    <h2 class="name">@item.Name</h2>
-                    <h3 class="job-title">@item.JobTitle</h3>
-                    <p class="description">@item.Description</p>
-                    <div class="actions">
-                        <a href="@Url.Action("Edit", "Highboard", new { id = @item.Id })" class="action-link text-decoration-none mx-1">
-                            <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/create-new--v2.png" alt="Edit" />
-                        </a>
-                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: inline;" class="mx-1 delete-form">
-                            @Html.AntiForgeryToken()
-                            <img src="https://img.icons8.com/pastel-glyph/64/1A1A1A/trash.png"
-                                 alt="trash"
-                                 width="20"
-                                 height="20"
-                                 class="delete-btn"
-                                 style="cursor: pointer;" />
-                        </form>
+            if (item != null)
+            {
+                <div class="box">
+                    <div class="imgBox">
+                        <img src="@item.Picture" alt="@item.Name">
+                    </div>
+                    <div class="content">
+                        <h2 class="name">@item.Name</h2>
+                        <h3 class="job-title">@item.JobTitle</h3>
+                        <p class="description">@item.Description</p>
+                        <div class="actions">
+                            <a href="@Url.Action("Edit", "Highboard", new { id = @item.Id })" class="action-link text-decoration-none mx-1">
+                                <img width="20" height="20" src="https://img.icons8.com/pastel-glyph/64/1A1A1A/create-new--v2.png" alt="Edit" />
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display: inline;" class="mx-1 delete-form">
+                                @Html.AntiForgeryToken()
+                                <img src="https://img.icons8.com/pastel-glyph/64/1A1A1A/trash.png"
+                                     alt="trash"
+                                     width="20"
+                                     height="20"
+                                     class="delete-btn"
+                                     style="cursor: pointer;" />
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         }
     </div>
+}
 
+@if (Model != null)
+{
     <div class="other-positions">
         @foreach (var item in Model)
         {
-            if (item.JobTitle != Models.Enums.JobTitle.HeadOfDepartment && item.JobTitle != Models.Enums.JobTitle.Doctor &&
-            item.JobTitle != Models.Enums.JobTitle.DeanOfFaculty && item.JobTitle != Models.Enums.JobTitle.Prof_Doctor &&
-            item.JobTitle != Models.Enums.JobTitle.President && item.JobTitle != Models.Enums.JobTitle.VicePrecident)
+            if (item != null && item.JobTitle != Models.Enums.JobTitle.HeadOfDepartment &&
+            item.JobTitle != Models.Enums.JobTitle.Doctor &&
+            item.JobTitle != Models.Enums.JobTitle.DeanOfFaculty &&
+            item.JobTitle != Models.Enums.JobTitle.Prof_Doctor &&
+            item.JobTitle != Models.Enums.JobTitle.President &&
+            item.JobTitle != Models.Enums.JobTitle.VicePrecident)
             {
                 <div class="box">
                     <div class="imgBox">
@@ -97,6 +112,7 @@
             }
         }
     </div>
+}
 </div>
 <!-- SweetAlert2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
